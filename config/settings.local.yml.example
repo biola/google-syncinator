@@ -1,0 +1,13 @@
+sentry:
+  url:
+
+trogdir:
+  access_id:
+  secret_key:
+
+google:
+  api_client:
+    key_path: # set in settings.local.yml
+    secret: # set in settings.local.yml
+    issuer: # set in settings.local.yml
+    person: # set in settings.local.yml

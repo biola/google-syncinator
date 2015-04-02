@@ -1,0 +1,29 @@
+redis:
+  url: "redis://localhost:6379/0"
+
+sentry:
+  url: # set in settings.local.yml
+
+google:
+  domain: biola.edu
+  api_client:
+    application_name: google-syncinator
+    application_version: '0.1.0'
+    key_path: # set in settings.local.yml
+    secret: # set in settings.local.yml
+    scopes:
+      - "https://www.googleapis.com/auth/admin.directory.user"
+      - "https://www.googleapis.com/auth/admin.directory.group"
+      - "https://www.googleapis.com/auth/admin.directory.group.member"
+    issuer: # set in settings.local.yml
+    person: # set in settings.local.yml
+
+trogdir:
+  scheme: http
+  host: trogdir-api.dev
+  port:
+  script_name:
+  version: v1
+  access_id: # set in settings.local.yml
+  secret_key: # set in settings.local.yml
+  api_timeout: 300 # 5 min

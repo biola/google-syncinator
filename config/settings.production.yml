@@ -1,0 +1,9 @@
+redis:
+  url: "redis://redis1.prod.biola.edu:6379/0"
+
+trogdir:
+  scheme: https
+  host: api.biola.edu
+  port: 443
+  script_name: directory
+  version: v1
