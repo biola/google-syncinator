@@ -1,3 +1,6 @@
+google:
+  domain: example.com
+
 trogdir:
   access_id: 1000000000000000000
   secret_key: h3VpTrPDx2VWVJCilCFTDNKPCBJgbDZbfjj6I1+3Baf5KA5HMrCoEqTYriBIT+dXk/7LkryXNe4oeAZBV1XhRg==

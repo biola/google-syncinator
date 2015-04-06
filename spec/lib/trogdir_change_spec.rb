@@ -1,0 +1,122 @@
+require 'spec_helper'
+
+describe TrogdirChange do
+  let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+  subject { TrogdirChange.new(hash) }
+
+  describe '#sync_log_id' do
+    it { expect(subject.sync_log_id).to eql '000000000000000000000000'}
+  end
+
+  describe '#person_uuid' do
+    it { expect(subject.person_uuid).to eql '00000000-0000-0000-0000-000000000000'}
+  end
+
+  describe '#preferred_name' do
+    it { expect(subject.preferred_name).to eql 'Bob'}
+  end
+
+  describe '#first_name' do
+    it { expect(subject.first_name).to eql 'Robert'}
+  end
+
+  describe '#middle_name' do
+    it { expect(subject.middle_name).to eql 'Joseph'}
+  end
+
+  describe '#last_name' do
+    it { expect(subject.last_name).to eql 'Dole'}
+  end
+
+  describe '#title' do
+    it { expect(subject.title).to eql 'Commander in Chief'}
+  end
+
+  describe '#department' do
+    it { expect(subject.department).to eql 'Office of the President'}
+  end
+
+  describe '#affiliations' do
+    it { expect(subject.affiliations).to eql ['employee']}
+  end
+
+  describe '#privacy' do
+    it { expect(subject.privacy).to eql false}
+  end
+
+  describe '#university_email_exists?' do
+    context 'with a university email' do
+      it { expect(subject.university_email_exists?).to be true }
+    end
+
+    context 'without a university email' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user_without_university_email.json')) }
+
+      it { expect(subject.university_email_exists?).to be false }
+    end
+  end
+
+  describe '#affiliation_added?' do
+    context 'when creating a person with affiliations' do
+      it { expect(subject.affiliation_added?).to be true }
+    end
+
+    context 'when creating an id' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_id.json')) }
+
+      it { expect(subject.affiliation_added?).to be false }
+    end
+
+    context 'when updating a person but not changing affiliations' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person.json')) }
+
+      it { expect(subject.affiliation_added?).to be false }
+    end
+  end
+
+  describe '#university_email_added?' do
+    context 'when creating a university email' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_email.json')) }
+
+      it { expect(subject.university_email_added?).to be true }
+    end
+
+    context 'when creating a personal email' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_personal_email.json')) }
+
+      it { expect(subject.university_email_added?).to be false }
+    end
+  end
+
+  describe '#account_info_updated?' do
+    context 'when changing name' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person_name.json')) }
+
+      it { expect(subject.account_info_updated?).to be true }
+    end
+
+    context 'when changing work_info' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person.json')) }
+
+      it { expect(subject.account_info_updated?).to be true }
+    end
+
+    context 'when changing privacy' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person_privacy.json')) }
+
+      it { expect(subject.account_info_updated?).to be true }
+    end
+
+    context 'when creating an id' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_id.json')) }
+
+      it { expect(subject.account_info_updated?).to be false }
+    end
+
+    context 'when changing partial_ssn' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person_ssn.json')) }
+
+      it { expect(subject.account_info_updated?).to be false }
+    end
+  end
+end
