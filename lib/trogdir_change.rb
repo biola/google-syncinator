@@ -28,8 +28,20 @@ class TrogdirChange
     all_attrs['last_name']
   end
 
+  def title
+    all_attrs['title']
+  end
+
+  def department
+    all_attrs['department']
+  end
+
   def affiliations
     all_attrs['affiliations']
+  end
+
+  def privacy
+    all_attrs['privacy']
   end
 
   def university_email_exists?
@@ -38,6 +50,14 @@ class TrogdirChange
 
   def affiliation_added?
     person? && (create? || update?) && affiliations_changed?
+  end
+
+  def university_email_added?
+    # TODO
+  end
+
+  def account_info_updated?
+    person? && (create? || update?) && (name_changed? || work_changed? || privacy_changed?)
   end
 
   private
@@ -56,6 +76,18 @@ class TrogdirChange
 
   def affiliations_changed?
     modified.has_key?('affiliations')
+  end
+
+  def name_changed?
+    modified.has_key?('first_name') || modified.has_key?('last_name')
+  end
+
+  def work_changed?
+    modified.has_key?('department') || modified.has_key?('title')
+  end
+
+  def privacy_changed?
+    modified.has_key? 'privacy'
   end
 
   def all_attrs

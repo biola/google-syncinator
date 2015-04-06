@@ -1,5 +1,5 @@
 module Workers
-  class AssignEmailAddresses
+  class TrogdirChangeListener
     include Sidekiq::Worker
     include Sidetiq::Schedulable
 
@@ -21,17 +21,30 @@ module Workers
       # Keep processing batches until we run out
       if changes.any?
         changes.each do |change|
+          skipped = true
+
           if change.affiliation_added? && !change.university_email_exists?
             email_options = EmailAddressOptions.new(change.affiliations, change.preferred_name, change.first_name, change.middle_name, change.last_name).to_a
 
             if email_options.any?
               AssignEmailAddress.perform_async(change.person_uuid, email_options, change.sync_log_id)
-            else
-              finish! change, :skip
+              skipped = false
             end
-          else
-            finish! change, :skip
           end
+
+          if change.university_email_added?
+            # TODO: CreateGoogleAppsAccount.perform_async()
+            skipped = false
+          end
+
+          if change.account_info_updated? && change.university_email_exists?
+            SyncGoogleAppsAccount.perform_async(change.email, change.first_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
+            skipped = false
+          end
+
+          # TODO: handle changes to email address with appropriate renaming and aliasing
+
+          finish! change, :skip if skipped
         end
 
         SyncPersonalEmails.perform_async

@@ -1,6 +1,8 @@
 class GoogleAccount
   attr_reader :email
 
+  class GoogleAppsAPIError < RuntimeError; end
+
   def initialize(email)
     @email = email
   end
@@ -19,6 +21,27 @@ class GoogleAccount
 
   def available?
     !exists?
+  end
+
+  def update!(first_name, last_name, department, title, privacy)
+    params = {
+      name: {
+        givenName: first_name,
+        familyName: last_name
+      },
+      organizations: [
+        department: department,
+        title: title
+      ],
+      includeInGlobalAddressList: !privacy
+    }
+
+    user_updates = directory.users.update.request_schema.new(params)
+
+    result = api.execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+
+    true
   end
 
   def full_email
