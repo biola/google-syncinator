@@ -1,4 +1,4 @@
-Google Syncinator
+Google Syncinator [![Build Status](https://travis-ci.org/biola/google-syncinator.svg?branch=master)](https://travis-ci.org/biola/google-syncinator)
 =================
 
 Google Syncinator creates and syncs accounts from [trogdir-api](https://github.com/biola/trogdir-api) into a Google Apps domain.
