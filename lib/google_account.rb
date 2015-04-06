@@ -23,6 +23,29 @@ class GoogleAccount
     !exists?
   end
 
+  def create!(first_name, last_name, department, title, privacy)
+    params = {
+      primaryEmail: full_email,
+      password: GoogleAccount.random_password,
+      name: {
+        familyName: last_name,
+        givenName: first_name
+      },
+      organizations: [
+        department: department,
+        title: title
+      ],
+      includeInGlobalAddressList: !privacy
+    }
+
+    new_user = directory.users.insert.request_schema.new(params)
+
+    result = api.execute api_method: directory.users.insert, body_object: new_user
+    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+
+    true
+  end
+
   def update!(first_name, last_name, department, title, privacy)
     params = {
       name: {
@@ -56,6 +79,10 @@ class GoogleAccount
     end
   end
 
+  def self.random_password
+    rand(36**rand(16..42)).to_s(36)
+  end
+
   private
 
   def api
@@ -80,6 +107,5 @@ class GoogleAccount
 
   def directory
     @directory ||= api.discovered_api('admin', 'directory_v1')
-    api.discovered_api('admin', 'directory_v1')
   end
 end

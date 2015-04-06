@@ -53,7 +53,7 @@ class TrogdirChange
   end
 
   def university_email_added?
-    # TODO
+    email? && create? && all_attrs['type'] == 'university'
   end
 
   def account_info_updated?
@@ -63,7 +63,11 @@ class TrogdirChange
   private
 
   def person?
-    scope == 'person'
+    hash['scope'] == 'person'
+  end
+
+  def email?
+    hash['scope'] == 'email'
   end
 
   def create?
@@ -75,19 +79,23 @@ class TrogdirChange
   end
 
   def affiliations_changed?
-    modified.has_key?('affiliations')
+    changed_attrs.include?('affiliations')
   end
 
   def name_changed?
-    modified.has_key?('first_name') || modified.has_key?('last_name')
+    changed_attrs.include?('preferred_name') || changed_attrs.include?('last_name')
   end
 
   def work_changed?
-    modified.has_key?('department') || modified.has_key?('title')
+    changed_attrs.include?('department') || changed_attrs.include?('title')
   end
 
   def privacy_changed?
-    modified.has_key? 'privacy'
+    changed_attrs.include? 'privacy'
+  end
+
+  def changed_attrs
+    @changed_attrs ||= (hash['original'].keys + hash['modified'].keys).uniq
   end
 
   def all_attrs
