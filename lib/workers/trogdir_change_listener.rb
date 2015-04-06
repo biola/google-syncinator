@@ -38,7 +38,7 @@ module Workers
           end
 
           if change.account_info_updated? && change.university_email_exists?
-            SyncGoogleAppsAccount.perform_async(change.email, change.first_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
+            UpdateGoogleAppsAccount.perform_async(change.email, change.first_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
             skipped = false
           end
 
