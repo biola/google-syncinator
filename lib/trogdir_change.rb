@@ -44,6 +44,14 @@ class TrogdirChange
     all_attrs['privacy']
   end
 
+  def university_email
+    if person?
+      Array(all_attrs['emails']).find { |email| email['type'] == 'university' }['address']
+    elsif email?
+      all_attrs['address']
+    end
+  end
+
   def university_email_exists?
     all_attrs['emails'].any? { |email| email['type'] == 'university' }
   end

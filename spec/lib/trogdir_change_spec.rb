@@ -44,6 +44,18 @@ describe TrogdirChange do
     it { expect(subject.privacy).to eql false}
   end
 
+  describe '#university_email' do
+    context 'when creating a person' do
+      it { expect(subject.university_email).to eql 'bob.dole@biola.edu' }
+    end
+
+    context 'when creating an email' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_email.json')) }
+
+      it { expect(subject.university_email).to eql 'bob.dole@biola.edu' }
+    end
+  end
+
   describe '#university_email_exists?' do
     context 'with a university email' do
       it { expect(subject.university_email_exists?).to be true }

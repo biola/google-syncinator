@@ -33,29 +33,25 @@ module Workers
           end
 
           if change.university_email_added?
-            CreateGoogleAppsAccount.perform_async(change.email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
+            CreateGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
             skipped = false
           end
 
           if change.account_info_updated? && change.university_email_exists?
-            UpdateGoogleAppsAccount.perform_async(change.email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
+            UpdateGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
             skipped = false
           end
 
           # TODO: handle changes to email address with appropriate renaming and aliasing
 
-          finish! change, :skip if skipped
+          TrogdirChangeFinishWorker.perform_async change.sync_log_id, :skip if skipped
         end
 
-        SyncPersonalEmails.perform_async
+        TrogdirChangeListener.perform_async
       end
     end
 
     private
-
-    def finish!(change, action)
-      TrogdirChangeFinishWorker.perform_async change.sync_log_id, action
-    end
 
     def change_syncs
       Trogdir::APIClient::ChangeSyncs.new
