@@ -12,6 +12,8 @@ module Workers
     end
 
     def perform
+      Log.info "[#{jid}] Starting job"
+
       response = change_syncs.start.perform
       raise TrogdirAPIError, response.parse['error'] unless response.success?
 
@@ -19,7 +21,8 @@ module Workers
       changes = hashes.map { | hash| TrogdirChange.new(hash) }
 
       # Keep processing batches until we run out
-      if changes.any?
+      changes_found = if changes.any?
+        Log.info "[#{jid}] Processing #{changes.length} changes"
         changes.each do |change|
           skipped = true
 
@@ -27,23 +30,31 @@ module Workers
             email_options = EmailAddressOptions.new(change.affiliations, change.preferred_name, change.first_name, change.middle_name, change.last_name).to_a
 
             if email_options.any?
+              Log.info "[#{jid}] Assigning email address to person #{change.person_uuid}"
               AssignEmailAddress.perform_async(change.person_uuid, email_options, change.sync_log_id)
               skipped = false
             end
           end
 
           if change.university_email_added? || (change.account_info_updated? && change.university_email_exists?)
+            Log.info "[#{jid}] Syncing Google account #{change.university_email} for person #{change.person_uuid}"
             SyncGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
             skipped = false
           end
 
           # TODO: handle changes to email address with appropriate renaming and aliasing
 
-          TrogdirChangeFinishWorker.perform_async change.sync_log_id, :skip if skipped
+          if skipped
+            Log.info "[#{jid}] No changes needed for person #{change.person_uuid}"
+            TrogdirChangeFinishWorker.perform_async change.sync_log_id, :skip
+          end
         end
 
         TrogdirChangeListener.perform_async
       end
+
+      Log.info "[#{jid}] Finished job"
+      changes_found
     end
 
     private
