@@ -23,6 +23,16 @@ class GoogleAccount
     !exists?
   end
 
+  def create_or_update!(first_name, last_name, department, title, privacy)
+    if exists?
+      update! first_name, last_name, department, title, privacy
+      :update
+    else
+      create! first_name, last_name, department, title, privacy
+      :create
+    end
+  end
+
   def create!(first_name, last_name, department, title, privacy)
     params = {
       primaryEmail: full_email,

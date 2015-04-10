@@ -32,13 +32,8 @@ module Workers
             end
           end
 
-          if change.university_email_added?
-            CreateGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
-            skipped = false
-          end
-
-          if change.account_info_updated? && change.university_email_exists?
-            UpdateGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
+          if change.university_email_added? || (change.account_info_updated? && change.university_email_exists?)
+            SyncGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
             skipped = false
           end
 

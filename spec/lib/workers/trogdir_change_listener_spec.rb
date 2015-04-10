@@ -13,8 +13,7 @@ describe Workers::TrogdirChangeListener do
   context 'with no change syncs' do
     it 'does not call any workers' do
       expect(Workers::AssignEmailAddress).to_not receive(:perform_async)
-      expect(Workers::CreateGoogleAppsAccount).to_not receive(:perform_async)
-      expect(Workers::UpdateGoogleAppsAccount).to_not receive(:perform_async)
+      expect(Workers::SyncGoogleAppsAccount).to_not receive(:perform_async)
       expect(Workers::TrogdirChangeListener).to_not receive(:perform_async)
 
       expect(subject.perform).to be_falsey
@@ -26,8 +25,7 @@ describe Workers::TrogdirChangeListener do
 
     it 'does not call any workers' do
       expect(Workers::AssignEmailAddress).to_not receive(:perform_async)
-      expect(Workers::CreateGoogleAppsAccount).to_not receive(:perform_async)
-      expect(Workers::UpdateGoogleAppsAccount).to_not receive(:perform_async)
+      expect(Workers::SyncGoogleAppsAccount).to_not receive(:perform_async)
       expect(Workers::TrogdirChangeFinishWorker).to receive(:perform_async)
       expect(Workers::TrogdirChangeListener).to receive(:perform_async)
 
@@ -41,8 +39,7 @@ describe Workers::TrogdirChangeListener do
 
     it 'raises a TrogdirAPIError' do
       expect(Workers::AssignEmailAddress).to_not receive(:perform_async)
-      expect(Workers::CreateGoogleAppsAccount).to_not receive(:perform_async)
-      expect(Workers::UpdateGoogleAppsAccount).to_not receive(:perform_async)
+      expect(Workers::SyncGoogleAppsAccount).to_not receive(:perform_async)
 
       expect { subject.perform }.to raise_error Workers::TrogdirChangeListener::TrogdirAPIError
     end
@@ -51,10 +48,9 @@ describe Workers::TrogdirChangeListener do
   context 'when affiliation added' do
     let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/create_user_without_university_email.json'))] }
 
-    it 'only calls AssignEmailAddress worker' do
+    it 'calls AssignEmailAddress worker' do
       expect(Workers::AssignEmailAddress).to receive(:perform_async)
-      expect(Workers::CreateGoogleAppsAccount).to_not receive(:perform_async)
-      expect(Workers::UpdateGoogleAppsAccount).to_not receive(:perform_async)
+      expect(Workers::SyncGoogleAppsAccount).to_not receive(:perform_async)
       expect(Workers::TrogdirChangeListener).to receive(:perform_async)
 
       subject.perform
@@ -64,10 +60,9 @@ describe Workers::TrogdirChangeListener do
   context 'when university email created' do
     let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/create_email.json'))] }
 
-    it 'only calls CreateGoogleAppsAccount worker' do
+    it 'calls SyncGoogleAppsAccount worker' do
       expect(Workers::AssignEmailAddress).to_not receive(:perform_async)
-      expect(Workers::CreateGoogleAppsAccount).to receive(:perform_async)
-      expect(Workers::UpdateGoogleAppsAccount).to_not receive(:perform_async)
+      expect(Workers::SyncGoogleAppsAccount).to receive(:perform_async)
       expect(Workers::TrogdirChangeListener).to receive(:perform_async)
 
       subject.perform
@@ -77,10 +72,9 @@ describe Workers::TrogdirChangeListener do
   context 'when account info updated' do
     let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/update_person.json'))] }
 
-    it 'only calls UpdateGoogleAppsAccount worker' do
+    it 'calls SyncGoogleAppsAccount worker' do
       expect(Workers::AssignEmailAddress).to_not receive(:perform_async)
-      expect(Workers::CreateGoogleAppsAccount).to_not receive(:perform_async)
-      expect(Workers::UpdateGoogleAppsAccount).to receive(:perform_async)
+      expect(Workers::SyncGoogleAppsAccount).to receive(:perform_async)
       expect(Workers::TrogdirChangeListener).to receive(:perform_async)
 
       subject.perform

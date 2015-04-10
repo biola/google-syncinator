@@ -1,13 +1,13 @@
 module Workers
-  class CreateGoogleAppsAccount
+  class SyncGoogleAppsAccount
     include Sidekiq::Worker
 
     sidekiq_options retry: false
 
     def perform(email, first_name, last_name, department, title, privacy, sync_log_id)
       begin
-        if GoogleAccount.new(email).create!(first_name, last_name, department, title, privacy)
-          TrogdirChangeFinishWorker.perform_async sync_log_id, :create
+        if action = GoogleAccount.new(email).create_or_update!(first_name, last_name, department, title, privacy)
+          TrogdirChangeFinishWorker.perform_async sync_log_id, action
         end
       rescue StandardError => err
         TrogdirChangeErrorWorker.perform_async sync_log_id, err.message
