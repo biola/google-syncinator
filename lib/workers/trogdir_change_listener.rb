@@ -26,28 +26,33 @@ module Workers
         changes.each do |change|
           skipped = true
 
-          if change.affiliation_added? && !change.university_email_exists?
-            email_options = EmailAddressOptions.new(change.affiliations, change.preferred_name, change.first_name, change.middle_name, change.last_name).to_a
+          begin
+            if change.affiliation_added? && !change.university_email_exists?
+              email_options = EmailAddressOptions.new(change.affiliations, change.preferred_name, change.first_name, change.middle_name, change.last_name).to_a
 
-            if email_options.any?
-              Log.info "[#{jid}] Assigning email address to person #{change.person_uuid}"
-              AssignEmailAddress.perform_async(change.person_uuid, email_options, change.sync_log_id)
+              if email_options.any?
+                Log.info "[#{jid}] Assigning email address to person #{change.person_uuid}"
+                AssignEmailAddress.perform_async(change.person_uuid, email_options, change.sync_log_id)
+                skipped = false
+              end
+            end
+
+            if change.university_email_added? || (change.account_info_updated? && change.university_email_exists?)
+              Log.info "[#{jid}] Syncing Google account #{change.university_email} for person #{change.person_uuid}"
+              SyncGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
               skipped = false
             end
-          end
 
-          if change.university_email_added? || (change.account_info_updated? && change.university_email_exists?)
-            Log.info "[#{jid}] Syncing Google account #{change.university_email} for person #{change.person_uuid}"
-            SyncGoogleAppsAccount.perform_async(change.university_email, change.preferred_name, change.last_name, change.title, change.department, change.privacy, change.sync_log_id)
-            skipped = false
-          end
+            # TODO: handle changes to email address with appropriate renaming and aliasing
 
-          # TODO: handle changes to email address with appropriate renaming and aliasing
-
-          if skipped
-            Log.info "[#{jid}] No changes needed for person #{change.person_uuid}"
-            TrogdirChangeFinishWorker.perform_async change.sync_log_id, :skip
+            if skipped
+              Log.info "[#{jid}] No changes needed for person #{change.person_uuid}"
+              TrogdirChangeFinishWorker.perform_async change.sync_log_id, :skip
+            end
           end
+        rescue StandardError => err
+          TrogdirChangeErrorWorker.perform_async change.sync_log_id, err.message
+          Raven.capture_exception(err) if defined? Raven
         end
 
         TrogdirChangeListener.perform_async
