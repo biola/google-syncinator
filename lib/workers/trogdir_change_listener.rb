@@ -49,10 +49,11 @@ module Workers
               Log.info "[#{jid}] No changes needed for person #{change.person_uuid}"
               TrogdirChangeFinishWorker.perform_async change.sync_log_id, :skip
             end
+
+          rescue StandardError => err
+            TrogdirChangeErrorWorker.perform_async change.sync_log_id, err.message
+            Raven.capture_exception(err) if defined? Raven
           end
-        rescue StandardError => err
-          TrogdirChangeErrorWorker.perform_async change.sync_log_id, err.message
-          Raven.capture_exception(err) if defined? Raven
         end
 
         TrogdirChangeListener.perform_async
