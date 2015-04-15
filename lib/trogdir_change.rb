@@ -53,7 +53,7 @@ class TrogdirChange
   end
 
   def university_email_exists?
-    all_attrs['emails'].any? { |email| email['type'] == 'university' }
+    Array(all_attrs['emails']).any? { |email| email['type'] == 'university' }
   end
 
   def affiliation_added?
