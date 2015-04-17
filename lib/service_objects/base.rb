@@ -21,5 +21,11 @@ module ServiceObjects
     def self.ignore?(change)
       self.new(change).ignore?
     end
+
+    protected
+
+    def google_account
+      @google_account ||= GoogleAccount.new(change.university_email)
+    end
   end
 end

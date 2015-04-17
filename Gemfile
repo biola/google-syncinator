@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'activesupport'
 gem 'blazing'
 gem 'google-api-client'
 gem 'logging', '~> 1.8' # 2.0 is not compatible with blazing

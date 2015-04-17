@@ -68,6 +68,16 @@ class TrogdirChange
     person? && (create? || update?) && (name_changed? || work_changed? || privacy_changed?)
   end
 
+  def joined_groups
+    return [] unless person?
+    Array(modified['groups']) - Array(original['groups'])
+  end
+
+  def left_groups
+    return [] unless person?
+    Array(original['groups']) - Array(modified['groups'])
+  end
+
   private
 
   def person?
@@ -103,7 +113,15 @@ class TrogdirChange
   end
 
   def changed_attrs
-    @changed_attrs ||= (hash['original'].keys + hash['modified'].keys).uniq
+    @changed_attrs ||= (original.keys + modified.keys).uniq
+  end
+
+  def original
+    hash['original']
+  end
+
+  def modified
+    hash['modified']
   end
 
   def all_attrs

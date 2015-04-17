@@ -77,6 +77,22 @@ class GoogleAccount
     true
   end
 
+  def join!(group, role = 'MEMBER')
+    group = GoogleAccount.group_to_email(group)
+    params = {email: full_email, role: role}
+
+    new_member = directory.members.insert.request_schema.new(params)
+
+    result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
+    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+  end
+
+  def leave!(group)
+    group = GoogleAccount.group_to_email(group)
+    result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
+    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+  end
+
   def full_email
     GoogleAccount.full_email(email)
   end
@@ -87,6 +103,10 @@ class GoogleAccount
     else
       "#{email}@#{Settings.google.domain}"
     end
+  end
+
+  def self.group_to_email(group_name)
+    full_email(group_name.to_s.downcase.gsub /[^a-z0-9]+/, '.')
   end
 
   def self.random_password

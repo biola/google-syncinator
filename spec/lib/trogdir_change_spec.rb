@@ -131,4 +131,32 @@ describe TrogdirChange do
       it { expect(subject.account_info_updated?).to be false }
     end
   end
+
+  describe '#joined_groups' do
+    context 'when creating a person' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+
+      it { expect(subject.joined_groups).to eql [] }
+    end
+
+    context 'when joining a group' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/join_group.json')) }
+
+      it { expect(subject.joined_groups).to eql ['President'] }
+    end
+  end
+
+  describe '#left_groups' do
+    context 'when creating a person' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+
+      it { expect(subject.left_groups).to eql [] }
+    end
+
+    context 'when joining a group' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/leave_group.json')) }
+
+      it { expect(subject.left_groups).to eql ['Congressman'] }
+    end
+  end
 end

@@ -27,3 +27,94 @@ trogdir:
   access_id: # set in settings.local.yml
   secret_key: # set in settings.local.yml
   api_timeout: 300 # 5 min
+
+groups:
+  whitelist:
+    - Alpha 1st East
+    - Alpha 1st West
+    - Alpha 2nd East
+    - Alpha 2nd West
+    - Alpha 3rd East
+    - Alpha 3rd West
+    - Beachcomber 1st
+    - Beachcomber 2nd
+    - Biola House
+    - Calpella House 2
+    - Calpella House
+    - Emerson 1st Even
+    - Emerson 1st Odd
+    - Emerson 2nd Even
+    - Emerson 2nd Odd
+    - Fairvilla House
+    - Figueras House
+    - Gardenhill House
+    - Hart 1st Even
+    - Hart 1st Odd
+    - Hart 2nd Even
+    - Hart 2nd Odd
+    - Hope 1st North
+    - Hope 1st South
+    - Hope 2nd North
+    - Hope 2nd South
+    - Hope 3rd North
+    - Hope 3rd South
+    - Hope 4th North
+    - Hope 4th South
+    - Horton 1st North
+    - Horton 1st South
+    - Horton 2nd North
+    - Horton 2nd South
+    - Horton 3rd North
+    - Horton 3rd South
+    - Horton 4th North
+    - Horton 4th South
+    - Horton 5th North
+    - Horton 5th South
+    - La Mirada 1st
+    - La Mirada 2nd
+    - Li 1st
+    - Li 2nd
+    - Li 3rd
+    - Lido Mirada 1st
+    - Lido Mirada 2nd
+    - Philosophy House
+    - Ranch 1st
+    - Rosecrans 1 1st
+    - Rosecrans 1 2nd
+    - Rosecrans 2 1st
+    - Rosecrans 2 2nd
+    - Rosecrans 3 1st
+    - Rosecrans 3 2nd
+    - Rosecrans 4 1st
+    - Rosecrans 4 2nd
+    - Rosecrans 5 1st
+    - Rosecrans 5 2nd
+    - Sigma 1st Long
+    - Sigma 1st Short
+    - Sigma 2nd Long
+    - Sigma 2nd Short
+    - Sigma 3rd Long
+    - Sigma 3rd Short
+    - Springford House
+    - Stewart 1st Back Suites
+    - Stewart 1st Front Suites
+    - Stewart 1st North Quads
+    - Stewart 1st South Quads
+    - Stewart 2nd Back Suites
+    - Stewart 2nd Front Quites
+    - Stewart 2nd North Quads
+    - Stewart 2nd South Quads
+    - Thompson 1st Even
+    - Thompson 1st Odd
+    - Thompson 2nd Even
+    - Thompson 2nd Odd
+    - Thompson 3rd Even
+    - Thompson 3rd Odd
+    - Tradewinds 1st
+    - Tradewinds 2nd
+    - Tropicana 1st
+    - Tropicana 2nd
+    - Welch 1st
+    - Welch 2nd
+    - Welch 3rd
+    - Whiterock House
