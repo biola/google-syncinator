@@ -28,7 +28,7 @@ module ServiceObjects
       end
     end
 
-    def self.ignore?(change)
+    def ignore?(change)
       AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change)
     end
 
