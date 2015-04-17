@@ -18,6 +18,16 @@ module ServiceObjects
           actions << SyncGoogleAccount.new(change).call
         end
 
+        unless JoinGoogleGroup.ignore?(change)
+          Log.info "Joining Google group(s) #{Whitelist.filter(change.joined_groups).to_sentence} for person #{change.person_uuid}"
+          actions << JoinGoogleGroup.new(change).call
+        end
+
+        unless LeaveGoogleGroup.ignore?(change)
+          Log.info "Leaving Google group(s) #{Whitelist.filter(change.left_groups).to_sentence} for person #{change.person_uuid}"
+          actions << LeaveGoogleGroup.new(change).call
+        end
+
         action = actions.first || :skip
         Log.info "No changes needed for person #{change.person_uuid}" if actions.empty?
         Workers::ChangeFinish.perform_async change.sync_log_id, action
@@ -29,7 +39,7 @@ module ServiceObjects
     end
 
     def ignore?
-      AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change)
+      AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change) && JoinGoogleGroup.ignore?(change) && LeaveGoogleGroup.ignore?(change)
     end
 
     private

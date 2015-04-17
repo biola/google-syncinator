@@ -1,7 +1,7 @@
 module ServiceObjects
   class SyncGoogleAccount < Base
     def call
-      GoogleAccount.new(change.university_email).create_or_update!(change.first_name, change.last_name, change.department, change.title, change.privacy)
+      google_account.create_or_update!(change.first_name, change.last_name, change.department, change.title, change.privacy)
     end
 
     def ignore?

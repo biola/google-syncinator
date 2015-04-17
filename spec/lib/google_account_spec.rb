@@ -11,4 +11,9 @@ describe GoogleAccount do
   describe '.full_email' do
     it { expect(GoogleAccount.full_email('john.kerry')).to eql 'john.kerry@example.com' }
   end
+
+  describe '.group_to_email' do
+    it { expect(GoogleAccount.group_to_email('Stewart 1st Back Suites')).to eql 'stewart.1st.back.suites@example.com' }
+    it { expect(GoogleAccount.group_to_email('Some Dorm #1  North')).to eql 'some.dorm.1.north@example.com' }
+  end
 end

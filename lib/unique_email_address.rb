@@ -15,6 +15,7 @@ class UniqueEmailAddress
     best = options.find do |email|
       # TODO: Check for deleted but not yet reusable addresses.
       #       This will mean checking with some DB other than Google, that doesn't exist yet.
+      # TODO: Also check if the email has been assigns in trogdir but not yet created in Google Apps
       GoogleAccount.new(email).available?
     end
 
