@@ -36,6 +36,7 @@ module GoogleSyncinator
     require './lib/email_address_options'
     require './lib/google_account'
     require './lib/log'
+    require './lib/service_objects'
     require './lib/trogdir_change'
     require './lib/unique_email_address'
     require './lib/workers'
