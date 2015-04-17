@@ -23,6 +23,7 @@ describe Workers::HandleChanges do
 
     it 'does not call any workers' do
       expect(Workers::HandleChange).to_not receive(:perform_async)
+      expect(Workers::HandleChanges).to receive(:perform_async)
 
       subject.perform
     end
@@ -44,6 +45,7 @@ describe Workers::HandleChanges do
 
     it 'calls AssignEmailAddress worker' do
       expect(Workers::HandleChange).to receive(:perform_async)
+      expect(Workers::HandleChanges).to receive(:perform_async)
 
       subject.perform
     end
@@ -54,6 +56,7 @@ describe Workers::HandleChanges do
 
     it 'calls SyncGoogleAppsAccount worker' do
       expect(Workers::HandleChange).to receive(:perform_async)
+      expect(Workers::HandleChanges).to receive(:perform_async)
 
       subject.perform
     end
@@ -64,6 +67,7 @@ describe Workers::HandleChanges do
 
     it 'calls SyncGoogleAppsAccount worker' do
       expect(Workers::HandleChange).to receive(:perform_async)
+      expect(Workers::HandleChanges).to receive(:perform_async)
 
       subject.perform
     end
