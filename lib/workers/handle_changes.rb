@@ -24,11 +24,7 @@ module Workers
         Log.info "[#{jid}] Processing #{hashes.length} changes"
 
         hashes.each do |hash|
-          change = TrogdirChange.new(hash)
-
-          unless ServiceObjects::HandleChange.ignore? change
-            Workers::HandleChange.perform_async(hash)
-          end
+          Workers::HandleChange.perform_async(hash)
         end
       end
 

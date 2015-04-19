@@ -18,17 +18,6 @@ describe Workers::HandleChanges do
     end
   end
 
-  context 'when personal email created' do
-    let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/create_personal_email.json'))] }
-
-    it 'does not call any workers' do
-      expect(Workers::HandleChange).to_not receive(:perform_async)
-      expect(Workers::HandleChanges).to receive(:perform_async)
-
-      subject.perform
-    end
-  end
-
   context 'when a trogdir-api error' do
     let(:success) { false }
     let(:change_syncs) { {'error' => 'Oopsie!'} }
