@@ -38,6 +38,7 @@ module GoogleSyncinator
     require './lib/log'
     require './lib/service_objects'
     require './lib/trogdir_change'
+    require './lib/trogdir_person'
     require './lib/unique_email_address'
     require './lib/whitelist'
     require './lib/workers'
