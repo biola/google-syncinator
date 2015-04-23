@@ -41,7 +41,11 @@ class TrogdirChange
   end
 
   def affiliations
-    all_attrs['affiliations']
+    if modified.has_key? 'affiliations'
+      modified['affiliations']
+    else
+      all_attrs['affiliations']
+    end
   end
 
   def privacy
