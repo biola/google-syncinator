@@ -35,6 +35,7 @@ module ServiceObjects
       rescue StandardError => err
         Workers::ChangeError.perform_async change.sync_log_id, err.message
         Raven.capture_exception(err) if defined? Raven
+        raise err
       end
     end
 

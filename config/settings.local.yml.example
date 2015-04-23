@@ -11,3 +11,9 @@ google:
     secret: # set in settings.local.yml
     issuer: # set in settings.local.yml
     person: # set in settings.local.yml
+
+ws:
+  db:
+    host: db.example.com
+    user: google_syncinator
+    password: "************"
