@@ -70,6 +70,7 @@ GEM
     minitest (5.5.1)
     multi_json (1.11.0)
     multipart-post (2.0.0)
+    mysql2 (0.3.17)
     posix-spawn (0.3.10)
     promise (0.3.1)
     pry (0.10.1)
@@ -105,6 +106,7 @@ GEM
     rspec-support (3.2.2)
     sentry-raven (0.12.3)
       faraday (>= 0.7.6)
+    sequel (4.21.0)
     sidekiq (3.3.3)
       celluloid (>= 0.16.0)
       connection_pool (>= 2.1.1)
@@ -147,6 +149,7 @@ DEPENDENCIES
   blazing
   google-api-client
   logging (~> 1.8)
+  mysql2
   pry
   pry-rescue
   pry-stack_explorer
@@ -154,6 +157,7 @@ DEPENDENCIES
   rake
   rspec
   sentry-raven
+  sequel
   sidekiq
   sidetiq
   trogdir_api_client

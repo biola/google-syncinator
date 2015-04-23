@@ -28,6 +28,15 @@ trogdir:
   secret_key: # set in settings.local.yml
   api_timeout: 300 # 5 min
 
+ws:
+  db:
+    adapter: mysql2
+    host: # set in settings.local.yml
+    database: ws
+    user: # set in settings.local.yml
+    password: # set in settings.local.yml
+    reconnect: true
+
 groups:
   whitelist:
     - Alpha 1st East

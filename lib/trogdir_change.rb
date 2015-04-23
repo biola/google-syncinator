@@ -12,6 +12,10 @@ class TrogdirChange
     hash['person_id']
   end
 
+  def biola_id
+    Array(all_attrs['ids']).find { |id| id['type'] == 'biola_id' }['identifier']
+  end
+
   def preferred_name
     all_attrs['preferred_name']
   end
