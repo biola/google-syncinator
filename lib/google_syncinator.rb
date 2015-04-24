@@ -31,6 +31,8 @@ module GoogleSyncinator
 
     Weary::Adapter::NetHttpAdvanced.timeout = Settings.trogdir.api_timeout
 
+    require 'active_support'
+    require 'active_support/core_ext'
     require 'google/api_client'
 
     require './lib/email_address_options'
