@@ -12,6 +12,10 @@ class TrogdirPerson
     end
   end
 
+  def first_or_preferred_name
+    hash['preferred_name'] || hash['first_name']
+  end
+
   private
 
   def hash
