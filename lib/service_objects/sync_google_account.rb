@@ -2,7 +2,7 @@ module ServiceObjects
   class SyncGoogleAccount < Base
     def call
       person = TrogdirPerson.new(change.person_uuid)
-      google_account.create_or_update!(person.first_name, person.last_name, person.department, person.title, person.privacy)
+      google_account.create_or_update!(person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy)
     end
 
     def ignore?
