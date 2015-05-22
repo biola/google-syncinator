@@ -51,7 +51,7 @@ class GoogleAccount
     new_user = directory.users.insert.request_schema.new(params)
 
     result = api.execute api_method: directory.users.insert, body_object: new_user
-    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
 
     true
   end
@@ -72,7 +72,7 @@ class GoogleAccount
     user_updates = directory.users.update.request_schema.new(params)
 
     result = api.execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
-    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
 
     true
   end
@@ -84,13 +84,13 @@ class GoogleAccount
     new_member = directory.members.insert.request_schema.new(params)
 
     result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
-    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
   end
 
   def leave!(group)
     group = GoogleAccount.group_to_email(group)
     result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
-    raise GoogleAppsAPIError, result.data.error['message'] unless result.success?
+    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
   end
 
   def full_email
