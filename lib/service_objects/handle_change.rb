@@ -13,6 +13,11 @@ module ServiceObjects
           end
         end
 
+        unless UpdateEmailAddress.ignore?(change)
+          Log.info "Updating Google account email (#{change.university_email}) for person #{change.person_uuid}"
+          actions << UpdateEmailAddress.new(change).call
+        end
+
         unless SyncGoogleAccount.ignore?(change)
           Log.info "Syncing Google account #{change.university_email} for person #{change.person_uuid}"
           actions << SyncGoogleAccount.new(change).call
@@ -40,7 +45,7 @@ module ServiceObjects
     end
 
     def ignore?
-      AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change) && JoinGoogleGroup.ignore?(change) && LeaveGoogleGroup.ignore?(change)
+      AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change) && UpdateEmailAddress.ignore?(change) && JoinGoogleGroup.ignore?(change) && LeaveGoogleGroup.ignore?(change)
     end
 
     private
