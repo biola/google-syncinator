@@ -60,6 +60,10 @@ class TrogdirChange
     end
   end
 
+  def new_university_email
+    modified['address']
+  end
+
   def university_email_exists?
     Array(all_attrs['emails']).any? { |email| email['type'] == 'university' }
   end
@@ -74,6 +78,10 @@ class TrogdirChange
 
   def account_info_updated?
     person? && (create? || update?) && (name_changed? || work_changed? || privacy_changed?)
+  end
+
+  def university_email_updated?
+    email? && update? && all_attrs['type'] == 'university'
   end
 
   def joined_groups
