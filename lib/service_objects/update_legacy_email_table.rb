@@ -2,8 +2,8 @@ module ServiceObjects
   class UpdateLegacyEmailTable < Base
     DB = Sequel.connect(Settings.ws.db.to_hash)
 
-    def call(email)
-      DB[:email].insert(idnumber: change.biola_id, email: email)
+    def call(email, biola_id)
+      DB[:email].insert(idnumber: biola_id, email: email)
     end
 
     def ignore?

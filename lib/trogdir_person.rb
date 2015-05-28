@@ -12,6 +12,10 @@ class TrogdirPerson
     end
   end
 
+  define_method("biola_id") do
+    Array(hash['ids']).find { |id| id['type'] == 'biola_id' }['identifier']
+  end
+
   def first_or_preferred_name
     hash['preferred_name'] || hash['first_name']
   end
