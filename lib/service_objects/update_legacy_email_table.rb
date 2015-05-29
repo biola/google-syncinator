@@ -2,11 +2,11 @@ module ServiceObjects
   class UpdateLegacyEmailTable < Base
     DB = Sequel.connect(Settings.ws.db.to_hash)
 
-    def self.insert(email)
+    def insert(change, email)
       DB[:email].insert(idnumber: change.biola_id, email: email)
     end
 
-    def self.insert_and_update(biola_id, old_email, new_email)
+    def insert_and_update(biola_id, old_email, new_email)
       DB[:email].where(idnumber: biola_id, email: old_email).update(primary: 0)
       DB[:email].insert(idnumber: biola_id, email: new_email)
     end
