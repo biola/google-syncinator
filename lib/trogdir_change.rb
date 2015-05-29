@@ -64,6 +64,10 @@ class TrogdirChange
     modified['address']
   end
 
+  def old_university_email
+    original['address']
+  end
+
   def university_email_exists?
     Array(all_attrs['emails']).any? { |email| email['type'] == 'university' }
   end

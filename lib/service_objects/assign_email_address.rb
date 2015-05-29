@@ -12,7 +12,7 @@ module ServiceObjects
 
       response = Trogdir::APIClient::Emails.new.create(uuid: change.person_uuid, address: full_unique_email, type: EMAIL_TYPE, primary: MAKE_EMAIL_PRIMARY).perform
       if response.success?
-        UpdateLegacyEmailTable.new(change).call(full_unique_email, change.biola_id)
+        UpdateLegacyEmailTable.new(change).insert(full_unique_email)
         :create
       else
         raise TrogdirAPIError, response.parse['error']
