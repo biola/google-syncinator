@@ -8,7 +8,11 @@ module ServiceObjects
 
     def insert_and_update(biola_id, old_email, new_email)
       DB[:email].where(idnumber: biola_id, email: old_email).update(primary: 0)
-      DB[:email].insert(idnumber: biola_id, email: new_email)
+      if DB[:email].where(idnumber: biola_id, email: new_email).count > 0
+        DB[:email].where(idnumber: biola_id, email: new_email).update(primary: 1, expiration_date: "0000-00-00 00:00:00")
+      else
+        DB[:email].insert(idnumber: biola_id, email: new_email)
+      end
     end
 
     def ignore?
