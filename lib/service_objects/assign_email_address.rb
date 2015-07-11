@@ -10,13 +10,11 @@ module ServiceObjects
       unique_email = UniqueEmailAddress.new(email_options).best
       full_unique_email = GoogleAccount.full_email(unique_email)
 
-      response = Trogdir::APIClient::Emails.new.create(uuid: change.person_uuid, address: full_unique_email, type: EMAIL_TYPE, primary: MAKE_EMAIL_PRIMARY).perform
-      if response.success?
-        UpdateLegacyEmailTable.new(change).insert(full_unique_email)
-        :create
-      else
-        raise TrogdirAPIError, response.parse['error']
-      end
+      UniversityEmail.create! uuid: change.person_uuid, address: full_unique_email
+      Workers::CreateTrogdirEmail.perform_async change.person_uuid, full_unique_email
+      Workers::InsertIntoLegacyEmailTable.perform_async(change.biola_id, full_unique_email)
+
+      :create
     end
 
     def ignore?

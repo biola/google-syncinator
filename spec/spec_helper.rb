@@ -7,6 +7,9 @@ Bundler.require :default, :test
 
 require 'rspec'
 
+require 'sidekiq/testing'
+Sidekiq::Testing.fake!
+
 require 'google_syncinator'
 GoogleSyncinator.initialize!
 
