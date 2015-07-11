@@ -5,6 +5,11 @@ module GoogleSyncinator
 
     RailsConfig.load_and_set_settings('./config/settings.yml', "./config/settings.#{env}.yml", './config/settings.local.yml')
 
+    # Use mongoid.yml.example for Travis CI, etc.
+    mongoid_yml_path = File.expand_path('../../config/mongoid.yml',  __FILE__)
+    mongoid_yml_path = "#{mongoid_yml_path}.example" if !File.exists? mongoid_yml_path
+    Mongoid.load! mongoid_yml_path
+
     if defined? Raven
       Raven.configure do |config|
         config.dsn = Settings.sentry.url
@@ -42,6 +47,7 @@ module GoogleSyncinator
     require './lib/trogdir_change'
     require './lib/trogdir_person'
     require './lib/unique_email_address'
+    require './lib/university_email'
     require './lib/whitelist'
     require './lib/workers'
 
