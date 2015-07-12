@@ -2,6 +2,8 @@ class UniversityEmail
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  embeds_many :deprovision_schedules
+
   field :uuid, type: String
   field :address, type: String
   field :primary, type: Boolean, default: true

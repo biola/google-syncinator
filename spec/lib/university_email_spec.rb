@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-describe UniversityEmail, type: :model do
+describe UniversityEmail do
+  it { is_expected.to embed_many(:deprovision_schedules) }
   it { is_expected.to have_fields(:uuid, :address, :primary, :state) }
   it { is_expected.to be_timestamped_document }
 

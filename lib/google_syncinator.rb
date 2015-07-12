@@ -40,6 +40,7 @@ module GoogleSyncinator
     require 'active_support/core_ext'
     require 'google/api_client'
 
+    require './lib/deprovision_schedule'
     require './lib/email_address_options'
     require './lib/google_account'
     require './lib/log'

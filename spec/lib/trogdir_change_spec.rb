@@ -68,6 +68,18 @@ describe TrogdirChange do
     end
   end
 
+  describe '#affiliations_changed?' do
+    context 'when creating a person with affiliations' do
+      it { expect(subject.affiliations_changed?).to be true }
+    end
+
+    context 'when creating an id' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_id.json')) }
+
+      it { expect(subject.affiliations_changed?).to be false }
+    end
+  end
+
   describe '#affiliation_added?' do
     context 'when creating a person with affiliations' do
       it { expect(subject.affiliation_added?).to be true }
