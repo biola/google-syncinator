@@ -7,3 +7,8 @@ trogdir:
   port: 443
   script_name: directory
   version: v1
+
+email:
+  delivery_method: smtp
+  options:
+    address: postfix.biola.edu

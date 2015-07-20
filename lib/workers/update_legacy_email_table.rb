@@ -2,7 +2,7 @@ module Workers
   class UpdateLegacyEmailTable
     include Sidekiq::Worker
 
-    def perform_async(biola_id, old_email, new_email)
+    def perform(biola_id, old_email, new_email)
       db = Sequel.connect(Settings.ws.db.to_hash)
 
       db[:email].where(idnumber: biola_id, email: old_email).update(primary: 0)

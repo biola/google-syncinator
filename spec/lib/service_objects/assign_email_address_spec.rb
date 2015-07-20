@@ -36,6 +36,7 @@ describe ServiceObjects::AssignEmailAddress do
   describe '#ignore?' do
     context 'when creating a user with a university email' do
       let(:fixture) { 'create_user' }
+      before { UniversityEmail.create uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
       it { expect(subject.ignore?).to be true }
     end
 

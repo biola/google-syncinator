@@ -3,5 +3,6 @@
 /config/mongoid.yml
 /config/settings.local.yml
 /config/blazing.rb
+/log/*
 /vendor/bundle
 /tmp

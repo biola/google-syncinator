@@ -69,6 +69,8 @@ GEM
     logging (1.8.2)
       little-plugger (>= 1.1.3)
       multi_json (>= 1.8.4)
+    mail (2.6.3)
+      mime-types (>= 1.16, < 3)
     memoist (0.11.0)
     method_source (0.8.2)
     mime-types (1.25.1)
@@ -133,6 +135,8 @@ GEM
       json
       redis (>= 3.0.6)
       redis-namespace (>= 1.3.1)
+    sidekiq-status (0.5.3)
+      sidekiq (>= 2.7, < 3.4)
     sidetiq (0.6.3)
       celluloid (>= 0.14.1)
       ice_cube (= 0.11.1)
@@ -169,6 +173,7 @@ DEPENDENCIES
   blazing
   google-api-client
   logging (~> 1.8)
+  mail
   mongoid
   mongoid-rspec (~> 2.1)
   mysql2
@@ -181,5 +186,6 @@ DEPENDENCIES
   sentry-raven
   sequel
   sidekiq
+  sidekiq-status
   sidetiq
   trogdir_api_client

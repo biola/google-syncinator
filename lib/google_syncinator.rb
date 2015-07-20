@@ -34,6 +34,10 @@ module GoogleSyncinator
       config.secret_key = Settings.trogdir.secret_key
     end
 
+    Mail.defaults do
+      delivery_method Settings.email.delivery_method, Settings.email.options.to_hash
+    end
+
     Weary::Adapter::NetHttpAdvanced.timeout = Settings.trogdir.api_timeout
 
     require 'active_support'
@@ -42,6 +46,7 @@ module GoogleSyncinator
 
     require './lib/deprovision_schedule'
     require './lib/email_address_options'
+    require './lib/emails'
     require './lib/google_account'
     require './lib/log'
     require './lib/service_objects'

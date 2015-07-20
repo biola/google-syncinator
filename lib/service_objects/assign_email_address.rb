@@ -18,7 +18,10 @@ module ServiceObjects
     end
 
     def ignore?
-      !(change.affiliation_added? && !change.university_email_exists?)
+      return true unless change.affiliation_added?
+      return true if UniversityEmail.active? change.person_uuid
+      # If the person has a reprovisionable email, let ReprovisionGoogleAccount handle it
+      UniversityEmail.find_reprovisionable(change.person_uuid).present?
     end
   end
 end

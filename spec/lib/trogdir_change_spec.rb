@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe TrogdirChange do
-  let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+  let(:fixture) { 'create_user' }
+  let(:hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   subject { TrogdirChange.new(hash) }
 
   describe '#sync_log_id' do
@@ -10,6 +11,10 @@ describe TrogdirChange do
 
   describe '#person_uuid' do
     it { expect(subject.person_uuid).to eql '00000000-0000-0000-0000-000000000000'}
+  end
+
+  describe '#biola_id' do
+    it { expect(subject.biola_id).to eql '234567' }
   end
 
   describe '#preferred_name' do
@@ -54,6 +59,16 @@ describe TrogdirChange do
 
       it { expect(subject.university_email).to eql 'bob.dole@biola.edu' }
     end
+  end
+
+  describe '#new_university_email' do
+    let(:fixture) { 'update_email' }
+    it { expect(subject.new_university_email).to eql 'bob.dole@biola.edu' }
+  end
+
+  describe '#old_university_email' do
+    let(:fixture) { 'update_email' }
+    it { expect(subject.old_university_email).to eql 'bobby.dole@biola.edu' }
   end
 
   describe '#university_email_exists?' do
@@ -142,6 +157,11 @@ describe TrogdirChange do
 
       it { expect(subject.account_info_updated?).to be false }
     end
+  end
+
+  describe '#university_email_updated?' do
+    let(:fixture) { 'update_email' }
+    it { expect(subject.university_email_updated?).to be true }
   end
 
   describe '#joined_groups' do

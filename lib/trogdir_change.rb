@@ -54,7 +54,7 @@ class TrogdirChange
 
   def university_email
     if person?
-      Array(all_attrs['emails']).find { |email| email['type'] == 'university' }['address']
+      Array(all_attrs['emails']).find { |email| email['type'] == 'university' }.try(:[], 'address')
     elsif email?
       all_attrs['address']
     end
@@ -70,6 +70,10 @@ class TrogdirChange
 
   def university_email_exists?
     Array(all_attrs['emails']).any? { |email| email['type'] == 'university' }
+  end
+
+  def affiliations_changed?
+    changed_attrs.include?('affiliations')
   end
 
   def affiliation_added?
@@ -114,10 +118,6 @@ class TrogdirChange
 
   def update?
     hash['action'] == 'update'
-  end
-
-  def affiliations_changed?
-    changed_attrs.include?('affiliations')
   end
 
   def name_changed?

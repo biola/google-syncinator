@@ -37,6 +37,12 @@ ws:
     password: # set in settings.local.yml
     reconnect: true
 
+# See http://rdoc.info/github/mikel/mail/Mail#defaults-class_method
+email:
+  from: no-reply@biola.edu
+  delivery_method: test
+  options: {}
+
 groups:
   whitelist:
     - Alpha 1st East

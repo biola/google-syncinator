@@ -8,19 +8,31 @@ class GoogleAccount
   end
 
   def exists?
-    result = api.execute(
-      api_method: directory.users.get,
-      # This will find by primary email or aliases according to Google's documentation
-      parameters: {userKey: full_email}
-    )
+    return false if data.nil?
 
-    return false unless result.success?
-
-    result.data.emails.map{|e| e['address']}.include? full_email
+    data.emails.map{|e| e['address']}.include? full_email
   end
 
   def available?
     !exists?
+  end
+
+  def suspended?
+    data['suspended'].present?
+  end
+
+  def last_login
+    return nil if data.nil?
+
+    data['lastLoginTime'].to_i == 0 ? nil : data['lastLoginTime']
+  end
+
+  def logged_in?
+    last_login.nil?
+  end
+
+  def never_logged_in?
+    last_login.present?
   end
 
   def create_or_update!(first_name, last_name, department, title, privacy)
@@ -77,6 +89,21 @@ class GoogleAccount
     true
   end
 
+  def suspend!
+    update_suspension! true
+  end
+
+  def unsuspend!
+    update_suspension! false
+  end
+
+  def delete!
+    result = api.execute api_method: directory.users.delete, parameters: {userKey: email}
+    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+
+    true
+  end
+
   def join!(group, role = 'MEMBER')
     group = GoogleAccount.group_to_email(group)
     params = {email: full_email, role: role}
@@ -115,6 +142,15 @@ class GoogleAccount
 
   private
 
+  def update_suspension!(suspend = true)
+    user_updates = directory.users.update.request_schema.new(suspend: suspend)
+
+    result = api.execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+
+    true
+  end
+
   def api
     return @api unless @api.nil?
 
@@ -133,6 +169,18 @@ class GoogleAccount
     @api.authorization.person = Settings.google.api_client.person
     @api.authorization.fetch_access_token!
     @api
+  end
+
+  def data
+    @data ||= (
+      result = api.execute(
+        api_method: directory.users.get,
+        # This will find by primary email or aliases according to Google's documentation
+        parameters: {userKey: full_email}
+      )
+
+      result.success? ? result.data : nil
+    )
   end
 
   def directory

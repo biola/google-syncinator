@@ -7,8 +7,10 @@ Requirements
 ------------
 - Ruby
 - Redis server (for Sidekiq)
+- MongoDB server
 - trogdir-api installation
 - Admin access to a Google Apps account
+- Biola WS email table (just temporarily for legacy support)
 
 Installation
 ------------
@@ -30,6 +32,15 @@ Running
 
 ```ruby
 sidekiq -r ./config/environment.rb
+```
+
+Testing
+-------
+
+*Before running the specs you'll need to create a `ws_test` MySQL database.*
+
+```ruby
+bundle exec rspec
 ```
 
 Deployment

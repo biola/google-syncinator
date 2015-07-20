@@ -33,6 +33,16 @@ module ServiceObjects
           actions << LeaveGoogleGroup.new(change).call
         end
 
+        unless DeprovisionGoogleAccount.ignore?(change)
+          Log.info "Begin deprovisioning of #{change.university_email} for person #{change.person_uuid}"
+          actions << DeprovisionGoogleAccount.new(change).call
+        end
+
+        unless ReprovisionGoogleAccount.ignore?(change)
+          Log.info "Begin deprovisioning of #{change.university_email} for person #{change.person_uuid}"
+          actions << ReprovisionGoogleAccount.new(change).call
+        end
+
         action = actions.first || :skip
         Log.info "No changes needed for person #{change.person_uuid}" if actions.empty?
         Workers::ChangeFinish.perform_async change.sync_log_id, action

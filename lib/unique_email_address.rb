@@ -13,10 +13,8 @@ class UniqueEmailAddress
   def best
     # Grab the first one that's available
     best = options.find do |email|
-      # TODO: Check for deleted but not yet reusable addresses.
-      #       This will mean checking with some DB other than Google, that doesn't exist yet.
-      # TODO: Also check if the email has been assigns in trogdir but not yet created in Google Apps
-      GoogleAccount.new(email).available?
+      # TODO: For now we're checking Google too to be safe. But when all emails are in university_emails, that won't be necessary
+      UniversityEmail.available?(email) && GoogleAccount.new(email).available?
     end
 
     # If none of the options are available append a three-digit number

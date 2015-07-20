@@ -1,6 +1,7 @@
 class EmailAddressOptions
   EMPLOYEEISH_AFFILIATIONS = ['employee', 'trustee', 'faculty', 'other', 'faculty emeritus']
   STUDENTISH_AFFILIATIONS = ['student']
+  ALLOWED_AFFILIATIONS = ['alumnus']
   SEPARATOR = '.'
 
   attr_reader :affiliations, :preferred_name, :first_name, :middle_name, :last_name
@@ -15,16 +16,17 @@ class EmailAddressOptions
 
   # alumnus, accepted student, non-banner alumnus don't get emails created
   def to_a
+    return [] unless self.class.allowed?(affiliations)
     options = []
 
-    if employeeish?
+    if self.class.employeeish?(affiliations)
       options << build_address(preferred_name, last_name)
       options << build_address(first_name, last_name)
       options << build_address(preferred_name, middle_initial, last_name)
       options << build_address(first_name, middle_initial, last_name)
       options << build_address(preferred_name, middle_name, last_name)
       options << build_address(first_name, middle_name, last_name)
-    elsif studentish?
+    elsif self.class.studentish?(affiliations)
       options << build_address(preferred_name, middle_initial, last_name)
       options << build_address(first_name, middle_initial, last_name)
       options << build_address(preferred_name, middle_name, last_name)
@@ -36,21 +38,29 @@ class EmailAddressOptions
     options.uniq
   end
 
+  def self.not_required?(affiliations)
+    (affiliations & ALLOWED_AFFILIATIONS).any?
+  end
+
+  def self.allowed?(affiliations)
+    employeeish?(affiliations) || studentish?(affiliations) || not_required?(affiliations)
+  end
+
   private
 
   def middle_initial
     middle_name.to_s[0]
   end
 
-  def employeeish?
+  def build_address(*parts)
+    parts.map(&:to_s).map(&:downcase).map(&:strip).map{|p| p.gsub(/[^a-z\._-]/, '')}.reject(&:empty?).join(SEPARATOR)
+  end
+
+  def self.employeeish?(affiliations)
     (affiliations & EMPLOYEEISH_AFFILIATIONS).any?
   end
 
-  def studentish?
+  def self.studentish?(affiliations)
     (affiliations & STUDENTISH_AFFILIATIONS).any?
-  end
-
-  def build_address(*parts)
-    parts.map(&:to_s).map(&:downcase).map(&:strip).map{|p| p.gsub(/[^a-z\._-]/, '')}.reject(&:empty?).join(SEPARATOR)
   end
 end
