@@ -1,6 +1,9 @@
 language: ruby
 rvm:
   - 2.1.4
+services:
+  - mongodb
+  - mysql
 before_script:
   - mysql -e 'create database ws_test;'
 script: bundle exec rspec
