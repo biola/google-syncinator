@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe UniversityEmail do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
+  let(:address) { 'bob.dole@biola.edu' }
 
   it { is_expected.to embed_many(:deprovision_schedules) }
   it { is_expected.to have_fields(:uuid, :address, :primary, :state) }
@@ -15,7 +16,7 @@ describe UniversityEmail do
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }
 
   describe '#disable_date' do
-    subject { UniversityEmail.new(uuid: uuid, address: 'test@example.com') }
+    subject { UniversityEmail.new(uuid: uuid, address: address) }
 
     context 'when no deprovision_schedules' do
       it { expect(subject.disable_date).to be nil }
@@ -41,8 +42,31 @@ describe UniversityEmail do
     end
   end
 
+  describe '#being_deprovisioned?' do
+    subject { UniversityEmail.create(uuid: uuid, address: address) }
+
+    context 'when no deprovision schedules' do
+      it { expect(subject.being_deprovisioned?).to be false }
+    end
+
+    context 'when completed deprovision schedules' do
+      before { subject.deprovision_schedules.create action: :delete, scheduled_for: 1.day.ago, completed_at: 1.day.ago }
+      it { expect(subject.being_deprovisioned?).to be false }
+    end
+
+    context 'when canceled deprovision schedules' do
+      before { subject.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now, canceled: true }
+      it { expect(subject.being_deprovisioned?).to be false }
+    end
+
+    context 'when incomplete deprovision schedules' do
+      before { subject.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now }
+      it { expect(subject.being_deprovisioned?).to be true }
+    end
+  end
+
   describe '#cancel_deprovisioning!' do
-    let!(:email) { UniversityEmail.create! uuid: uuid, address: 'test@example.com' }
+    let!(:email) { UniversityEmail.create! uuid: uuid, address: address }
     let!(:completed) { email.deprovision_schedules.create(action: :notify_of_inactivity, scheduled_for: 1.day.ago, completed_at: 1.day.ago) }
     let!(:incomplete) { email.deprovision_schedules.create(action: :notify_of_inactivity, scheduled_for: 1.day.ago, job_id: '123') }
 
@@ -52,27 +76,50 @@ describe UniversityEmail do
     it { expect { email.cancel_deprovisioning! }.to change { incomplete.canceled? }.from(false).to true }
   end
 
+  describe '.current' do
+    context 'without a record' do
+      it { expect(UniversityEmail.current(address)).to be nil }
+    end
+
+    context 'with a record' do
+      before { UniversityEmail.create uuid: uuid, address: 'bob.dole@biola.edu', state: state }
+
+      context 'when active' do
+        let(:state) { :active }
+        it { expect(UniversityEmail.current(address)).to be_a UniversityEmail }
+      end
+
+      context 'with a suspended record' do
+        let(:state) { :suspended }
+        it { expect(UniversityEmail.current(address)).to be_a UniversityEmail }
+      end
+
+      context 'with deleted record' do
+        let(:state) { :deleted }
+        it { expect(UniversityEmail.current(address)).to be nil }
+      end
+    end
+  end
+
   describe '.active?' do
     subject { UniversityEmail }
+
     context 'when no emails' do
       it { expect(subject.active?(uuid)).to be false }
     end
 
     context 'when an suspended email' do
-      before { subject.create uuid: uuid, address: 'test@example.com', state: :suspended }
+      before { subject.create uuid: uuid, address: address, state: :suspended }
       it { expect(subject.active?(uuid)).to be false }
     end
 
     context 'when an active email' do
-      before { subject.create uuid: uuid, address: 'test@example.com', state: :active }
+      before { subject.create uuid: uuid, address: address, state: :active }
       it { expect(subject.active?(uuid)).to be true }
     end
   end
 
   describe '.available?' do
-    let(:uuid) { '00000000-0000-0000-0000-000000000000' }
-    let(:address) { 'bob.dole@biola.edu' }
-
     subject { UniversityEmail }
 
     context "when email doesn't exist" do
@@ -97,17 +144,17 @@ describe UniversityEmail do
     end
 
     context 'when person has an active email' do
-      let!(:email) { UniversityEmail.create uuid: uuid, address: 'test@example.com', primary: true, state: :active }
+      let!(:email) { UniversityEmail.create uuid: uuid, address: address, primary: true, state: :active }
       it { expect(UniversityEmail.find_reprovisionable(uuid)).to be nil }
     end
 
     context 'when person has a suspended email' do
-      let!(:email) { UniversityEmail.create uuid: uuid, address: 'test@example.com', primary: true, state: :suspended }
+      let!(:email) { UniversityEmail.create uuid: uuid, address: address, primary: true, state: :suspended }
       it { expect(UniversityEmail.find_reprovisionable(uuid)).to eql email }
     end
 
     context 'when person has a deleted email' do
-      let!(:email) { UniversityEmail.create uuid: uuid, address: 'test@example.com', primary: true, state: :deleted }
+      let!(:email) { UniversityEmail.create uuid: uuid, address: address, primary: true, state: :deleted }
       it { expect(UniversityEmail.find_reprovisionable(uuid)).to eql email }
     end
   end

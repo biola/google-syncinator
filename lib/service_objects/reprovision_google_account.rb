@@ -3,11 +3,7 @@ module ServiceObjects
     class ReprovisionError < StandardError; end
 
     def call
-      reprovisionable_email.deprovision_schedules << DeprovisionSchedule.new(action: :activate, scheduled_for: DateTime.now, completed_at: DateTime.now)
-      reprovisionable_email.update state: :active
-      Workers::CreateTrogdirEmail.perform_async change.person_uuid, reprovisionable_email.address
-      Workers::UnexpireLegacyEmailTable.perform_async(change.biola_id, reprovisionable_email.address)
-
+      Workers::Deprovisioning::Activate.perform_async(reprovisionable_email.id)
       :create
     end
 

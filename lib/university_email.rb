@@ -23,11 +23,19 @@ class UniversityEmail
     deprovision_schedules.where(:action.in => [:suspend, :delete]).asc(:scheduled_for).first.try(:scheduled_for)
   end
 
+  def being_deprovisioned?
+    deprovision_schedules.any?(&:pending?)
+  end
+
   def cancel_deprovisioning!
     deprovision_schedules.where(completed_at: nil).each do |schedule|
       Sidekiq::Status.cancel schedule.job_id
       schedule.update canceled: true
     end
+  end
+
+  def self.current(address)
+    UniversityEmail.where(address: address, :state.ne => :deleted).first
   end
 
   def self.active?(uuid)

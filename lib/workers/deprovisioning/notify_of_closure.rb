@@ -8,6 +8,7 @@ module Workers
         schedule = email.deprovision_schedules.find_by(action: :notify_of_closure, job_id: jid)
 
         unless schedule.canceled?
+          #TODO: only notify on the primary email?
           Emails::NotifyOfClosure.new(schedule).send!
           schedule.update completed_at: DateTime.now
         end

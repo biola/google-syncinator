@@ -12,6 +12,7 @@ module Workers
           if GoogleAccount.new(email.address).last_login > 1.year.ago
             email.cancel_deprovisioning!
           else
+            #TODO: only notify on the primary email?
             Emails::NotifyOfInactivity.new(schedule).send!
             schedule.update completed_at: DateTime.now
           end

@@ -9,20 +9,9 @@ describe ServiceObjects::ReprovisionGoogleAccount do
   describe '#call' do
     let!(:university_email) { UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, state: :suspended) }
 
-    it 'activates the email' do
-      expect { subject.call }.to change { university_email.reload.deprovision_schedules.count }.by 1
-    end
-
-    it 'adds an activate deprovision schedule' do
-      expect { subject.call }.to change { university_email.reload.state }.from(:suspended).to :active
-    end
-
-    it 'creates a Trogdir email' do
-      expect { subject.call }.to change(Workers::CreateTrogdirEmail.jobs, :size).by 1
-    end
-
-    it 'unexpires the legacy email table' do
-      expect { subject.call }.to change(Workers::UnexpireLegacyEmailTable.jobs, :size).by 1 
+    it 'calls Workers::Deprovisioning::Activate' do
+      expect(Workers::Deprovisioning::Activate).to receive(:perform_async).with(university_email.id)
+      subject.call
     end
   end
 

@@ -2,6 +2,7 @@ class DeprovisionSchedule
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  ACTIONS = [:notify_of_inactivity, :notify_of_closure, :suspend, :delete, :activate]
   STATE_MAP = {
     activate: :active,
     suspend: :suspended,
@@ -21,7 +22,11 @@ class DeprovisionSchedule
   validates :scheduled_for, presence: true, unless: :completed_at?
   validates :completed_at, presence: true, unless: :scheduled_for?
   # TODO: do we need a "check again in 1 month" action
-  validates :action, inclusion: {in: [:notify_of_inactivity, :notify_of_closure, :suspend, :delete, :activate]}
+  validates :action, inclusion: {in: ACTIONS}
+
+  def pending?
+    !(completed_at? || canceled?)
+  end
 
   after_save do
     if completed_at_changed? && completed_at.present?
