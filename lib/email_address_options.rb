@@ -1,11 +1,4 @@
 class EmailAddressOptions
-  # TODO: these should probably be stored in config
-  EMPLOYEEISH_AFFILIATIONS = ['employee', 'trustee', 'faculty', 'other', 'faculty emeritus']
-  STUDENTISH_AFFILIATIONS = ['student']
-  # Affiliattons that are required to have an email address
-  REQUIRED_AFFILIATIONS = EMPLOYEEISH_AFFILIATIONS + STUDENTISH_AFFILIATIONS
-  # Affiliatoins thhat can have an email address but it is not required
-  ALLOWED_AFFILIATIONS = ['alumnus']
   SEPARATOR = '.'
 
   attr_reader :affiliations, :preferred_name, :first_name, :middle_name, :last_name
@@ -44,12 +37,12 @@ class EmailAddressOptions
 
   # Must have an email address
   def self.required?(affiliations)
-    (affiliations & REQUIRED_AFFILIATIONS).any?
+    (affiliations & Settings.affiliations.email_required).any?
   end
 
   # Can have an email address, but it's not required
   def self.not_required?(affiliations)
-    !required?(affiliations) && (affiliations & ALLOWED_AFFILIATIONS).any?
+    !required?(affiliations) && (affiliations & Settings.affiliations.email_allowed).any?
   end
 
   # Is allowed to have an email address
@@ -68,10 +61,10 @@ class EmailAddressOptions
   end
 
   def self.employeeish?(affiliations)
-    (affiliations & EMPLOYEEISH_AFFILIATIONS).any?
+    (affiliations & Settings.affiliations.employeeish).any?
   end
 
   def self.studentish?(affiliations)
-    (affiliations & STUDENTISH_AFFILIATIONS).any?
+    (affiliations & Settings.affiliations.studentish).any?
   end
 end

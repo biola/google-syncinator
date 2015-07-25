@@ -44,6 +44,29 @@ email:
   delivery_method: test
   options: {}
 
+affiliations:
+  # affiliations that get a john.doe style email
+  employeeish:
+    - employee
+    - trustee
+    - faculty
+    - other
+    - faculty emeritus
+  # affiliations that get a john.h.doe style email
+  studentish:
+    - student
+  # these affiliations are required to have an email address
+  email_required:
+    - employee
+    - trustee
+    - faculty
+    - other
+    - faculty emeritus
+    - student
+  # these affiliations are allowed but not required to have an email address
+  email_allowed:
+    - alumnus
+
 groups:
   whitelist:
     - Alpha 1st East
