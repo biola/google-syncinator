@@ -13,9 +13,10 @@ module Workers
           person = TrogdirPerson.new(email.uuid)
 
           if EmailAddressOptions.not_required?(person.affiliations)
-            # TODO: ensure we're past the 1 month buffer
-            # TODO: double check that they were never active
-            Workers::ScheduleActions.perform_async email.uuid, *Settings.deprovisioning.schedules.allowed.never_active
+            if GoogleAccount.new(email_address).never_active?
+              # TODO: ensure we're past the 1 month buffer
+              Workers::ScheduleActions.perform_async email.uuid, *Settings.deprovisioning.schedules.allowed.never_active
+            end
           end
         end
       end

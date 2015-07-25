@@ -44,6 +44,7 @@ class GoogleAccount
   def never_logged_in?
     last_login.present?
   end
+  alias :never_active? :never_logged_in?
 
   def create_or_update!(first_name, last_name, department, title, privacy)
     if exists?
@@ -134,6 +135,8 @@ class GoogleAccount
     GoogleAccount.full_email(email)
   end
 
+  # WARNING: the usage report from google isn't available up to the minute
+  # so it's always best to check GoogleAccount#never_active? too
   def self.never_active
     page_token = nil
     never_active_emails = []
@@ -163,6 +166,8 @@ class GoogleAccount
     never_active_emails
   end
 
+  # WARNING: the usage report from google isn't available up to the minute
+  # so it's always best to check GoogleAccount#never_active? too
   def self.inactive
     page_token = nil
     inactive_emails = []

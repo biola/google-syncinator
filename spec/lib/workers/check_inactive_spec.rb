@@ -28,11 +28,24 @@ describe Workers::CheckInactive do
       end
 
       context 'when the person is just an alumnus' do
-        let(:affiliations) { ['alumnus'] }
+        context "when they're really inactive" do
+          let(:affiliations) { ['alumnus'] }
+          before { expect_any_instance_of(GoogleAccount).to receive(:inactive?).and_return true }
 
-        it 'scheduled deprovisioning' do
-          expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
-          Workers::CheckInactive.new.perform
+          it 'scheduled deprovisioning' do
+            expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
+            Workers::CheckInactive.new.perform
+          end
+        end
+
+        context 'when they really have been active recently' do
+          let(:affiliations) { ['alumnus'] }
+          before { expect_any_instance_of(GoogleAccount).to receive(:inactive?).and_return false }
+
+          it 'does nothing' do
+            expect(Workers::ScheduleActions).to_not receive(:perform_async)
+            Workers::CheckInactive.new.perform
+          end
         end
       end
     end
