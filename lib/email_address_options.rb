@@ -1,6 +1,10 @@
 class EmailAddressOptions
+  # TODO: these should probably be stored in config
   EMPLOYEEISH_AFFILIATIONS = ['employee', 'trustee', 'faculty', 'other', 'faculty emeritus']
   STUDENTISH_AFFILIATIONS = ['student']
+  # Affiliattons that are required to have an email address
+  REQUIRED_AFFILIATIONS = EMPLOYEEISH_AFFILIATIONS + STUDENTISH_AFFILIATIONS
+  # Affiliatoins thhat can have an email address but it is not required
   ALLOWED_AFFILIATIONS = ['alumnus']
   SEPARATOR = '.'
 
@@ -38,10 +42,17 @@ class EmailAddressOptions
     options.uniq
   end
 
-  def self.not_required?(affiliations)
-    (affiliations & ALLOWED_AFFILIATIONS).any?
+  # Must have an email address
+  def self.required?(affiliations)
+    (affiliations & REQUIRED_AFFILIATIONS).any?
   end
 
+  # Can have an email address, but it's not required
+  def self.not_required?(affiliations)
+    !required?(affiliations) && (affiliations & ALLOWED_AFFILIATIONS).any?
+  end
+
+  # Is allowed to have an email address
   def self.allowed?(affiliations)
     employeeish?(affiliations) || studentish?(affiliations) || not_required?(affiliations)
   end
