@@ -34,6 +34,11 @@ describe TrogdirPerson do
     it { expect(subject.biola_id).to eql 1234567 }
   end
 
+  describe '#affiliatons' do
+    let(:hash) { {'affiliations' => ['alumnus', 'employee']} }
+    it { expect(subject.affiliations).to eql ['alumnus', 'employee'] }
+  end
+
   describe '#first_or_preferred_name' do
     context 'with no preferred_name' do
       let(:hash) { {'preferred_name' => nil, 'first_name' => 'Robert'} }

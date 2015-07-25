@@ -17,9 +17,23 @@ describe Workers::CheckInactive do
     before { expect(GoogleAccount).to receive(:inactive).and_return [address] }
 
     context 'when email is not being deprovisioned' do
-      it 'scheduled deprovisioning' do
-        expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
-        Workers::CheckInactive.new.perform
+      before { expect_any_instance_of(TrogdirPerson).to receive(:affiliations).and_return affiliations}
+
+      context 'when the person is an employee' do
+        let(:affiliations) { ['employee'] }
+
+        it 'does not schedule deprovisioning' do
+          expect { Workers::CheckInactive.new.perform }.to_not change { Workers::ScheduleActions.jobs.length }.from 0
+        end
+      end
+
+      context 'when the person is just an alumnus' do
+        let(:affiliations) { ['alumnus'] }
+
+        it 'scheduled deprovisioning' do
+          expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
+          Workers::CheckInactive.new.perform
+        end
       end
     end
 

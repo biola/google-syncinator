@@ -6,7 +6,7 @@ class TrogdirPerson
     @uuid = uuid
   end
 
-  %w(first_name last_name department title privacy).each do |m|
+  %w(first_name last_name department title privacy affiliations).each do |m|
     define_method(m) do
       hash[m]
     end
