@@ -2,19 +2,18 @@ module ServiceObjects
   class DeprovisionGoogleAccount < Base
     def call
       # TODO: check for 1 month buffer
-      # TODO: all times should be set in config
 
       # Not allowed to have an email?
       if !EmailAddressOptions.allowed?(change.affiliations)
 
         # Never logged in
         if google_account.never_logged_in?
-          schedule_actions! 5.days.to_i, :delete
+          schedule_actions!(*Settings.deprovisioning.schedules.unallowed.never_active)
           :schedule_deprovision
 
         # Has logged in
         else
-          schedule_actions! 5.days.to_i, :notify_of_closure, 1.week.to_i, :suspend, 6.months.to_i, :delete
+          schedule_actions!(*Settings.deprovisioning.schedules.unallowed.active)
           :schedule_deprovision
         end
 
@@ -23,12 +22,12 @@ module ServiceObjects
 
         # Never logged in
         if google_account.never_logged_in?
-          schedule_actions! 5.days.to_i, :suspend, 6.months.to_i, :delete
+          schedule_actions!(*Settings.deprovisioning.schedules.allowed.never_active)
           :schedule_deprovision
 
         # Logged in over a year ago
-        elsif google_account.last_login < 1.year.ago
-          schedule_actions! 5.days.to_i, :notify_of_inactivity, 27.days.to_i, :notify_of_inactivity, 3.days.to_i, :suspend, 6.months.to_i, :delete
+      elsif google_account.inactive?
+          schedule_actions!(*Settings.deprovisioning.schedules.allowed.inactive)
           :schedule_deprovision
 
         # Logged in within the last year

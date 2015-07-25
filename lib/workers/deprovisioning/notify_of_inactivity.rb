@@ -8,8 +8,7 @@ module Workers
         schedule = email.deprovision_schedules.find_by(action: :notify_of_inactivity, job_id: jid)
 
         unless schedule.canceled?
-          # TODO: grab duration from config
-          if GoogleAccount.new(email.address).last_login > 1.year.ago
+          if GoogleAccount.new(email.address).active?
             email.cancel_deprovisioning!
           else
             #TODO: only notify on the primary email?

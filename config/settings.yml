@@ -6,6 +6,11 @@ sentry:
 
 google:
   domain: biola.edu
+  usage_report:
+    # You'd think you could just set this to today but it seems like you get errors like
+    # "Data for dates later than ______ is not yet available" unless you back about 2-3 days
+    # See https://developers.google.com/admin-sdk/reports/v1/reference/userUsageReport/get
+    days_ago: 3
   api_client:
     application_name: google-syncinator
     application_version: '0.1.0'
@@ -43,6 +48,40 @@ email:
   from: no-reply@biola.edu
   delivery_method: test
   options: {}
+
+# all times should be in seconds
+deprovisioning:
+  inactive_after: 31557600 # 1 year
+  reusable_after: 15552000 # 6 months
+  schedules:
+    # typically alumni only
+    allowed:
+      never_active:
+        - 432000 # 5 days
+        - :suspend
+        - 15552000 # 6 months
+        - :delete
+      inactive:
+        - 432000 # 5 days
+        - :notify_of_inactivity
+        - 2332800 # 27 days
+        - :notify_of_inactivity
+        - 259200 # 3.days
+        - :suspend
+        - 15552000 # 6 months
+        - :delete
+    # typically those with no affiliations
+    unallowed:
+      never_active:
+        - 432000 # 5 days
+        - :delete
+      active:
+        - 432000 # 5 days
+        - :notify_of_closure
+        - 604800 # 1 week
+        - :suspend
+        - 15552000 # 6 months
+        - :delete
 
 affiliations:
   # affiliations that get a john.doe style email

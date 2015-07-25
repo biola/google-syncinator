@@ -4,8 +4,9 @@ module Workers
 
     include Sidekiq::Worker
 
-    # TODO: grab times from config
-    def perform(biola_id, email_address, expire_on = Time.now, reusable_on = 6.months.from_now)
+    def perform(biola_id, email_address, expire_on = Time.now, reusable_on = nil)
+      reusable_on ||= Time.now + Settings.deprovisioning.reusable_after
+
       db = Sequel.connect(Settings.ws.db.to_hash)
 
       row = db[:email].where(idnumber: biola_id, email: email_address).first

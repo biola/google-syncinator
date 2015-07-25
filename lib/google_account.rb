@@ -29,6 +29,14 @@ class GoogleAccount
     data['lastLoginTime'].to_i == 0 ? nil : data['lastLoginTime']
   end
 
+  def active?
+    last_login >= (Time.now - Settings.deprovisioning.inactive_after)
+  end
+
+  def inactive?
+    !active?
+  end
+
   def logged_in?
     last_login.nil?
   end
@@ -135,7 +143,7 @@ class GoogleAccount
         api_method: reports.user_usage_report.get,
         parameters: {
           userKey: 'all',
-          date: 3.days.ago.to_date.to_s, # TODO: grab from settings
+          date: Settings.google.usage_report.days_ago.days.ago.to_date.to_s,
           filters: "accounts:last_login_time==#{ZERO_DATE},accounts:is_disabled==false",
           parameters: 'accounts:last_login_time',
           fields: 'nextPageToken,usageReports(entity/userEmail,parameters)',
@@ -160,12 +168,14 @@ class GoogleAccount
     inactive_emails = []
 
     loop do
+      inactive_date = (Time.now - Settings.deprovisioning.inactive_after)
+
       result = api.execute(
         api_method: reports.user_usage_report.get,
         parameters: {
           userKey: 'all',
-          date: 3.days.ago.to_date.to_s, # TODO: grab from settings
-          filters: "accounts:last_login_time<#{1.year.ago.iso8601},accounts:last_login_time>#{ZERO_DATE},accounts:is_disabled==false",
+          date: Settings.google.usage_report.days_ago.days.ago.to_date.to_s,
+          filters: "accounts:last_login_time<#{inactive_date.iso8601},accounts:last_login_time>#{ZERO_DATE},accounts:is_disabled==false",
           parameters: 'accounts:last_login_time',
           fields: 'nextPageToken,usageReports(entity/userEmail,parameters)',
           pageToken: page_token
@@ -175,10 +185,9 @@ class GoogleAccount
       raise GoogleAppsAPIError, result.error_message unless result.success?
 
       result.data.usage_reports.each do |report|
-        # TODO: get time from Settings
         last_login = report.parameters.find{|p| p.name = 'accounts:last_login_time'}.datetime_value
         # It shouldn't be necessary to recheck the last_login here but better safe than sorry
-        if last_login < 1.year.ago
+        if last_login < inactive_date
           inactive_emails << report.entity.user_email
         end
       end

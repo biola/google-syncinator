@@ -4,6 +4,38 @@ describe GoogleAccount do
   let(:email) { 'bob.dole' }
   subject { GoogleAccount.new(email) }
 
+  describe '#active?' do
+    context 'when less than a year since last login' do
+      it 'is true' do
+        expect(subject).to receive(:last_login).and_return 364.days.ago
+        expect(subject.active?).to be true
+      end
+    end
+
+    context 'when more than a year since last login' do
+      it 'is false' do
+        expect(subject).to receive(:last_login).and_return 366.days.ago
+        expect(subject.active?).to be false
+      end
+    end
+  end
+
+  describe '#inactive?' do
+    context 'when less than a year since last login' do
+      it 'is false' do
+        expect(subject).to receive(:last_login).and_return 364.days.ago
+        expect(subject.inactive?).to be false
+      end
+    end
+
+    context 'when more than a year since last login' do
+      it 'is true' do
+        expect(subject).to receive(:last_login).and_return 366.days.ago
+        expect(subject.inactive?).to be true
+      end
+    end
+  end
+
   describe '#full_email' do
     it { expect(subject.full_email).to eql 'bob.dole@example.com' }
   end

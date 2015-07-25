@@ -45,7 +45,7 @@ describe ServiceObjects::DeprovisionGoogleAccount do
       end
 
       context 'having not logged in in over a year' do
-        before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, last_login: 13.months.ago) }
+        before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, inactive?: true) }
 
         it 'schedules notify_of_inactivity twice, suspend and delete' do
           expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
@@ -54,7 +54,7 @@ describe ServiceObjects::DeprovisionGoogleAccount do
       end
 
       context 'having logged in in the last year' do
-        before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, last_login: 354.days.ago) }
+        before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, inactive?: false) }
 
         it 'does nothing' do
           expect(Workers::ScheduleActions).to_not receive(:perform_async)

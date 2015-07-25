@@ -14,8 +14,8 @@ module Workers
 
           if EmailAddressOptions.not_required?(person.affiliations)
             # TODO: ensure we're past the 1 month buffer
-            # TODO: all times should be set in config
-            Workers::ScheduleActions.perform_async email.uuid, 5.days.to_i, :suspend, 6.months.to_i, :delete
+            # TODO: double check that they were never active
+            Workers::ScheduleActions.perform_async email.uuid, *Settings.deprovisioning.schedules.allowed.never_active
           end
         end
       end

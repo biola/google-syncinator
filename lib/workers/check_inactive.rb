@@ -13,9 +13,9 @@ module Workers
           person = TrogdirPerson.new(email.uuid)
 
           if EmailAddressOptions.not_required?(person.affiliations)
+            # TODO: double check that they're inactive
             # TODO: ensure we're past the 1 month buffer
-            # TODO: all times should be set in config
-            Workers::ScheduleActions.perform_async email.uuid, 5.days.to_i, :notify_of_inactivity, 27.days.to_i, :notify_of_inactivity, 3.days.to_i, :suspend, 6.months.to_i, :delete
+            Workers::ScheduleActions.perform_async email.uuid, *Settings.deprovisioning.schedules.allowed.inactive
           end
         end
       end
