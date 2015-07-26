@@ -23,6 +23,15 @@ class UniversityEmail
     deprovision_schedules.where(:action.in => [:suspend, :delete]).asc(:scheduled_for).first.try(:scheduled_for)
   end
 
+  # Recently created emails are protected from deprovisioning for a certain amount of time
+  def protected?
+    created_at > (Time.now - Settings.deprovisioning.protect_for)
+  end
+
+  def protected_until
+    created_at + Settings.deprovisioning.protect_for
+  end
+
   def being_deprovisioned?
     deprovision_schedules.any?(&:pending?)
   end

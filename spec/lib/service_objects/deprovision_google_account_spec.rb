@@ -1,64 +1,75 @@
 require 'spec_helper'
 
 describe ServiceObjects::DeprovisionGoogleAccount do
-  let(:fixture) { 'create_accepted_student' }
+  let(:fixture) { 'update_person_remove_all_affiliations' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }
   subject { ServiceObjects::DeprovisionGoogleAccount.new(trogdir_change) }
 
   describe '#call' do
     let(:uuid) { '00000000-0000-0000-0000-000000000000' }
-    let!(:university_email) { UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email) }
+    let!(:university_email) { UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, created_at: created_at) }
 
-    context 'when no affiliations' do
-      let(:fixture) { 'update_person_remove_all_affiliations' }
+    context 'when email is protected' do
+      let(:created_at) { Time.now - Settings.deprovisioning.protect_for + 86400 }
 
-      context 'having never logged in' do
-        before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return true }
-
-        it 'schedules delete' do
-          expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :delete)
-          subject.call
-        end
-      end
-
-      context 'having logged in' do
-        before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return false }
-
-        it 'schedules notify_of_closure, suspend and delete' do
-          expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_closure, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
-          subject.call
-        end
+      it 'schedules deprovisioning for later' do
+        expect(Workers::DeprovisionGoogleAccount).to receive(:perform_at).with a_kind_of(Time), a_kind_of(Hash)
+        subject.call
       end
     end
 
-    context 'when just an alumnus' do
-      let(:fixture) { 'update_person_remove_affiliation' }
+    context 'when email is not protected' do
+      let(:created_at) { Time.now - Settings.deprovisioning.protect_for - 86400 }
 
-      context 'having never logged in' do
-        before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return true }
+      context 'when no affiliations' do
+        context 'having never logged in' do
+          before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return true }
 
-        it 'schedules suspend and delete' do
-          expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
-          subject.call
+          it 'schedules delete' do
+            expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :delete)
+            subject.call
+          end
+        end
+
+        context 'having logged in' do
+          before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return false }
+
+          it 'schedules notify_of_closure, suspend and delete' do
+            expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_closure, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
+            subject.call
+          end
         end
       end
 
-      context 'having not logged in in over a year' do
-        before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, inactive?: true) }
+      context 'when just an alumnus' do
+        let(:fixture) { 'update_person_remove_affiliation' }
 
-        it 'schedules notify_of_inactivity twice, suspend and delete' do
-          expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
-          subject.call
+        context 'having never logged in' do
+          before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return true }
+
+          it 'schedules suspend and delete' do
+            expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
+            subject.call
+          end
         end
-      end
 
-      context 'having logged in in the last year' do
-        before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, inactive?: false) }
+        context 'having not logged in in over a year' do
+          before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, inactive?: true) }
 
-        it 'does nothing' do
-          expect(Workers::ScheduleActions).to_not receive(:perform_async)
-          subject.call
+          it 'schedules notify_of_inactivity twice, suspend and delete' do
+            expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
+            subject.call
+          end
+        end
+
+        context 'having logged in in the last year' do
+          before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, inactive?: false) }
+
+          it 'does nothing' do
+            expect(Workers::ScheduleActions).to_not receive(:perform_async)
+            subject.call
+          end
         end
       end
     end
@@ -66,6 +77,7 @@ describe ServiceObjects::DeprovisionGoogleAccount do
 
   describe '#ignore?' do
     context "when universtiy email doesn't exist" do
+      let(:fixture) { 'create_accepted_student' }
       it { expect(subject.ignore?).to be true }
     end
 
@@ -80,7 +92,6 @@ describe ServiceObjects::DeprovisionGoogleAccount do
     end
 
     context 'when removing all affiliations' do
-      let(:fixture) { 'update_person_remove_all_affiliations' }
       it { expect(subject.ignore?).to be false }
     end
   end

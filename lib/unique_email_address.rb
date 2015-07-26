@@ -13,7 +13,7 @@ class UniqueEmailAddress
   def best
     # Grab the first one that's available
     best = options.find do |email|
-      # TODO: For now we're checking Google too to be safe. But when all emails are in university_emails, that won't be necessary
+      # NOTE: For now we're checking Google too to be safe. When all emails are in university_emails, that may not be necessary
       UniversityEmail.available?(email) && GoogleAccount.new(email).available?
     end
 

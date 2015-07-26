@@ -9,6 +9,7 @@ module Workers
   require './lib/workers/check_never_active'
   require './lib/workers/create_trogdir_email'
   require './lib/workers/delete_trogdir_email'
+  require './lib/workers/deprovision_google_account'
   require './lib/workers/expire_legacy_email_table'
   require './lib/workers/handle_change'
   require './lib/workers/handle_changes'

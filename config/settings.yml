@@ -51,6 +51,8 @@ email:
 
 # all times should be in seconds
 deprovisioning:
+  # period to protect new accounts from being deprovisioned
+  protect_for: 2592000 # 30 days
   inactive_after: 31557600 # 1 year
   reusable_after: 15552000 # 6 months
   schedules:

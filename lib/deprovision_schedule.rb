@@ -21,7 +21,6 @@ class DeprovisionSchedule
   validates :action, presence: true
   validates :scheduled_for, presence: true, unless: :completed_at?
   validates :completed_at, presence: true, unless: :scheduled_for?
-  # TODO: do we need a "check again in 1 month" action
   validates :action, inclusion: {in: ACTIONS}
 
   def pending?

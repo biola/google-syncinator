@@ -1,7 +1,13 @@
 module ServiceObjects
   class DeprovisionGoogleAccount < Base
     def call
-      # TODO: check for 1 month buffer
+      # If the email address was recently created and is in it's protection period,
+      # then schedule deprovisioning for the end of the protected period
+      if university_email.protected?
+        # Add 5 minutes to be sure we're past the protection time
+        Workers::DeprovisionGoogleAccount.perform_at(university_email.protected_until + 300, change.hash)
+        return :nothing
+      end
 
       # Not allowed to have an email?
       if !EmailAddressOptions.allowed?(change.affiliations)
@@ -47,6 +53,10 @@ module ServiceObjects
     end
 
     private
+
+    def university_email
+      @university_email ||= UniversityEmail.find_by(uuid: change.person_uuid, address: change.university_email)
+    end
 
     def schedule_actions!(*actions_and_durations)
       Workers::ScheduleActions.perform_async(change.person_uuid, *actions_and_durations)

@@ -9,12 +9,11 @@ module Workers
       GoogleAccount.inactive.each do |email_address|
         email = UniversityEmail.current(email_address)
 
-        unless email.being_deprovisioned?
+        unless email.being_deprovisioned? || email.protected?
           person = TrogdirPerson.new(email.uuid)
 
           if EmailAddressOptions.not_required?(person.affiliations)
             if GoogleAccount.new(email_address).inactive?
-              # TODO: ensure we're past the 1 month buffer
               Workers::ScheduleActions.perform_async email.uuid, *Settings.deprovisioning.schedules.allowed.inactive
             end
           end

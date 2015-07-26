@@ -12,39 +12,50 @@ describe Workers::CheckNeverActive do
   context 'with never active emails' do
     let(:uuid) { '00000000-0000-0000-0000-000000000000' }
     let(:address) { 'bob.dole@biola.edu' }
-    let!(:email) { UniversityEmail.create(uuid: uuid, address: address) }
+    let(:created_at) { 31.days.ago }
+    let!(:email) { UniversityEmail.create(uuid: uuid, address: address, created_at: created_at) }
 
     before { expect(GoogleAccount).to receive(:never_active).and_return [address] }
 
     context 'when email is not being deprovisioned' do
-      before { expect_any_instance_of(TrogdirPerson).to receive(:affiliations).and_return affiliations}
-
-      context 'when person is an employee' do
-        let(:affiliations) { ['employee'] }
+      context 'when email is protected' do
+        let(:created_at) { 29.days.ago }
 
         it 'does not schedule deprovisioning' do
           expect { Workers::CheckNeverActive.new.perform }.to_not change { Workers::ScheduleActions.jobs.length }.from 0
         end
       end
 
-      context 'when person is just an alumnus' do
-        context "when they're really inactive" do
-          let(:affiliations) { ['alumnus'] }
-          before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return true }
+      context 'when email is not protected' do
+        before { expect_any_instance_of(TrogdirPerson).to receive(:affiliations).and_return affiliations}
 
-          it 'scheduled deprovisioning' do
-            expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
-            Workers::CheckNeverActive.new.perform
+        context 'when person is an employee' do
+          let(:affiliations) { ['employee'] }
+
+          it 'does not schedule deprovisioning' do
+            expect { Workers::CheckNeverActive.new.perform }.to_not change { Workers::ScheduleActions.jobs.length }.from 0
           end
         end
 
-        context 'when they really have been active recently' do
-          let(:affiliations) { ['alumnus'] }
-          before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return false }
+        context 'when person is just an alumnus' do
+          context "when they're really inactive" do
+            let(:affiliations) { ['alumnus'] }
+            before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return true }
 
-          it 'does nothing' do
-            expect(Workers::ScheduleActions).to_not receive(:perform_async)
-            Workers::CheckNeverActive.new.perform
+            it 'scheduled deprovisioning' do
+              expect(Workers::ScheduleActions).to receive(:perform_async).with(uuid, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
+              Workers::CheckNeverActive.new.perform
+            end
+          end
+
+          context 'when they really have been active recently' do
+            let(:affiliations) { ['alumnus'] }
+            before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return false }
+
+            it 'does nothing' do
+              expect(Workers::ScheduleActions).to_not receive(:perform_async)
+              Workers::CheckNeverActive.new.perform
+            end
           end
         end
       end

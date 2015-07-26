@@ -42,6 +42,33 @@ describe UniversityEmail do
     end
   end
 
+  describe '#protected?' do
+    context 'when created_at is recent' do
+      subject { UniversityEmail.new(uuid: uuid, address: address, created_at: 29.days.ago) }
+      it { expect(subject.protected?).to be true }
+    end
+
+    context 'when created at is a long time ago' do
+      subject { UniversityEmail.new(uuid: uuid, address: address, created_at: 31.days.ago) }
+      it { expect(subject.protected?).to be false }
+    end
+  end
+
+  describe '#protected_until' do
+    let(:now) { Time.now }
+    subject { UniversityEmail.new(uuid: uuid, address: address, created_at: created_at) }
+
+    context 'when created before the protection period' do
+      let(:created_at) { now - Settings.deprovisioning.protect_for - 86400 }
+      it { expect(subject.protected_until).to eql now - 86400 }
+    end
+
+    context 'when created within the protection peroid' do
+      let(:created_at) { now - Settings.deprovisioning.protect_for + 86400 }
+      it { expect(subject.protected_until).to eql now + 86400 }
+    end
+  end
+
   describe '#being_deprovisioned?' do
     subject { UniversityEmail.create(uuid: uuid, address: address) }
 
