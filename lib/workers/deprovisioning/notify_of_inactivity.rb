@@ -11,8 +11,8 @@ module Workers
           if GoogleAccount.new(email.address).active?
             email.cancel_deprovisioning!
           else
-            #TODO: only notify on the primary email?
-            Emails::NotifyOfInactivity.new(schedule).send!
+            # Only send a notice to the primary email to avoid duplicate emails
+            Emails::NotifyOfInactivity.new(schedule).send! if email.primary?
             schedule.update completed_at: DateTime.now
           end
         end
