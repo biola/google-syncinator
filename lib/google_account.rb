@@ -38,11 +38,11 @@ class GoogleAccount
   end
 
   def logged_in?
-    last_login.nil?
+    last_login.present?
   end
 
   def never_logged_in?
-    last_login.present?
+    last_login.nil?
   end
   alias :never_active? :never_logged_in?
 
@@ -73,8 +73,7 @@ class GoogleAccount
 
     new_user = directory.users.insert.request_schema.new(params)
 
-    result = api.execute api_method: directory.users.insert, body_object: new_user
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    execute api_method: directory.users.insert, body_object: new_user
 
     true
   end
@@ -94,8 +93,7 @@ class GoogleAccount
 
     user_updates = directory.users.update.request_schema.new(params)
 
-    result = api.execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end
@@ -109,8 +107,7 @@ class GoogleAccount
   end
 
   def delete!
-    result = api.execute api_method: directory.users.delete, parameters: {userKey: email}
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    execute api_method: directory.users.delete, parameters: {userKey: email}
 
     true
   end
@@ -121,14 +118,12 @@ class GoogleAccount
 
     new_member = directory.members.insert.request_schema.new(params)
 
-    result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
   end
 
   def leave!(group)
     group = GoogleAccount.group_to_email(group)
-    result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
   end
 
   def full_email
@@ -142,7 +137,7 @@ class GoogleAccount
     never_active_emails = []
 
     loop do
-      result = api.execute(
+      result = execute(
         api_method: reports.user_usage_report.get,
         parameters: {
           userKey: 'all',
@@ -153,8 +148,6 @@ class GoogleAccount
           pageToken: page_token
         }
       )
-
-      raise GoogleAppsAPIError, result.error_message unless result.success?
 
       result.data.usage_reports.each do |report|
         never_active_emails << report.entity.user_email
@@ -175,7 +168,7 @@ class GoogleAccount
     loop do
       inactive_date = (Time.now - Settings.deprovisioning.inactive_after)
 
-      result = api.execute(
+      result = execute(
         api_method: reports.user_usage_report.get,
         parameters: {
           userKey: 'all',
@@ -186,8 +179,6 @@ class GoogleAccount
           pageToken: page_token
         }
       )
-
-      raise GoogleAppsAPIError, result.error_message unless result.success?
 
       result.data.usage_reports.each do |report|
         last_login = report.parameters.find{|p| p.name = 'accounts:last_login_time'}.datetime_value
@@ -224,8 +215,7 @@ class GoogleAccount
   def update_suspension!(suspend = true)
     user_updates = directory.users.update.request_schema.new(suspend: suspend)
 
-    result = api.execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end
@@ -254,6 +244,16 @@ class GoogleAccount
     @api = self.class.api
   end
 
+  def self.execute(argument_hash)
+    result = api.execute(argument_hash)
+    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    result
+  end
+
+  def execute(argument_hash)
+    self.class.execute(argument_hash)
+  end
+
   def self.reports
     api.discovered_api('admin', 'reports_v1')
   end
@@ -268,7 +268,7 @@ class GoogleAccount
 
   def data
     @data ||= (
-      result = api.execute(
+      result = execute(
         api_method: directory.users.get,
         # This will find by primary email or aliases according to Google's documentation
         parameters: {userKey: full_email}
