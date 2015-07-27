@@ -5,7 +5,9 @@ module ServiceObjects
       # then schedule deprovisioning for the end of the protected period
       if university_email.protected?
         # Add 5 minutes to be sure we're past the protection time
-        Workers::DeprovisionGoogleAccount.perform_at(university_email.protected_until + 300, change.hash)
+        # We won't schedule this during a dry run because even though it would be safe to do now, dry_run could be off when it actually runs
+        Workers::DeprovisionGoogleAccount.perform_at(university_email.protected_until + 300, change.hash) if !Settings.dry_run?
+        Log.info "Schedule deprovisioning of #{change.person_uuid}/#{change.university_email} for #{university_email.protected_until + 300}"
         return :nothing
       end
 

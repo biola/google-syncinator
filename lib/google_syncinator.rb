@@ -1,9 +1,12 @@
 module GoogleSyncinator
-  def self.initialize!
-    env = ENV['RACK_ENV'] || ENV['RAILS_ENV'] || :development
-    ENV['RACK_ENV'] ||= env.to_s
+  def self.environment
+    (ENV['RACK_ENV'] || ENV['RAILS_ENV'] || :development).to_sym
+  end
 
-    RailsConfig.load_and_set_settings('./config/settings.yml', "./config/settings.#{env}.yml", './config/settings.local.yml')
+  def self.initialize!
+    ENV['RACK_ENV'] ||= environment.to_s
+
+    RailsConfig.load_and_set_settings('./config/settings.yml', "./config/settings.#{environment}.yml", './config/settings.local.yml')
 
     # Use mongoid.yml.example for Travis CI, etc.
     mongoid_yml_path = File.expand_path('../../config/mongoid.yml',  __FILE__)

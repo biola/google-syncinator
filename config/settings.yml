@@ -1,3 +1,6 @@
+# Log changes but don't actually do anything
+dry_run: false
+
 redis:
   url: "redis://localhost:6379/0"
 

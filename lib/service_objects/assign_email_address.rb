@@ -10,7 +10,8 @@ module ServiceObjects
       unique_email = UniqueEmailAddress.new(email_options).best
       full_unique_email = GoogleAccount.full_email(unique_email)
 
-      UniversityEmail.create! uuid: change.person_uuid, address: full_unique_email
+      UniversityEmail.create! uuid: change.person_uuid, address: full_unique_email if !Settings.dry_run?
+      Log.info %{Create UniversityEmail for uuid: "#{change.person_uuid}" with address }
       Workers::CreateTrogdirEmail.perform_async change.person_uuid, full_unique_email
       Workers::InsertIntoLegacyEmailTable.perform_async(change.biola_id, full_unique_email)
 

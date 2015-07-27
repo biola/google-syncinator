@@ -13,7 +13,8 @@ module Workers
           GoogleAccount.new(email.address).delete!
           DeleteTrogdirEmail.perform_async(email.uuid, email.address)
           ExpireLegacyEmailTable.perform_async(biola_id, email.address)
-          schedule.update completed_at: DateTime.now
+          schedule.update completed_at: DateTime.now if !Settings.dry_run?
+          Log.info "Marked delete schedule for #{email} complete"
         end
       end
     end

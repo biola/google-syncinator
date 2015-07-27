@@ -32,8 +32,15 @@ module Workers
           end
 
           university_emails.each do |univ_email|
-            job_id = Workers::Deprovisioning.const_get(action.to_s.classify).perform_in(seconds, univ_email.id)
-            univ_email.deprovision_schedules << DeprovisionSchedule.new(action: action, scheduled_for: (Time.now + seconds), job_id: job_id)
+            scheduled_for = Time.now + seconds
+
+            # We won't schedule this during a dry run because even though it would be safe to do now, dry_run could be off when it actually runs
+            if !Settings.dry_run?
+              job_id = Workers::Deprovisioning.const_get(action.to_s.classify).perform_in(seconds, univ_email.id)
+              univ_email.deprovision_schedules << DeprovisionSchedule.new(action: action, scheduled_for: scheduled_for, job_id: job_id)
+            end
+
+            Log.info "Scheduled an action of #{action} on #{scheduled_for} for #{univ_email}"
           end
         end
       end

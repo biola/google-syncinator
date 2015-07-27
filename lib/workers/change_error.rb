@@ -5,6 +5,7 @@ module Workers
     def perform(sync_log_id, message)
       response = trogdir.error(sync_log_id: sync_log_id, message: message).perform
       raise "Error: #{response.parse['error']}" unless response.success?
+      Log.info "Reported error on sync log #{sync_log_id} with an message of #{message}"
     end
 
     private

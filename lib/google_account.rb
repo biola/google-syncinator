@@ -73,7 +73,7 @@ class GoogleAccount
 
     new_user = directory.users.insert.request_schema.new(params)
 
-    execute api_method: directory.users.insert, body_object: new_user
+    safe_execute api_method: directory.users.insert, body_object: new_user
 
     true
   end
@@ -93,7 +93,7 @@ class GoogleAccount
 
     user_updates = directory.users.update.request_schema.new(params)
 
-    execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end
@@ -107,7 +107,7 @@ class GoogleAccount
   end
 
   def delete!
-    execute api_method: directory.users.delete, parameters: {userKey: email}
+    safe_execute api_method: directory.users.delete, parameters: {userKey: email}
 
     true
   end
@@ -118,12 +118,12 @@ class GoogleAccount
 
     new_member = directory.members.insert.request_schema.new(params)
 
-    execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
+    safe_execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
   end
 
   def leave!(group)
     group = GoogleAccount.group_to_email(group)
-    execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
+    safe_execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
   end
 
   def full_email
@@ -215,7 +215,7 @@ class GoogleAccount
   def update_suspension!(suspend = true)
     user_updates = directory.users.update.request_schema.new(suspend: suspend)
 
-    execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end
@@ -248,6 +248,14 @@ class GoogleAccount
     result = api.execute(argument_hash)
     raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
     result
+  end
+
+  def safe_execute(argument_hash)
+    if Settings.dry_run?
+      Log.info "Would have called the Google API with #{argument_hash.inspect}"
+    else
+      execute(argument_hash)
+    end
   end
 
   def execute(argument_hash)

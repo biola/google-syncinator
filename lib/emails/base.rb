@@ -8,7 +8,7 @@ module Emails
       if disable_days_from_now < 7
         "#{university_email.address} Email Account Closure"
       else
-        "#{university_email.address} Email Account Closure in #{disabe_days_from_now} DAYS"
+        "#{university_email.address} Email Account Closure in #{disable_days_from_now} DAYS"
       end
     end
 
@@ -17,15 +17,19 @@ module Emails
     end
 
     def send!
-      send_to = university_email.address
-      email_body = body
+      if !Settings.dry_run?
+        send_to = university_email.address
+        email_body = body
 
-      Mail.deliver do
-        from     Settings.email.from
-        to       send_to
-        subject  subject
-        body     email_body
+        Mail.deliver do
+          from     Settings.email.from
+          to       send_to
+          subject  subject
+          body     email_body
+        end
       end
+
+      Log.info %{Sent "#{subject}" email}
     end
 
     private

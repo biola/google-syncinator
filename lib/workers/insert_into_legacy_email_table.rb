@@ -4,7 +4,8 @@ module Workers
 
     def perform(biola_id, email)
       db = Sequel.connect(Settings.ws.db.to_hash)
-      db[:email].insert(idnumber: biola_id, email: email)
+      db[:email].insert(idnumber: biola_id, email: email) if !Settings.dry_run?
+      Log.info "Insert record into legacy email table: idnumber: #{biola_id}, email: #{email}"
     end
   end
 end

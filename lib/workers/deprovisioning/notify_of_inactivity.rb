@@ -13,7 +13,8 @@ module Workers
           else
             # Only send a notice to the primary email to avoid duplicate emails
             Emails::NotifyOfInactivity.new(schedule).send! if email.primary?
-            schedule.update completed_at: DateTime.now
+            schedule.update completed_at: DateTime.now if !Settings.dry_run?
+            Log.info "Marked notify_of_inactivity schedule for #{email} complete"
           end
         end
       end

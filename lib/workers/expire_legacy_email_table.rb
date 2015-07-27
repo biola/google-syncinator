@@ -16,7 +16,8 @@ module Workers
       updates[:expiration_date] = expire_on if row[:expiration_date].nil? || row[:expiration_date] > expire_on
       updates[:reusable_date] = reusable_on if row[:reusable_date].nil? || row[:reusable_date] > reusable_on
 
-      db[:email].where(idnumber: biola_id, email: email_address).update(updates) unless updates.empty?
+      db[:email].where(idnumber: biola_id, email: email_address).update(updates) unless updates.empty? || Settings.dry_run?
+      Log.info "Update legacy email table where biola_id = #{biola_id} and email = #{email_address} with #{updates.inspect}"
     end
   end
 end

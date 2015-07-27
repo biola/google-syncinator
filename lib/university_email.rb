@@ -50,6 +50,10 @@ class UniversityEmail
     end
   end
 
+  def to_s
+    "#{uuid}/#{address}"
+  end
+
   def self.current(address)
     UniversityEmail.where(address: address, :state.ne => :deleted).first
   end

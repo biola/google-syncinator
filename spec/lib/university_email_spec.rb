@@ -132,6 +132,14 @@ describe UniversityEmail do
     it { expect { email.cancel_deprovisioning! }.to change { incomplete.canceled? }.from(false).to true }
   end
 
+  describe '#to_s' do
+    subject { UniversityEmail.new(uuid: uuid, address: address) }
+
+    it 'returns a string of the uuid and the address' do
+      expect(subject.to_s).to eql '00000000-0000-0000-0000-000000000000/bob.dole@biola.edu'
+    end
+  end
+
   describe '.current' do
     context 'without a record' do
       it { expect(UniversityEmail.current(address)).to be nil }
