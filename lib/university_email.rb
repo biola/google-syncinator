@@ -3,6 +3,7 @@ class UniversityEmail
   include Mongoid::Timestamps
 
   embeds_many :deprovision_schedules
+  embeds_many :exclusions
 
   field :uuid, type: String
   field :address, type: String

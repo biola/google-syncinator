@@ -5,6 +5,7 @@ describe UniversityEmail do
   let(:address) { 'bob.dole@biola.edu' }
 
   it { is_expected.to embed_many(:deprovision_schedules) }
+  it { is_expected.to embed_many(:exclusions) }
   it { is_expected.to have_fields(:uuid, :address, :primary, :state) }
   it { is_expected.to be_timestamped_document }
 

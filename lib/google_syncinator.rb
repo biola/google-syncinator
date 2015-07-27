@@ -47,6 +47,7 @@ module GoogleSyncinator
     require './lib/deprovision_schedule'
     require './lib/email_address_options'
     require './lib/emails'
+    require './lib/exclusion'
     require './lib/google_account'
     require './lib/log'
     require './lib/service_objects'
