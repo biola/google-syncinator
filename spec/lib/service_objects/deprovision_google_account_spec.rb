@@ -4,10 +4,10 @@ describe ServiceObjects::DeprovisionGoogleAccount do
   let(:fixture) { 'update_person_remove_all_affiliations' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }
+  let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   subject { ServiceObjects::DeprovisionGoogleAccount.new(trogdir_change) }
 
   describe '#call' do
-    let(:uuid) { '00000000-0000-0000-0000-000000000000' }
     let!(:university_email) { UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, created_at: created_at) }
 
     context 'when email is protected' do
@@ -83,6 +83,14 @@ describe ServiceObjects::DeprovisionGoogleAccount do
 
     context 'when not changing affiliations' do
       let(:fixture) { 'update_person_name' }
+      it { expect(subject.ignore?).to be true }
+    end
+
+    context 'when an exclusion exists' do
+      before do
+        e = UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email)
+        e.exclusions.create creator_uuid: uuid, starts_at: 1.minute.ago, ends_at: 1.minute.from_now
+      end
       it { expect(subject.ignore?).to be true }
     end
 

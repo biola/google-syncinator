@@ -70,6 +70,34 @@ describe UniversityEmail do
     end
   end
 
+  describe '#excluded?' do
+    let(:now) { Time.now }
+    let(:starts_at) { now - 1 }
+    let(:ends_at) { nil }
+    before { subject.exclusions.build creator_uuid: uuid, starts_at: starts_at, ends_at: ends_at }
+
+    context 'when starts_at is in the future' do
+      let(:starts_at) { 1.day.from_now }
+      it { expect(subject.excluded?).to be false }
+    end
+
+    context 'when starts_at is in the past' do
+      context 'when ends_at is nil' do
+        it { expect(subject.excluded?).to be true }
+      end
+
+      context 'when ends_at is in the past' do
+        let(:ends_at) { now - 1 }
+        it { expect(subject.excluded?).to be false }
+      end
+
+      context 'when ends_at is in the future' do
+        let(:ends_at) { now + 1 }
+        it { expect(subject.excluded?).to be true }
+      end
+    end
+  end
+
   describe '#being_deprovisioned?' do
     subject { UniversityEmail.create(uuid: uuid, address: address) }
 

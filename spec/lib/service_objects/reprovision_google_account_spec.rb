@@ -26,6 +26,14 @@ describe ServiceObjects::ReprovisionGoogleAccount do
       it { expect(subject.ignore?).to be true }
     end
 
+    context 'when an exclusion exists' do
+      before do
+        e = UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email)
+        e.exclusions.create creator_uuid: trogdir_change.person_uuid, starts_at: 1.minute.ago, ends_at: 1.minute.from_now
+      end
+      it { expect(subject.ignore?).to be true }
+    end
+
     context 'when remove affiliation' do
       let(:fixture) { 'update_person_remove_affiliation' }
       before { UniversityEmail.create! uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }

@@ -48,7 +48,7 @@ module ServiceObjects
     def ignore?
       return true unless change.university_email_exists?
       return true unless change.affiliations_changed?
-      # TODO: check for exclusions
+      return true if UniversityEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
       EmailAddressOptions.allowed?(change.affiliations)
     end
 

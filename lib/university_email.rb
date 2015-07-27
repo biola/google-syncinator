@@ -33,6 +33,12 @@ class UniversityEmail
     created_at + Settings.deprovisioning.protect_for
   end
 
+  def excluded?
+    exclusions.all? do |exclusion|
+      exclusion.starts_at.past? && (exclusion.ends_at.nil? || exclusion.ends_at.future?)
+    end
+  end
+
   def being_deprovisioned?
     deprovision_schedules.any?(&:pending?)
   end
