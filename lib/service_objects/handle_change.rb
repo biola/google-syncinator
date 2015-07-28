@@ -7,10 +7,8 @@ module ServiceObjects
 
       begin
         unless AssignEmailAddress.ignore?(change)
-          if assign_action = AssignEmailAddress.new(change).call
-            Log.info "Assigning email address to person #{change.person_uuid}"
-            actions << assign_action
-          end
+          actions << AssignEmailAddress.new(change).call
+          Log.info "Assigning email address to person #{change.person_uuid}"
         end
 
         unless UpdateEmailAddress.ignore?(change)
@@ -55,7 +53,9 @@ module ServiceObjects
     end
 
     def ignore?
-      AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change) && UpdateEmailAddress.ignore?(change) && JoinGoogleGroup.ignore?(change) && LeaveGoogleGroup.ignore?(change)
+      [AssignEmailAddress, SyncGoogleAccount, UpdateEmailAddress, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, ReprovisionGoogleAccount].all? do |klass|
+        klass.ignore? change
+      end
     end
 
     private

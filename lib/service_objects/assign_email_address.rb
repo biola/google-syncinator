@@ -22,7 +22,7 @@ module ServiceObjects
       return true unless change.affiliation_added?
       return true if UniversityEmail.active? change.person_uuid
       # If the person has a reprovisionable email, let ReprovisionGoogleAccount handle it
-      UniversityEmail.find_reprovisionable(change.person_uuid).present?
+      !(EmailAddressOptions.required?(change.affiliations) && UniversityEmail.find_reprovisionable(change.person_uuid).blank?)
     end
   end
 end

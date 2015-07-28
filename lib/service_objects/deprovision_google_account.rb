@@ -17,12 +17,12 @@ module ServiceObjects
         # Never logged in
         if google_account.never_logged_in?
           schedule_actions!(*Settings.deprovisioning.schedules.unallowed.never_active)
-          :schedule_deprovision
+          :update
 
         # Has logged in
         else
           schedule_actions!(*Settings.deprovisioning.schedules.unallowed.active)
-          :schedule_deprovision
+          :update
         end
 
       # Email address allowed but not required such as an alumnus
@@ -31,12 +31,12 @@ module ServiceObjects
         # Never logged in
         if google_account.never_logged_in?
           schedule_actions!(*Settings.deprovisioning.schedules.allowed.never_active)
-          :schedule_deprovision
+          :update
 
         # Logged in over a year ago
       elsif google_account.inactive?
           schedule_actions!(*Settings.deprovisioning.schedules.allowed.inactive)
-          :schedule_deprovision
+          :update
 
         # Logged in within the last year
         else
