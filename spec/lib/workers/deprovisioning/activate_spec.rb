@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::Deprovisioning::Activate do
+describe Workers::Deprovisioning::Activate, type: :unit do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
   let(:email) { UniversityEmail.create uuid: uuid, address: address, state: state}

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::Deprovisioning::NotifyOfClosure do
+describe Workers::Deprovisioning::NotifyOfClosure, type: :unit do
   let(:primary) { true }
   let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', primary: primary }
 
@@ -23,7 +23,7 @@ describe Workers::Deprovisioning::NotifyOfClosure do
 
     context 'when email is not the primary' do
       let(:primary) { false }
-      
+
       it 'does not send an email' do
         expect_any_instance_of(Emails::NotifyOfClosure).to_not receive(:send!)
         subject.perform(email.id)

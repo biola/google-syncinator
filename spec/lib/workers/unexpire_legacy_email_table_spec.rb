@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::UnexpireLegacyEmailTable do
+describe Workers::UnexpireLegacyEmailTable, type: :unit do
   let(:biola_id) { 1234567 }
   let(:email) { 'bob.dole@biola.edu' }
 

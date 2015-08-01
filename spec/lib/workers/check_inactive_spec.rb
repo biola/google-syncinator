@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::CheckInactive do
+describe Workers::CheckInactive, type: :unit do
   context 'without inactive emails' do
     before { expect(GoogleAccount).to receive(:inactive).and_return [] }
 

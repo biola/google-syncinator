@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GoogleAccount do
+describe GoogleAccount, type: :unit do
   let(:email) { 'bob.dole' }
   subject { GoogleAccount.new(email) }
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TrogdirPerson do
+describe TrogdirPerson, type: :unit do
   before { expect_any_instance_of(Trogdir::APIClient::People).to receive_message_chain(:show, :perform).and_return(double(success?: true, parse: hash)) }
   subject { TrogdirPerson.new('00000000-0000-0000-0000-000000000000') }
 

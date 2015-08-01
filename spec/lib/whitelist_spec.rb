@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Whitelist do
+describe Whitelist, type: :unit do
   describe '.filter' do
     before { expect(Settings).to receive_message_chain(:groups, :whitelist).and_return ['Dorm 1', 'Dorm 2'] }
     it { expect(Whitelist.filter([])). to eql [] }

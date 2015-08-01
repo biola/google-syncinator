@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceObjects::LeaveGoogleGroup do
+describe ServiceObjects::LeaveGoogleGroup, type: :unit do
   let(:fixture) { 'leave_group' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }

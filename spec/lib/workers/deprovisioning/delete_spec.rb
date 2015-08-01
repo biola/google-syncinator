@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::Deprovisioning::Delete do
+describe Workers::Deprovisioning::Delete, type: :unit do
   describe '#perform' do
     let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
 

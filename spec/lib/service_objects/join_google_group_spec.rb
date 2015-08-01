@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceObjects::JoinGoogleGroup do
+describe ServiceObjects::JoinGoogleGroup, type: :unit do
   let(:fixture) { 'join_group' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }

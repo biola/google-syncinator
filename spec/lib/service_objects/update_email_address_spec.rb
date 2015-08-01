@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceObjects::UpdateEmailAddress do
+describe ServiceObjects::UpdateEmailAddress, type: :unit do
   let(:fixture) { 'update_email' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }

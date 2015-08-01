@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::DeprovisionGoogleAccount do
+describe Workers::DeprovisionGoogleAccount, type: :unit do
   let(:change_hash) { {'person_id' => '1111111-2222-3333-4444-555555555555'} }
   it 'calls ServiceObjects::DeprovisionGoogleAccount' do
     dga = double(ServiceObjects::DeprovisionGoogleAccount)

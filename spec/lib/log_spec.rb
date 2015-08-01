@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Log do
+describe Log, type: :unit do
   Log::LEVELS.each do |level|
     describe "##{level}" do
       context 'when in dry run mode' do

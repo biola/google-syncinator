@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceObjects::SyncGoogleAccount do
+describe ServiceObjects::SyncGoogleAccount, type: :unit do
   let(:fixture) { 'update_person' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }

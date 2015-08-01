@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe DeprovisionSchedule do
+describe DeprovisionSchedule, type: :unit do
   it { is_expected.to be_embedded_in(:university_email) }
   it { is_expected.to have_fields(:action, :reason, :scheduled_for, :completed_at, :canceled, :job_id) }
   it { is_expected.to be_timestamped_document }

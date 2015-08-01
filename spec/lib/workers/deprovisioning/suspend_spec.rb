@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::Deprovisioning::Suspend do
+describe Workers::Deprovisioning::Suspend, type: :unit do
   let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
 
   context 'when deprovision schedule canceled' do

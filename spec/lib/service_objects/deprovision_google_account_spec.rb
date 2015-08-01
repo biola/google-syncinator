@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceObjects::DeprovisionGoogleAccount do
+describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
   let(:fixture) { 'update_person_remove_all_affiliations' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }

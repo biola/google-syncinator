@@ -8,6 +8,8 @@ module GoogleSyncinator
 
     RailsConfig.load_and_set_settings('./config/settings.yml', "./config/settings.#{environment}.yml", './config/settings.local.yml')
 
+    ::DB ||= Sequel.connect(Settings.ws.db.to_hash)
+
     # Use mongoid.yml.example for Travis CI, etc.
     mongoid_yml_path = File.expand_path('../../config/mongoid.yml',  __FILE__)
     mongoid_yml_path = "#{mongoid_yml_path}.example" if !File.exists? mongoid_yml_path

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::ExpireLegacyEmailTable do
+describe Workers::ExpireLegacyEmailTable, type: :unit do
   let(:biola_id) { 1234567 }
   let(:email_adddress) { 'bob.dole@biola.edu' }
 
@@ -11,8 +11,6 @@ describe Workers::ExpireLegacyEmailTable do
   end
 
   context 'when record exists' do
-    after { DB[:email].truncate }
-
     context 'when expiration_date and reusable_date are nil' do
       before { DB[:email].insert idnumber: biola_id, email: email_adddress }
 

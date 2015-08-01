@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EmailAddressOptions do
+describe EmailAddressOptions, type: :unit do
   let(:affiliations) { ['student'] }
   let(:preferred_name) { 'Johnny' }
   let(:first_name) { 'John' }

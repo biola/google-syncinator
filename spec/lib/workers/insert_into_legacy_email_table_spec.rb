@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::InsertIntoLegacyEmailTable do
+describe Workers::InsertIntoLegacyEmailTable, type: :unit do
   let(:biola_id) { 1234567 }
   let(:email) { 'bob.dole@biola.edu' }
 

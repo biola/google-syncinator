@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe UniqueEmailAddress do
+describe UniqueEmailAddress, type: :unit do
   let(:options) { ['john.doe', 'john.b.doe', 'john.ben.doe'] }
   subject { UniqueEmailAddress.new(options) }
 

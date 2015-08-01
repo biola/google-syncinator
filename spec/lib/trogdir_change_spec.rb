@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TrogdirChange do
+describe TrogdirChange, type: :unit do
   let(:fixture) { 'create_user' }
   let(:hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   subject { TrogdirChange.new(hash) }

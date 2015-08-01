@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceObjects::AssignEmailAddress do
+describe ServiceObjects::AssignEmailAddress, type: :unit do
   let(:fixture) { 'create_accepted_student' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }

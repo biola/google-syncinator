@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::ScheduleActions do
+describe Workers::ScheduleActions, type: :unit do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
   let(:actions_and_durations) { [1.day.to_i, :notify_of_inactivity, 2.days.to_i, :notify_of_closure, 1.week.to_i, :suspend, 2.weeks.to_i, :delete] }

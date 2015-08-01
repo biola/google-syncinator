@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ServiceObjects::HandleChange do
+describe ServiceObjects::HandleChange, type: :unit do
   let(:fixture) { 'create_user' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }

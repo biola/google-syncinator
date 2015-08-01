@@ -14,7 +14,7 @@ module Workers
     def perform
       Log.info "[#{jid}] Starting job"
 
-      # TODO: if Trogdir ever gets a dry run feature for starting change syncs, it should be used here 
+      # TODO: if Trogdir ever gets a dry run feature for starting change syncs, it should be used here
       response = change_syncs.start.perform
       raise TrogdirAPIError, response.parse['error'] unless response.success?
 

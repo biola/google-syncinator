@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::HandleChanges do
+describe Workers::HandleChanges, type: :unit do
   subject { Workers::HandleChanges.new }
   let(:success) { true }
   let(:change_syncs) { [] }

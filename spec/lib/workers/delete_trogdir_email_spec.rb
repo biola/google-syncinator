@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::DeleteTrogdirEmail do
+describe Workers::DeleteTrogdirEmail, type: :unit do
   context 'when email exists' do
     before { expect_any_instance_of(Trogdir::APIClient::Emails).to receive_message_chain(:index, :perform).and_return double(success?: true, parse: ['id' => '12345', 'address' => 'bob.dole@biola.edu'])}
 
