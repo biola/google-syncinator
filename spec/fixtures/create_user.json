@@ -1,3 +1,4 @@
+// TODO: might want to rename this to create_employee
 {
   "sync_log_id":"000000000000000000000000",
   "action":"create",

@@ -1,16 +1,16 @@
 module Workers
   module Deprovisioning
-    class Activate
+    class Activate < Base
       include Sidekiq::Worker
 
-      def perform(university_email_id)
-        email = UniversityEmail.find(university_email_id)
+      def perform(deprovision_schedule_id)
+        schedule = find_schedule(deprovision_schedule_id)
+        email = schedule.university_email
 
         unless email.active?
           biola_id = TrogdirPerson.new(email.uuid).biola_id
 
-          # Activation can always happen right away, so no need to schedule it for the future like the others
-          email.deprovision_schedules << DeprovisionSchedule.new(action: :activate, scheduled_for: DateTime.now, completed_at: DateTime.now) if !Settings.dry_run?
+          schedule.update completed_at: Time.now unless Settings.dry_run?
           Log.info "Create activation schedule for #{email}"
           Workers::CreateTrogdirEmail.perform_async email.uuid, email.address
           Workers::UnexpireLegacyEmailTable.perform_async(biola_id, email.address)

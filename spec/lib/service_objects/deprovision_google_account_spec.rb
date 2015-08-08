@@ -94,9 +94,23 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
       it { expect(subject.ignore?).to be true }
     end
 
-    context 'when removing one affiliation' do
+    context 'when removing affiliation leaving only allowed affiliaton' do
       let(:fixture) { 'update_person_remove_affiliation' }
-      it { expect(subject.ignore?).to be true }
+
+      context 'when recently active' do
+        before { expect_any_instance_of(GoogleAccount).to receive(:last_login).and_return 364.days.ago }
+        it { expect(subject.ignore?).to be true }
+      end
+
+      context 'when not recently active' do
+        before { expect_any_instance_of(GoogleAccount).to receive(:last_login).and_return 366.days.ago }
+        it { expect(subject.ignore?).to be false }
+      end
+
+      context 'when never active' do
+        before { expect_any_instance_of(GoogleAccount).to receive(:last_login).and_return nil }
+        it { expect(subject.ignore?).to be false }
+      end
     end
 
     context 'when removing all affiliations' do

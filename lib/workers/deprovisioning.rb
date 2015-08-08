@@ -1,4 +1,5 @@
 module Deprovisioning
+  require './lib/workers/deprovisioning/base'
   require './lib/workers/deprovisioning/activate'
   require './lib/workers/deprovisioning/delete'
   require './lib/workers/deprovisioning/notify_of_closure'

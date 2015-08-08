@@ -5,7 +5,7 @@ module Emails
     end
 
     def subject
-      if disable_days_from_now < 7
+      if disable_days_from_now.to_i < 7
         "#{university_email.address} Email Account Closure"
       else
         "#{university_email.address} Email Account Closure in #{disable_days_from_now} DAYS"
@@ -37,6 +37,7 @@ module Emails
     attr_reader :deprovision_schedule
 
     def disable_days_from_now
+      return nil if university_email.disable_date.nil?
       university_email.disable_date.to_date.mjd - Date.today.mjd
     end
 

@@ -5,7 +5,7 @@ module ServiceObjects
     def call
       actions = []
 
-      begin
+      # begin
         unless AssignEmailAddress.ignore?(change)
           actions << AssignEmailAddress.new(change).call
           Log.info "Assigning email address to person #{change.person_uuid}"
@@ -45,11 +45,11 @@ module ServiceObjects
         Log.info "No changes needed for person #{change.person_uuid}" if actions.empty?
         Workers::ChangeFinish.perform_async change.sync_log_id, action
 
-      rescue StandardError => err
-        Workers::ChangeError.perform_async change.sync_log_id, err.message
-        Raven.capture_exception(err) if defined? Raven
-        raise err
-      end
+      # rescue StandardError => err
+      #   Workers::ChangeError.perform_async change.sync_log_id, err.message
+      #   Raven.capture_exception(err) if defined? Raven
+      #   raise err
+      # end
     end
 
     def ignore?

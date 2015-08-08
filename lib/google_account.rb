@@ -30,7 +30,7 @@ class GoogleAccount
   end
 
   def active?
-    last_login >= (Time.now - Settings.deprovisioning.inactive_after)
+    last_login.to_i >= (Time.now - Settings.deprovisioning.inactive_after).to_i
   end
 
   def inactive?
@@ -74,26 +74,6 @@ class GoogleAccount
     new_user = directory.users.insert.request_schema.new(params)
 
     safe_execute api_method: directory.users.insert, body_object: new_user
-
-    true
-  end
-
-  def update!(first_name, last_name, department, title, privacy)
-    params = {
-      name: {
-        givenName: first_name,
-        familyName: last_name
-      },
-      organizations: [
-        department: department,
-        title: title
-      ],
-      includeInGlobalAddressList: !privacy
-    }
-
-    user_updates = directory.users.update.request_schema.new(params)
-
-    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end
@@ -211,6 +191,26 @@ class GoogleAccount
   end
 
   private
+
+  def update!(first_name, last_name, department, title, privacy)
+    params = {
+      name: {
+        givenName: first_name,
+        familyName: last_name
+      },
+      organizations: [
+        department: department,
+        title: title
+      ],
+      includeInGlobalAddressList: !privacy
+    }
+
+    user_updates = directory.users.update.request_schema.new(params)
+
+    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+
+    true
+  end
 
   def update_suspension!(suspend = true)
     user_updates = directory.users.update.request_schema.new(suspend: suspend)

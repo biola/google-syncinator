@@ -1,11 +1,11 @@
 module Workers
   module Deprovisioning
-    class NotifyOfClosure
+    class NotifyOfClosure < Base
       include Sidekiq::Worker
 
-      def perform(university_email_id)
-        email = UniversityEmail.find(university_email_id)
-        schedule = email.deprovision_schedules.find_by(action: :notify_of_closure, job_id: jid)
+      def perform(deprovision_schedule_id)
+        schedule = find_schedule(deprovision_schedule_id)
+        email = schedule.university_email
 
         unless schedule.canceled?
           # Only send a notice to the primary email to avoid duplicate emails

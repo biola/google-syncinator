@@ -34,7 +34,7 @@ module ServiceObjects
           :update
 
         # Logged in over a year ago
-      elsif google_account.inactive?
+        elsif google_account.inactive?
           schedule_actions!(*Settings.deprovisioning.schedules.allowed.inactive)
           :update
 
@@ -51,7 +51,8 @@ module ServiceObjects
       return true unless change.university_email_exists?
       return true unless change.affiliations_changed?
       return true if UniversityEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
-      EmailAddressOptions.allowed?(change.affiliations)
+      return false if !EmailAddressOptions.allowed?(change.affiliations)
+      EmailAddressOptions.not_required?(change.affiliations) && google_account.active?
     end
 
     private

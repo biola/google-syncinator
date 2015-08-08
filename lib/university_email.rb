@@ -34,7 +34,7 @@ class UniversityEmail
   end
 
   def excluded?
-    exclusions.all? do |exclusion|
+    exclusions.any? do |exclusion|
       exclusion.starts_at.past? && (exclusion.ends_at.nil? || exclusion.ends_at.future?)
     end
   end

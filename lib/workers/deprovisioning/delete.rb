@@ -1,11 +1,11 @@
 module Workers
   module Deprovisioning
-    class Delete
+    class Delete < Base
       include Sidekiq::Worker
 
-      def perform(university_email_id)
-        email = UniversityEmail.find(university_email_id)
-        schedule = email.deprovision_schedules.find_by(action: :delete, job_id: jid)
+      def perform(deprovision_schedule_id)
+        schedule = find_schedule(deprovision_schedule_id)
+        email = schedule.university_email
 
         unless schedule.canceled?
           biola_id = TrogdirPerson.new(email.uuid).biola_id
