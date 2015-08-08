@@ -9,7 +9,6 @@ class UniversityEmail
   field :address, type: String
   field :primary, type: Boolean, default: true
   field :state, type: Symbol, default: :active
-  # TODO: probably want a reusable_on field
 
   validates :uuid, :address, :primary, :state, presence: true
   validates :address, uniqueness: {scope: :uuid}
@@ -63,7 +62,6 @@ class UniversityEmail
   end
 
   def self.available?(address)
-    # TODO: Check for deleted but not yet reusable addresses.
     where(address: address).all? { |ue| ue.deleted? }
   end
 

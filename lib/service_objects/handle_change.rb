@@ -1,6 +1,5 @@
 module ServiceObjects
   class HandleChange < Base
-    # TODO: handle changes to email address with appropriate renaming and aliasing
     # TODO: limit to emails with @biola.edu domain
     def call
       actions = []

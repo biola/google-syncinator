@@ -3,7 +3,6 @@ module Workers
     include Sidekiq::Worker
 
     def perform(biola_id, old_email, new_email)
-      # TODO: also update UniversityEmail and GoogleAccount
       DB[:email].where(idnumber: biola_id, email: old_email).update(primary: 0) if !Settings.dry_run?
       Log.info "Set primary = 0 in legacy email table where biola_id = #{biola_id} and email = #{old_email}"
       if DB[:email].where(idnumber: biola_id, email: new_email).count > 0

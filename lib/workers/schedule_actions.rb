@@ -41,7 +41,6 @@ module Workers
 
             # We won't schedule this during a dry run because even though it would be safe to do now, dry_run could be off when it actually runs
             if !Settings.dry_run?
-              # FIXME: there is a race condition here in testing because the worker fires before the job_id is saved
               schedule = univ_email.deprovision_schedules.create(action: action, scheduled_for: scheduled_for)
               job_id = Workers::Deprovisioning.const_get(action.to_s.classify).perform_in(seconds, schedule.id.to_s)
               schedule.update job_id: job_id
