@@ -13,7 +13,7 @@ describe ServiceObjects::AssignEmailAddress, type: :unit do
   end
 
   context 'when creating an employee' do
-    let(:fixture) { 'create_user_without_university_email'}
+    let(:fixture) { 'create_employee_without_university_email'}
 
     before do
       expect_any_instance_of(UniqueEmailAddress).to receive(:best).and_return('bob.dole@biola.edu')
@@ -35,13 +35,13 @@ describe ServiceObjects::AssignEmailAddress, type: :unit do
 
   describe '#ignore?' do
     context 'when creating a user with a university email' do
-      let(:fixture) { 'create_user' }
+      let(:fixture) { 'create_employee' }
       before { UniversityEmail.create uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
       it { expect(subject.ignore?).to be true }
     end
 
     context 'when creating a user without a university email' do
-      let(:fixture) { 'create_user_without_university_email' }
+      let(:fixture) { 'create_employee_without_university_email' }
       it { expect(subject.ignore?).to be false }
     end
   end

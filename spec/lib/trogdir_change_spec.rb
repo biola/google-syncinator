@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe TrogdirChange, type: :unit do
-  let(:fixture) { 'create_user' }
+  let(:fixture) { 'create_employee' }
   let(:hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   subject { TrogdirChange.new(hash) }
 
@@ -77,7 +77,7 @@ describe TrogdirChange, type: :unit do
     end
 
     context 'without a university email' do
-      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user_without_university_email.json')) }
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_employee_without_university_email.json')) }
 
       it { expect(subject.university_email_exists?).to be false }
     end
@@ -166,7 +166,7 @@ describe TrogdirChange, type: :unit do
 
   describe '#joined_groups' do
     context 'when creating a person' do
-      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_employee.json')) }
 
       it { expect(subject.joined_groups).to eql [] }
     end
@@ -180,7 +180,7 @@ describe TrogdirChange, type: :unit do
 
   describe '#left_groups' do
     context 'when creating a person' do
-      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_employee.json')) }
 
       it { expect(subject.left_groups).to eql [] }
     end

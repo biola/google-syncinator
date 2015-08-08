@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ServiceObjects::HandleChange, type: :unit do
-  let(:fixture) { 'create_user' }
+  let(:fixture) { 'create_employee' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }
   subject { ServiceObjects::HandleChange.new(trogdir_change) }
@@ -45,7 +45,7 @@ describe ServiceObjects::HandleChange, type: :unit do
     end
 
     context "when a reprovisionable email doesn't exist" do
-      let(:fixture) { 'create_user_without_university_email' }
+      let(:fixture) { 'create_employee_without_university_email' }
 
       it 'calls AssignEmailAddress' do
         expect_any_instance_of(ServiceObjects::AssignEmailAddress).to receive(:call).and_return(:create)

@@ -1,12 +1,10 @@
-# TODO: might want to rename this to create_employee_spec
-
 require 'spec_helper'
 
 describe 'create employee', type: :feature do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
   let(:biola_id) { 1234567 }
-  let(:change_hashes) { [JSON.parse(File.read("./spec/fixtures/create_user_without_university_email.json"))] }
+  let(:change_hashes) { [JSON.parse(File.read("./spec/fixtures/create_employee_without_university_email.json"))] }
   subject { Workers::HandleChanges.new }
 
   before do
