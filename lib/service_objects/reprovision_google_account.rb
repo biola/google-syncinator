@@ -4,8 +4,6 @@ module ServiceObjects
     # Reactivate a suspended or deleted account that used to belong to the user
     # @return [:create]
     def call
-      # FIXME: This shouldn't be needed since ScheduleActions should be handling creating the deprovision schedules now
-      reprovisionable_email.deprovision_schedules << DeprovisionSchedule.new(action: :activate, scheduled_for: DateTime.now) if !Settings.dry_run?
       # We'll delay the worker just a few seconds to prevent race conditions
       Workers::ScheduleActions.perform_async(reprovisionable_email.uuid, 10, :activate)
       :create

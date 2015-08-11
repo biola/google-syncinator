@@ -38,6 +38,7 @@ describe 'add an employee affiliation', type: :feature  do
       expect(UniversityEmail.count).to eql 1
       expect(UniversityEmail.first.address).to eql address
       expect(UniversityEmail.first.state).to eql :active
+      expect(UniversityEmail.first.deprovision_schedules.count).to eql 1
       expect(UniversityEmail.first.deprovision_schedules.last.action).to eql :activate
       expect(UniversityEmail.first.deprovision_schedules.last.completed_at?).to be true
       expect(DB[:email].count).to eql 1
