@@ -47,8 +47,11 @@ module Log
 
   # Does this object respond to the given method
   def self.respond_to?(meth)
-    # TODO: implement this
-    super
+    if logger.respond_to?(meth)
+      true
+    else
+      super
+    end
   end
 
   private
