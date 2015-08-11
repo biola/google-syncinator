@@ -16,6 +16,11 @@ gem 'sidekiq-status'
 gem 'sidetiq'
 gem 'trogdir_api_client'
 
+group :development do
+  gem 'yard'
+  gem 'yard-mongoid'
+end
+
 group :development, :test do
   gem 'pry'
   gem 'pry-rescue'

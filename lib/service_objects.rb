@@ -1,3 +1,4 @@
+# Namespace module for service object classes
 module ServiceObjects
   require './lib/service_objects/base'
   require './lib/service_objects/assign_email_address'

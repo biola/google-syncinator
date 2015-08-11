@@ -1,4 +1,6 @@
+# Namespace module for Sidekiq worker classes
 module Workers
+  # Exception for when an error occurs with Trogdir
   class TrogdirAPIError < StandardError; end
 
   require './lib/workers/deprovisioning'

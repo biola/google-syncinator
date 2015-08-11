@@ -1,15 +1,23 @@
+# Finds the best available email address from the given options that is not taken
 class UniqueEmailAddress
+  # If none of the options are available a number will be appended to the end of
+  #   the first option. This determines what the number should be zero padded to.
   PAD_NUMBER_TO = 3
 
+  # Email address options to check for availability
+  # @return [Array<String>]
   attr_reader :options
 
-  # Options should be an array of email addresses without the "@" or domain
+  # @param options [Array<String>] email addresses without the "@" or domain
   def initialize(options)
     raise ArgumentError, 'options must be an Array' unless options.is_a? Enumerable
 
     @options = options
   end
 
+  # Find the best available email address
+  # @note If all options are taken a zero-padded number will be appended
+  # @return [String] the local part of the best email 
   def best
     # Grab the first one that's available
     best = options.find do |email|

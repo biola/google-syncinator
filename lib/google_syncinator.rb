@@ -1,8 +1,15 @@
+# Module for application meta-code, intialization, environment, etc.
 module GoogleSyncinator
+  # The environment the application is running in. Looks for a RACK_ENV or
+  #   RAILS_ENV environment variable, otherwise it's :development by default
+  # @return [Symbol]
   def self.environment
     (ENV['RACK_ENV'] || ENV['RAILS_ENV'] || :development).to_sym
   end
 
+  # Initializes everything that is needed for the application to run - settings
+  #   databases, workers, etc. Also requires all the needed files and libraries.
+  # @return [true]
   def self.initialize!
     ENV['RACK_ENV'] ||= environment.to_s
 

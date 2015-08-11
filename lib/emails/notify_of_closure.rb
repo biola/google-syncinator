@@ -1,5 +1,8 @@
 module Emails
+  # Sends an email notifying the email owner that their acccount is about to close
   class NotifyOfClosure < Base
+    # The body of the email
+    # @return [String] the body of the email
     def body
 <<EOD
 Dear #{trogdir_person.first_or_preferred_name},

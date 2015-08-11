@@ -1,5 +1,10 @@
 module ServiceObjects
+  # Initiate an email deprovision process by scheduling notices of closure,
+  #   notices of inactivity, suspensions and deletions depending on the users
+  #   affiliations and account acctivity
   class DeprovisionGoogleAccount < Base
+    # Determine what sort of deprovisioning should happen and schedule it
+    # @return [Symbol] the action taken
     def call
       # If the email address was recently created and is in it's protection period,
       # then schedule deprovisioning for the end of the protected period
@@ -47,6 +52,8 @@ module ServiceObjects
       end
     end
 
+    # Should this change trigger a deprovisoning
+    # @return [Boolean]
     def ignore?
       return true unless change.university_email_exists?
       return true unless change.affiliations_changed?
@@ -57,10 +64,14 @@ module ServiceObjects
 
     private
 
+    # The UniversityEmail associated with the `change`
+    # @return [UniversityEmail]
     def university_email
       @university_email ||= UniversityEmail.find_by(uuid: change.person_uuid, address: change.university_email)
     end
 
+    # Simple wrapper for the Workers::ScheduleActions worker 
+    # @return [String] Sidekiq worked job ID
     def schedule_actions!(*actions_and_durations)
       Workers::ScheduleActions.perform_async(change.person_uuid, *actions_and_durations)
     end

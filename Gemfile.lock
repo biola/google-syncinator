@@ -164,6 +164,9 @@ GEM
       promise (~> 0.3.0)
       rack (~> 1.5)
       simple_oauth (~> 0.2)
+    yard (0.8.7.6)
+    yard-mongoid (0.0.3)
+      yard (~> 0.8.4)
 
 PLATFORMS
   ruby
@@ -189,3 +192,5 @@ DEPENDENCIES
   sidekiq-status
   sidetiq
   trogdir_api_client
+  yard
+  yard-mongoid

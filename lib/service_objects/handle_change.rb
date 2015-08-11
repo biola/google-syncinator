@@ -1,6 +1,10 @@
 module ServiceObjects
+  # Runs the appropriate other `ServiceObject`s
   class HandleChange < Base
     # TODO: limit to emails with @biola.edu domain
+
+    # Runs the appropriate service objects for this change
+    # @return [Array<Symbol>] a list of actions taken
     def call
       actions = []
 
@@ -49,8 +53,12 @@ module ServiceObjects
         Raven.capture_exception(err) if defined? Raven
         raise err
       end
+
+      actions
     end
 
+    # Should this `change` be processed by any of the other ServiceObjects
+    # @return [Boolean]
     def ignore?
       [AssignEmailAddress, SyncGoogleAccount, UpdateEmailAddress, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, ReprovisionGoogleAccount].all? do |klass|
         klass.ignore? change
@@ -59,6 +67,8 @@ module ServiceObjects
 
     private
 
+    # Simple wrapper for the Trogdir API change syncs object
+    # @return [Trogdir::APIClient::ChangeSyncs]
     def change_syncs
       Trogdir::APIClient::ChangeSyncs.new
     end

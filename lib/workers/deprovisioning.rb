@@ -1,8 +1,11 @@
-module Deprovisioning
-  require './lib/workers/deprovisioning/base'
-  require './lib/workers/deprovisioning/activate'
-  require './lib/workers/deprovisioning/delete'
-  require './lib/workers/deprovisioning/notify_of_closure'
-  require './lib/workers/deprovisioning/notify_of_inactivity'
-  require './lib/workers/deprovisioning/suspend'
+module Workers
+  # Namespace module for the deprovisioning worker classes
+  module Deprovisioning
+    require './lib/workers/deprovisioning/base'
+    require './lib/workers/deprovisioning/activate'
+    require './lib/workers/deprovisioning/delete'
+    require './lib/workers/deprovisioning/notify_of_closure'
+    require './lib/workers/deprovisioning/notify_of_inactivity'
+    require './lib/workers/deprovisioning/suspend'
+  end
 end

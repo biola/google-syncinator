@@ -1,8 +1,10 @@
 module Workers
+  # Scheduled Sidekiq worker to proccess changes fro Trogdir
   class HandleChanges
     include Sidekiq::Worker
     include Sidetiq::Schedulable
 
+    # Exception for when an error occurs with Trogdir
     class TrogdirAPIError < StandardError; end
 
     sidekiq_options retry: false
@@ -11,6 +13,9 @@ module Workers
       hourly.hour_of_day(*(8..20).to_a).day(:monday, :tuesday, :wednesday, :thursday, :friday)
     end
 
+    # Get the queued changes from Trogdir and pass them off to
+    # Workers::HandleChange to process asynchronously
+    # @return [nil]
     def perform
       Log.info "[#{jid}] Starting job"
 
@@ -35,10 +40,14 @@ module Workers
       if changes_processed
         HandleChanges.perform_async
       end
+
+      nil
     end
 
     private
 
+    # Wrapper for the Trogdir change syncs API object
+    # @return [Trogdir::APIClient::ChangeSyncs]
     def change_syncs
       Trogdir::APIClient::ChangeSyncs.new
     end

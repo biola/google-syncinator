@@ -1,51 +1,85 @@
+# A wrapper object for the Google Admin API
+# @note This class traps the google-api-client gem. See
+#   https://github.com/google/google-api-ruby-client for details.
 class GoogleAccount
+  # Exception for when an error occurs with the Google API
   class GoogleAppsAPIError < RuntimeError; end
 
+  # How a null date is represented in the Google APIs
   ZERO_DATE = '1970-01-01T00:00:00.000Z'
 
+  # The primary address of the Google account
+  # @return [String]
   attr_reader :email
 
+  # Initialize a new GoogleAccount object by it's email address
   def initialize(email)
     @email = email
   end
 
+  # Does the email account actually exist?
+  # @note opposite of available?
+  # @see #available?
   def exists?
     return false if data.nil?
 
     data.emails.map{|e| e['address']}.include? full_email
   end
 
+  # Is the email account available?
+  # @note opposite of exists?
+  # @see #exists?
   def available?
     !exists?
   end
 
+  # Is the account currently suspended?
   def suspended?
     data['suspended'].present?
   end
 
+  # The date and time of the last login
+  # @note currently this only includes logins to the web interface
+  # @return [DateTime]
+  # @return [nil] if never logged in
   def last_login
     return nil if data.nil?
 
     data['lastLoginTime'].to_i == 0 ? nil : data['lastLoginTime']
   end
 
+  # Has the user logged in within the configured amount of time?
   def active?
     last_login.to_i >= (Time.now - Settings.deprovisioning.inactive_after).to_i
   end
 
+  # Has the user not logged in within the configured amount of time?
   def inactive?
     !active?
   end
 
+  # Has the user ever logged in?
+  # @note opposite of #never_logged_in?
+  # @see #never_logged_in?
   def logged_in?
     last_login.present?
   end
 
+  # Has the user never logged in?
+  # @note opposite of #logged_in?
+  # @see #logged_in?
   def never_logged_in?
     last_login.nil?
   end
   alias :never_active? :never_logged_in?
 
+  # Create a new Google Apps account or update an existing one
+  # @param first_name [String] the users first name
+  # @param last_name [String] the users last name
+  # @param department [String,nil] the users department
+  # @param title [String,nil] the users title
+  # @param privacy [Boolean] the users privacy
+  # @return [:create,:update]
   def create_or_update!(first_name, last_name, department, title, privacy)
     if exists?
       update! first_name, last_name, department, title, privacy
@@ -56,6 +90,13 @@ class GoogleAccount
     end
   end
 
+  # Create a new Google Apps account
+  # @param first_name [String] the users first name
+  # @param last_name [String] the users last name
+  # @param department [String,nil] the users department
+  # @param title [String,nil] the users title
+  # @param privacy [Boolean] the users privacy
+  # @return [true]
   def create!(first_name, last_name, department, title, privacy)
     params = {
       primaryEmail: full_email,
@@ -78,20 +119,30 @@ class GoogleAccount
     true
   end
 
+  # Suspend the Google Apps account
+  # @return [true]
   def suspend!
     update_suspension! true
   end
 
+  # Unsuspend the Google Apps account
+  # @return [true]
   def unsuspend!
     update_suspension! false
   end
 
+  # Delete the Google Apps account
+  # @return [true]
   def delete!
     safe_execute api_method: directory.users.delete, parameters: {userKey: email}
 
     true
   end
 
+  # Join the Google Apps account to a Google group
+  # @param group [String] the name of the group to join
+  # @param role [String] the role the user should have in the group
+  # @return [Object]
   def join!(group, role = 'MEMBER')
     group = GoogleAccount.group_to_email(group)
     params = {email: full_email, role: role}
@@ -101,17 +152,24 @@ class GoogleAccount
     safe_execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
   end
 
+  # Make the Google Apps account leave a Google group
+  # @param group [String] the name of the group to leave
+  # @return [Object]
   def leave!(group)
     group = GoogleAccount.group_to_email(group)
     safe_execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
   end
 
+  # The full email address of the Google account
+  # @return [String] a full email address including the domain part
   def full_email
     GoogleAccount.full_email(email)
   end
 
-  # WARNING: the usage report from google isn't available up to the minute
-  # so it's always best to check GoogleAccount#never_active? too
+  # Gets a list of accounts that have never been active
+  # @note The usage report from Google isn't available up to the minute so it's
+  #   always best to check GoogleAccount#never_active? too
+  # @return [Array<String>] email addresses of those who have never been active
   def self.never_active
     page_token = nil
     never_active_emails = []
@@ -139,8 +197,12 @@ class GoogleAccount
     never_active_emails
   end
 
-  # WARNING: the usage report from google isn't available up to the minute
-  # so it's always best to check GoogleAccount#never_active? too
+  # Gets a list of accounts that have become inactive
+  # @note See the settings for the length of time until an account is considered
+  #   to be inactive
+  # @note The usage report from google isn't available up to the minute so it's
+  #   always best to check GoogleAccount#never_active? too
+  # @return [Array<String>] email addresses of those who are inactive
   def self.inactive
     page_token = nil
     inactive_emails = []
@@ -174,6 +236,11 @@ class GoogleAccount
     inactive_emails
   end
 
+  # Convert the local part of the email to a full email address
+  # @note if the email is already a full email address, it will be returned
+  #   unchanged
+  # @param email [String] the local part of or full email adddress
+  # @return [String] The full email address with domain part
   def self.full_email(email)
     if email.include? '@'
       email
@@ -182,16 +249,30 @@ class GoogleAccount
     end
   end
 
+  # Google repesents the group by it's email address but Trogdir just uses a
+  #   name. This method will convert the group name to an email address.
+  # @param group_name [String] The name of the group from Trogdir
+  # @return [String] The full email address of the group
   def self.group_to_email(group_name)
     full_email(group_name.to_s.downcase.gsub(/[^a-z0-9]+/, '.'))
   end
 
+  # Generates a random password for use as a temporary account password
+  # @return [String]
   def self.random_password
     rand(36**rand(16..42)).to_s(36)
   end
 
   private
 
+  # Updates a Google Apps account's details
+  # @param first_name [String] the users first name
+  # @param last_name [String] the users last name
+  # @param department [String,nil] the users department
+  # @param title [String,nil] the users title
+  # @param privacy [Boolean] the users privacy
+  # @return [true]
+  # @see #create_or_update!
   def update!(first_name, last_name, department, title, privacy)
     params = {
       name: {
@@ -212,6 +293,10 @@ class GoogleAccount
     true
   end
 
+  # Update a Google Apps account to be either active or suspended
+  # @return [true]
+  # @see #suspend!
+  # @see #unsuspend!
   def update_suspension!(suspend = true)
     user_updates = directory.users.update.request_schema.new(suspend: suspend)
 
@@ -220,6 +305,9 @@ class GoogleAccount
     true
   end
 
+  # An wrapper of sorts for making API calls to Google.
+  #   OAuth authentication is handled here.
+  # @return [Google::APIClient]
   def self.api
     api = Google::APIClient.new(
       application_name: Settings.google.api_client.application_name,
@@ -238,18 +326,29 @@ class GoogleAccount
     api
   end
 
+  # Instance method wrapper for the api class method
+  # @see .api
   def api
     return @api unless @api.nil?
 
     @api = self.class.api
   end
 
+  # Execute an operation against the Google Apps API
+  # @param argument_hash [Hash] A specially formatted hash to send to Google
+  # @return [Google::APIClient::Result]
   def self.execute(argument_hash)
     result = api.execute(argument_hash)
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    raise GoogleAppsAPIError,  result.data['error']['message'] unless result.success?
     result
   end
 
+  # For use with potentially destructive operations against the Google API.
+  #   If dry_run is on, logs the fact that it would have made a change,
+  #   otherwise it will call {#execute}.
+  # @param argument_hash [Hash] A specially formatted hash to send to Google
+  # @return [Google::APIClient::Result]
+  # @return [true] when in dry_run mode
   def safe_execute(argument_hash)
     if Settings.dry_run?
       Log.info "Would have called the Google API with #{argument_hash.inspect}"
@@ -258,22 +357,34 @@ class GoogleAccount
     end
   end
 
+  # A wrapper around the {.execute} class method
+  # @param argument_hash [Hash] A specially formatted hash to send to Google
+  # @return [Google::APIClient::Result]
+  # @see .execute
   def execute(argument_hash)
     self.class.execute(argument_hash)
   end
 
+  # Gets a Reports API object from Google for use with the {#execute} method
+  # @return [Google::APIClient::API]
   def self.reports
     api.discovered_api('admin', 'reports_v1')
   end
 
+  # Gets a Directory API object from Google for use with the {#execute} method
+  # @return [Google::APIClient::API]
   def self.directory
     api.discovered_api('admin', 'directory_v1')
   end
 
+  # A wrapper around {.directory}
+  # @return [Google::APIClient::API]
   def directory
     @directory ||= self.class.directory
   end
 
+  # An account data hash from the Google API
+  # @return [Hash]
   def data
     @data ||= (
       result = execute(

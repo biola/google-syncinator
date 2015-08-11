@@ -1,3 +1,4 @@
+# Namespace module for email classes
 module Emails
   require './lib/emails/base'
   require './lib/emails/notify_of_closure'

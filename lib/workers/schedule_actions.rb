@@ -1,10 +1,19 @@
 module Workers
+  # Schedules actions by creating deprovision schedules on university emails
+  #   and scheduling sidekiq workers to be run in the future 
   class ScheduleActions
     include Sidekiq::Worker
 
-    # This keeps track of the duration between each step so you can just pass in the time from the last step
-    # instead of always having to figure out the time from now
-    # Example: schedule_actions! 5.days.to_i, :notify_of_closure, 1.week.to_i, :suspend, 6.months.to_i, :delete
+    # Schedules actions by creating deprovision schedules on university emails
+    #   and scheduling sidekiq workers to be run in the future
+    # @note This keeps track of the duration between each step so you can just pass in the time from the last step
+    #   instead of always having to figure out the time from now
+    # @example
+    #   schedule_actions! 5.days.to_i, :notify_of_closure, 1.week.to_i, :suspend, 6.months.to_i, :delete
+    # @param uuid [String] UUID of the person who's email should be acted upon
+    # @param actions_and_durations [Array<Integer, String>] the actions that
+    #   should be taken and the amount of time in seconds between each action
+    # @return [nil]
     def perform(uuid, *actions_and_durations)
       # Because of Sidekiq's JSON serialization actions come across as strings
       # so convert them to symbols to match how they are in the rest of the code
@@ -50,6 +59,8 @@ module Workers
           end
         end
       end
+
+      nil
     end
   end
 end

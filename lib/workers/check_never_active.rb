@@ -1,10 +1,14 @@
 module Workers
+  # Scheduled Sidekiq worker that check for Google accounts that are not
+  #   required and have never been active and schedule them for deprovisioning
   class CheckNeverActive
     include Sidekiq::Worker
     include Sidetiq::Schedulable
 
     recurrence { weekly }
 
+    # Find never active Google accounts and schedule them to be deprovisioned
+    # @return [nil]
     def perform
       GoogleAccount.never_active.each do |email_address|
         email = UniversityEmail.current(email_address)
@@ -19,6 +23,8 @@ module Workers
           end
         end
       end
+
+      nil
     end
   end
 end

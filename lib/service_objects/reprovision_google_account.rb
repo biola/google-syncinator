@@ -1,15 +1,18 @@
 module ServiceObjects
+  # Re-activate an email account that once belonged to the user
   class ReprovisionGoogleAccount < Base
-    class ReprovisionError < StandardError; end
-
+    # Reactivate a suspended or deleted account that used to belong to the user
+    # @return [:create]
     def call
-      # Activation can always happen right away, so no need to schedule it for the future like the others
-      # We'll delay it just a few seconds to prevent race conditions
+      # FIXME: This shouldn't be needed since ScheduleActions should be handling creating the deprovision schedules now
       reprovisionable_email.deprovision_schedules << DeprovisionSchedule.new(action: :activate, scheduled_for: DateTime.now) if !Settings.dry_run?
+      # We'll delay the worker just a few seconds to prevent race conditions
       Workers::ScheduleActions.perform_async(reprovisionable_email.uuid, 10, :activate)
       :create
     end
 
+    # Should this change trigger a reprovisioning
+    # @return [Boolean]
     def ignore?
       return true if UniversityEmail.active? change.person_uuid
       return true unless change.affiliations_changed?
@@ -19,6 +22,9 @@ module ServiceObjects
 
     private
 
+    # Simple wrapper for UniversityEmail#find_reprovisionable
+    # @return [UniversityEmail] a UniversityEmail that used to belong to the user but is no longer active
+    # @see UniversityEmail#find_reprovisionable
     def reprovisionable_email
       @reprovisionable_email ||= UniversityEmail.find_reprovisionable(change.person_uuid)
     end
