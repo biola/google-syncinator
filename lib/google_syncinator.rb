@@ -1,4 +1,4 @@
-module GoogleSyncinator
+module AlphabetSyncinator
   def self.initialize!
     env = ENV['RACK_ENV'] || ENV['RAILS_ENV'] || :development
     ENV['RACK_ENV'] ||= env.to_s
@@ -12,11 +12,11 @@ module GoogleSyncinator
     end
 
     Sidekiq.configure_server do |config|
-      config.redis = { url: Settings.redis.url, namespace: 'google-syncinator' }
+      config.redis = { url: Settings.redis.url, namespace: 'alphabet-syncinator' }
     end
 
     Sidekiq.configure_client do |config|
-      config.redis = { url: Settings.redis.url, namespace: 'google-syncinator' }
+      config.redis = { url: Settings.redis.url, namespace: 'alphabet-syncinator' }
     end
 
     TrogdirAPIClient.configure do |config|
@@ -33,10 +33,10 @@ module GoogleSyncinator
 
     require 'active_support'
     require 'active_support/core_ext'
-    require 'google/api_client'
+    require 'alphabet/api_client'
 
     require './lib/email_address_options'
-    require './lib/google_account'
+    require './lib/alphabet_account'
     require './lib/log'
     require './lib/service_objects'
     require './lib/trogdir_change'

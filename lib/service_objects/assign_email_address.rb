@@ -8,7 +8,7 @@ module ServiceObjects
       return nil if email_options.none?
 
       unique_email = UniqueEmailAddress.new(email_options).best
-      full_unique_email = GoogleAccount.full_email(unique_email)
+      full_unique_email = AlphabetAccount.full_email(unique_email)
 
       response = Trogdir::APIClient::Emails.new.create(uuid: change.person_uuid, address: full_unique_email, type: EMAIL_TYPE, primary: MAKE_EMAIL_PRIMARY).perform
       if response.success?

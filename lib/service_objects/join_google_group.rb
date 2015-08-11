@@ -1,8 +1,8 @@
 module ServiceObjects
-  class JoinGoogleGroup < Base
+  class JoinAlphabetGroup < Base
     def call
       changes = Whitelist.filter(change.joined_groups).each do |group|
-        google_account.join! group
+        alphabet_account.join! group
       end
 
       changes.any? ? :update : :skip

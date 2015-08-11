@@ -43,7 +43,7 @@ describe Workers::HandleChanges do
   context 'when university email created' do
     let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/create_email.json'))] }
 
-    it 'calls SyncGoogleAppsAccount worker' do
+    it 'calls SyncAlphabetAppsAccount worker' do
       expect(Workers::HandleChange).to receive(:perform_async)
       expect(Workers::HandleChanges).to receive(:perform_async)
 
@@ -54,7 +54,7 @@ describe Workers::HandleChanges do
   context 'when account info updated' do
     let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/update_person.json'))] }
 
-    it 'calls SyncGoogleAppsAccount worker' do
+    it 'calls SyncAlphabetAppsAccount worker' do
       expect(Workers::HandleChange).to receive(:perform_async)
       expect(Workers::HandleChanges).to receive(:perform_async)
 
