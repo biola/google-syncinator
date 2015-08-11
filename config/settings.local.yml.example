@@ -5,7 +5,7 @@ trogdir:
   access_id:
   secret_key:
 
-google:
+alphabet:
   api_client:
     key_path: # set in settings.local.yml
     secret: # set in settings.local.yml
@@ -15,5 +15,5 @@ google:
 ws:
   db:
     host: db.example.com
-    user: google_syncinator
+    user: alphabet_syncinator
     password: "************"

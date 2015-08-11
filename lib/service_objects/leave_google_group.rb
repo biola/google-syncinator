@@ -1,8 +1,8 @@
 module ServiceObjects
-  class LeaveGoogleGroup < Base
+  class LeaveAlphabetGroup < Base
     def call
       changes = Whitelist.filter(change.left_groups).each do |group|
-        google_account.leave! group
+        alphabet_account.leave! group
       end
 
       changes.any? ? :update : :skip

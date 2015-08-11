@@ -7,8 +7,8 @@ Bundler.require :default, :test
 
 require 'rspec'
 
-require 'google_syncinator'
-GoogleSyncinator.initialize!
+require 'alphabet_syncinator'
+AlphabetSyncinator.initialize!
 
 Dir['./spec/support/*.rb'].each { |f| require f }
 

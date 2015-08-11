@@ -14,9 +14,9 @@ class UniqueEmailAddress
     # Grab the first one that's available
     best = options.find do |email|
       # TODO: Check for deleted but not yet reusable addresses.
-      #       This will mean checking with some DB other than Google, that doesn't exist yet.
-      # TODO: Also check if the email has been assigns in trogdir but not yet created in Google Apps
-      GoogleAccount.new(email).available?
+      #       This will mean checking with some DB other than Alphabet, that doesn't exist yet.
+      # TODO: Also check if the email has been assigns in trogdir but not yet created in Alphabet Apps
+      AlphabetAccount.new(email).available?
     end
 
     # If none of the options are available append a three-digit number
@@ -26,7 +26,7 @@ class UniqueEmailAddress
       options.each do |email|
         try_email = "#{email}#{i.to_s.rjust(PAD_NUMBER_TO, '0')}"
 
-        if GoogleAccount.new(try_email).available?
+        if AlphabetAccount.new(try_email).available?
           best = try_email
           break
         end

@@ -4,17 +4,17 @@ redis:
 sentry:
   url: # set in settings.local.yml
 
-google:
+alphabet:
   domain: biola.edu
   api_client:
-    application_name: google-syncinator
+    application_name: alphabet-syncinator
     application_version: '0.1.0'
     key_path: # set in settings.local.yml
     secret: # set in settings.local.yml
     scopes:
-      - "https://www.googleapis.com/auth/admin.directory.user"
-      - "https://www.googleapis.com/auth/admin.directory.group"
-      - "https://www.googleapis.com/auth/admin.directory.group.member"
+      - "https://www.alphabetapis.com/auth/admin.directory.user"
+      - "https://www.alphabetapis.com/auth/admin.directory.group"
+      - "https://www.alphabetapis.com/auth/admin.directory.group.member"
     issuer: # set in settings.local.yml
     person: # set in settings.local.yml
 

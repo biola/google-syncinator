@@ -1,7 +1,7 @@
-class GoogleAccount
+class AlphabetAccount
   attr_reader :email
 
-  class GoogleAppsAPIError < RuntimeError; end
+  class AlphabetAppsAPIError < RuntimeError; end
 
   def initialize(email)
     @email = email
@@ -10,7 +10,7 @@ class GoogleAccount
   def exists?
     result = api.execute(
       api_method: directory.users.get,
-      # This will find by primary email or aliases according to Google's documentation
+      # This will find by primary email or aliases according to Alphabet's documentation
       parameters: {userKey: full_email}
     )
 
@@ -36,7 +36,7 @@ class GoogleAccount
   def create!(first_name, last_name, department, title, privacy)
     params = {
       primaryEmail: full_email,
-      password: GoogleAccount.random_password,
+      password: AlphabetAccount.random_password,
       name: {
         familyName: last_name,
         givenName: first_name
@@ -51,7 +51,7 @@ class GoogleAccount
     new_user = directory.users.insert.request_schema.new(params)
 
     result = api.execute api_method: directory.users.insert, body_object: new_user
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    raise AlphabetAppsAPIError, result.data['error']['message'] unless result.success?
 
     true
   end
@@ -72,36 +72,36 @@ class GoogleAccount
     user_updates = directory.users.update.request_schema.new(params)
 
     result = api.execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    raise AlphabetAppsAPIError, result.data['error']['message'] unless result.success?
 
     true
   end
 
   def join!(group, role = 'MEMBER')
-    group = GoogleAccount.group_to_email(group)
+    group = AlphabetAccount.group_to_email(group)
     params = {email: full_email, role: role}
 
     new_member = directory.members.insert.request_schema.new(params)
 
     result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    raise AlphabetAppsAPIError, result.data['error']['message'] unless result.success?
   end
 
   def leave!(group)
-    group = GoogleAccount.group_to_email(group)
+    group = AlphabetAccount.group_to_email(group)
     result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    raise AlphabetAppsAPIError, result.data['error']['message'] unless result.success?
   end
 
   def full_email
-    GoogleAccount.full_email(email)
+    AlphabetAccount.full_email(email)
   end
 
   def self.full_email(email)
     if email.include? '@'
       email
     else
-      "#{email}@#{Settings.google.domain}"
+      "#{email}@#{Settings.alphabet.domain}"
     end
   end
 
@@ -118,19 +118,19 @@ class GoogleAccount
   def api
     return @api unless @api.nil?
 
-    @api = Google::APIClient.new(
-      application_name: Settings.google.api_client.application_name,
-      application_version: Settings.google.api_client.application_version)
+    @api = Alphabet::APIClient.new(
+      application_name: Settings.alphabet.api_client.application_name,
+      application_version: Settings.alphabet.api_client.application_version)
 
-    key = Google::APIClient::KeyUtils.load_from_pkcs12(Settings.google.api_client.key_path, Settings.google.api_client.secret)
+    key = Alphabet::APIClient::KeyUtils.load_from_pkcs12(Settings.alphabet.api_client.key_path, Settings.alphabet.api_client.secret)
 
     @api.authorization = Signet::OAuth2::Client.new(
-      token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-      audience: 'https://accounts.google.com/o/oauth2/token',
-      scope: Settings.google.api_client.scopes,
-      issuer: Settings.google.api_client.issuer,
+      token_credential_uri: 'https://accounts.alphabet.com/o/oauth2/token',
+      audience: 'https://accounts.alphabet.com/o/oauth2/token',
+      scope: Settings.alphabet.api_client.scopes,
+      issuer: Settings.alphabet.api_client.issuer,
       signing_key: key)
-    @api.authorization.person = Settings.google.api_client.person
+    @api.authorization.person = Settings.alphabet.api_client.person
     @api.authorization.fetch_access_token!
     @api
   end

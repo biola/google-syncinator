@@ -10,7 +10,7 @@ describe ServiceObjects::HandleChange do
 
     it 'does not call any service objects' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::SyncAlphabetAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :skip)
       expect(Workers::ChangeError).to_not receive(:perform_async)
 
@@ -23,7 +23,7 @@ describe ServiceObjects::HandleChange do
 
     it 'calls AssignEmailAddress' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to receive(:call).and_return(:create)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::SyncAlphabetAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
       expect(Workers::ChangeError).to_not receive(:perform_async)
 
@@ -34,9 +34,9 @@ describe ServiceObjects::HandleChange do
   context 'when university email created' do
     let(:change_hash) { JSON.parse(File.read('./spec/fixtures/create_email.json')) }
 
-    it 'calls SyncGoogleAccount' do
+    it 'calls SyncAlphabetAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to receive(:call).and_return(:create)
+      expect_any_instance_of(ServiceObjects::SyncAlphabetAccount).to receive(:call).and_return(:create)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
       expect(Workers::ChangeError).to_not receive(:perform_async)
 
@@ -47,9 +47,9 @@ describe ServiceObjects::HandleChange do
   context 'when account info updated' do
     let(:change_hash) { JSON.parse(File.read('./spec/fixtures/update_person.json')) }
 
-    it 'calls SyncGoogleAccount' do
+    it 'calls SyncAlphabetAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to receive(:call).and_return(:create)
+      expect_any_instance_of(ServiceObjects::SyncAlphabetAccount).to receive(:call).and_return(:create)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
       expect(Workers::ChangeError).to_not receive(:perform_async)
 

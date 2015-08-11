@@ -24,8 +24,8 @@ module ServiceObjects
 
     protected
 
-    def google_account
-      @google_account ||= GoogleAccount.new(change.university_email)
+    def alphabet_account
+      @alphabet_account ||= AlphabetAccount.new(change.university_email)
     end
   end
 end

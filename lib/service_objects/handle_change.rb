@@ -14,23 +14,23 @@ module ServiceObjects
         end
 
         unless UpdateEmailAddress.ignore?(change)
-          Log.info "Updating Google account email (#{change.university_email}) for person #{change.person_uuid}"
+          Log.info "Updating Alphabet account email (#{change.university_email}) for person #{change.person_uuid}"
           actions << UpdateEmailAddress.new(change).call
         end
 
-        unless SyncGoogleAccount.ignore?(change)
-          Log.info "Syncing Google account #{change.university_email} for person #{change.person_uuid}"
-          actions << SyncGoogleAccount.new(change).call
+        unless SyncAlphabetAccount.ignore?(change)
+          Log.info "Syncing Alphabet account #{change.university_email} for person #{change.person_uuid}"
+          actions << SyncAlphabetAccount.new(change).call
         end
 
-        unless JoinGoogleGroup.ignore?(change)
-          Log.info "Joining Google group(s) #{Whitelist.filter(change.joined_groups).to_sentence} for person #{change.person_uuid}"
-          actions << JoinGoogleGroup.new(change).call
+        unless JoinAlphabetGroup.ignore?(change)
+          Log.info "Joining Alphabet group(s) #{Whitelist.filter(change.joined_groups).to_sentence} for person #{change.person_uuid}"
+          actions << JoinAlphabetGroup.new(change).call
         end
 
-        unless LeaveGoogleGroup.ignore?(change)
-          Log.info "Leaving Google group(s) #{Whitelist.filter(change.left_groups).to_sentence} for person #{change.person_uuid}"
-          actions << LeaveGoogleGroup.new(change).call
+        unless LeaveAlphabetGroup.ignore?(change)
+          Log.info "Leaving Alphabet group(s) #{Whitelist.filter(change.left_groups).to_sentence} for person #{change.person_uuid}"
+          actions << LeaveAlphabetGroup.new(change).call
         end
 
         action = actions.first || :skip
@@ -45,7 +45,7 @@ module ServiceObjects
     end
 
     def ignore?
-      AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change) && UpdateEmailAddress.ignore?(change) && JoinGoogleGroup.ignore?(change) && LeaveGoogleGroup.ignore?(change)
+      AssignEmailAddress.ignore?(change) && SyncAlphabetAccount.ignore?(change) && UpdateEmailAddress.ignore?(change) && JoinAlphabetGroup.ignore?(change) && LeaveAlphabetGroup.ignore?(change)
     end
 
     private
