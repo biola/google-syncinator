@@ -25,6 +25,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
       expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:rename!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 

@@ -30,12 +30,18 @@ describe 'update an email address', type: :feature  do
     expect_any_instance_of(GoogleAccount).to_not receive(:join!)
     expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
+    account = instance_double(GoogleAccount)
+    expect(account).to receive(:rename!).with(new_address)
+    expect(GoogleAccount).to receive(:new).with(old_address).and_return account
+
     expect(DB[:email].count).to eql 1
     expect(DB[:email].first[:email]).to eql old_address
 
     subject.perform
 
-    expect(UniversityEmail.count).to eql 1
+    expect(UniversityEmail.count).to eql 2
+    expect(UniversityEmail.find_by(uuid: uuid, address: old_address).primary).to be false
+    expect(UniversityEmail.where(uuid: uuid, address: new_address, primary: true).any?).to be true
     expect(DB[:email].count).to eql 2
     expect(DB[:email].where(email: old_address).first[:primary]).to eql 0
     new_email_record = DB[:email].where(email: new_address).first

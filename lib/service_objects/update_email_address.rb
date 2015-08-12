@@ -8,7 +8,14 @@ module ServiceObjects
       # So we have to make a work around for it.
       biola_id = TrogdirPerson.new(change.person_uuid).biola_id
       Workers::UpdateLegacyEmailTable.perform_async(biola_id, change.old_university_email, change.new_university_email)
-      # TODO: update UniversityEmail and possibly GoogleAccount as well
+
+      UniversityEmail.where(uuid: change.person_uuid, address: change.old_university_email).update(primary: false) if !Settings.dry_run?
+      Log.info %{Update UniversityEmail for uuid: "#{change.person_uuid}" with address: #{change.old_university_email} to be not primary}
+      UniversityEmail.create! uuid: change.person_uuid, address: change.new_university_email if !Settings.dry_run?
+      Log.info %{Create UniversityEmail for uuid: "#{change.person_uuid}" with address: "#{change.new_university_email}" }
+
+      GoogleAccount.new(change.old_university_email).rename! change.new_university_email
+
       :update
     end
 

@@ -27,6 +27,7 @@ describe 'add an employee affiliation', type: :feature  do
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
       expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:update_suspension!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:rename!)
       expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)

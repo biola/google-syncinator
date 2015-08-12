@@ -119,6 +119,20 @@ class GoogleAccount
     true
   end
 
+  # Change a Google Apps accounts primary email address
+  # @note Google will automatically create a secondary email out of the old email
+  # @param new_email_address [String] users new primary email address
+  # @return [true]
+  def rename!(new_email_address)
+    params = {primaryEmail: new_email_address}
+
+    user_updates = directory.users.patch.request_schema.new(params)
+
+    safe_execute api_method: directory.users.patch, parameters: {userKey: full_email}, body_object: user_updates
+
+    true
+  end
+
   # Suspend the Google Apps account
   # @return [true]
   def suspend!
