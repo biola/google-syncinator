@@ -14,7 +14,8 @@ module ServiceObjects
       UniversityEmail.create! uuid: change.person_uuid, address: change.new_university_email if !Settings.dry_run?
       Log.info %{Create UniversityEmail for uuid: "#{change.person_uuid}" with address: "#{change.new_university_email}" }
 
-      GoogleAccount.new(change.old_university_email).rename! change.new_university_email
+      GoogleAccount.new(change.old_university_email).rename! change.new_university_email if !Settings.dry_run?
+      Log.info %{Rename GoogleAccount from "#{change.old_university_email} to "#{change.new_university_email}"}
 
       :update
     end
