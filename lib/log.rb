@@ -63,7 +63,7 @@ module Log
   end
 
   def self.log_file
-    file = File.expand_path("../../log/#{GoogleSyncinator.environment}.log", __FILE__)
+    file = File.expand_path("../../log/changes_#{GoogleSyncinator.environment}.log", __FILE__)
     dir = File.dirname(file)
 
     Dir.mkdir(dir) unless Dir.exists?(dir)

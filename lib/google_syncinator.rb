@@ -28,6 +28,11 @@ module GoogleSyncinator
       end
     end
 
+    Turnout.configure do |config|
+      config.named_maintenance_file_paths.merge! server: '/tmp/turnout.yml'
+      config.default_maintenance_page = Turnout::MaintenancePage::JSON
+    end
+
     Sidekiq.configure_server do |config|
       config.redis = { url: Settings.redis.url, namespace: 'google-syncinator' }
     end
@@ -55,7 +60,16 @@ module GoogleSyncinator
     require 'active_support'
     require 'active_support/core_ext'
     require 'google/api_client'
+    require 'grape-kaminari'
+    require 'rack/contrib'
 
+    # NOTE: this should be here below the other requires because apparently it
+    #   defines it's own Rails module that makes other things think that Rails
+    #   is loaded, when it isn't.
+    require 'api-auth'
+
+    require './lib/api'
+    require './lib/client'
     require './lib/deprovision_schedule'
     require './lib/email_address_options'
     require './lib/emails'
@@ -71,5 +85,40 @@ module GoogleSyncinator
     require './lib/workers'
 
     true
+  end
+
+  # Configuration block for the pinglish gem
+  # @return [nil]
+  def self.pinglish_block
+    Proc.new do |ping|
+      ping.check :mongodb do
+        Mongoid.default_session.command(ping: 1).has_key? 'ok'
+      end
+
+      ping.check :mysql do
+        DB.run('SELECT 1').nil?
+      end
+
+      ping.check :trogdir_api do
+        Trogdir::APIClient::People.new.by_id(id: 0).perform.status < 500
+      end
+
+      ping.check :google_api, timeout: 10 do
+        # Authenticates with the Google API
+        GoogleAccount.send(:api)
+        true
+      end
+
+      ping.check :smtp do
+        smtp = Net::SMTP.new(Settings.email.options.address)
+        smtp.start
+        ok = smtp.started?
+        smtp.finish
+
+        ok
+      end
+
+      nil
+    end
   end
 end
