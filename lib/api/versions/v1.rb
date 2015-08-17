@@ -2,6 +2,8 @@
 class API::V1 < Grape::API
   require './lib/api/versions/v1/entities/university_email_entity'
 
+  include Grape::Kaminari
+
   version 'v1', using: :path, vendor: :google_syncinator
 
   resource :emails do
@@ -9,6 +11,7 @@ class API::V1 < Grape::API
     params do
       optional :q, type: String
     end
+    paginate
     get do
       emails = if params[:q].present?
         regex = Regexp.new(params[:q].gsub(/\s/, '.*'), Regexp::IGNORECASE)
