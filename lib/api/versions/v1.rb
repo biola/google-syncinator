@@ -1,5 +1,7 @@
 # Version 1 of the Grape API
 class API::V1 < Grape::API
+  require './lib/api/versions/v1/entities/deprovision_schedule_entity'
+  require './lib/api/versions/v1/entities/exclusion_entity'
   require './lib/api/versions/v1/entities/university_email_entity'
 
   include Grape::Kaminari
@@ -17,7 +19,7 @@ class API::V1 < Grape::API
         regex = Regexp.new(params[:q].gsub(/\s/, '.*'), Regexp::IGNORECASE)
         UniversityEmail.where(address: regex)
       else
-        UniversityEmail.asc(:address)
+        UniversityEmail.asc(:address).asc(:address)
       end
 
       present paginate(emails), with: UniversityEmailEntity

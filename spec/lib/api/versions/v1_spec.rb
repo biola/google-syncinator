@@ -32,8 +32,8 @@ describe API::V1 do
 
     it 'returns multiple email objects' do
       expect(json).to eql [
-        {'id' => email.id.to_s, 'uuid' => email.uuid, 'address' => email.address, 'primary' => email.primary, 'state' => email.state.to_s},
-        {'id' => ross.id.to_s, 'uuid' => ross.uuid, 'address' => ross.address, 'primary' => ross.primary, 'state' => ross.state.to_s}
+        {'id' => email.id.to_s, 'uuid' => email.uuid, 'address' => email.address, 'primary' => email.primary, 'state' => email.state.to_s, 'deprovision_schedules' => [], 'exclusions' => []},
+        {'id' => ross.id.to_s, 'uuid' => ross.uuid, 'address' => ross.address, 'primary' => ross.primary, 'state' => ross.state.to_s, 'deprovision_schedules' => [], 'exclusions' => []}
       ]
     end
 
@@ -42,7 +42,7 @@ describe API::V1 do
 
       it 'only returns matching email objects' do
         expect(json).to eql [
-          {'id' => ross.id.to_s, 'uuid' => ross.uuid, 'address' => ross.address, 'primary' => ross.primary, 'state' => ross.state.to_s}
+          {'id' => ross.id.to_s, 'uuid' => ross.uuid, 'address' => ross.address, 'primary' => ross.primary, 'state' => ross.state.to_s, 'deprovision_schedules' => [], 'exclusions' => []}
         ]
       end
     end
@@ -60,7 +60,7 @@ describe API::V1 do
     it { expect(subject.status).to eql 200 }
 
     it 'returns an email objects' do
-      expect(json).to eql id: email.id.to_s, uuid: email.uuid, address: email.address, primary: email.primary, state: email.state.to_s
+      expect(json).to eql id: email.id.to_s, uuid: email.uuid, address: email.address, primary: email.primary, state: email.state.to_s, deprovision_schedules: [], exclusions: []
     end
   end
 
@@ -81,7 +81,7 @@ describe API::V1 do
     end
 
     it 'returns an email object' do
-      expect(json).to include id: an_instance_of(String), uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu', primary: false, state: 'active'
+      expect(json).to include id: an_instance_of(String), uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu', primary: false, state: 'active', deprovision_schedules: [], exclusions: []
     end
   end
 
@@ -103,7 +103,7 @@ describe API::V1 do
     end
 
     it 'returns an email object' do
-      expect(json).to include id: email.id.to_s, uuid: email.uuid, address: email.address, primary: params[:primary], state: email.state.to_s
+      expect(json).to include id: email.id.to_s, uuid: email.uuid, address: email.address, primary: params[:primary], state: email.state.to_s, deprovision_schedules: [], exclusions: []
     end
   end
 end
