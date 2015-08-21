@@ -16,6 +16,37 @@ describe UniversityEmail, type: :unit do
   it { is_expected.to validate_uniqueness_of(:address).scoped_to(:uuid) }
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }
 
+  describe 'validation' do
+    context 'when the email address already exists' do
+      before { UniversityEmail.create(uuid: '11111111-1111-1111-1111-111111111111', address: address, state: state)}
+      subject { UniversityEmail.new uuid: uuid, address: address }
+
+      context 'when the email is active' do
+        let(:state) { :active }
+
+        it 'is invalid' do
+          expect(subject).to be_invalid
+        end
+      end
+
+      context 'when the email is suspended' do
+        let(:state) { :suspended }
+
+        it 'is invalid' do
+          expect(subject).to be_invalid
+        end
+      end
+
+      context 'when the email is deleted' do
+        let(:state) { :deleted }
+
+        it 'is valid' do
+          expect(subject).to be_valid
+        end
+      end
+    end
+  end
+
   describe '#disable_date' do
     subject { UniversityEmail.new(uuid: uuid, address: address) }
 

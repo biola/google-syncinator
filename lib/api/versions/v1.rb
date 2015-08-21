@@ -42,7 +42,8 @@ class API::V1 < Grape::API
       optional :primary, type: Boolean, default: true
     end
     post do
-      email = UniversityEmail.create(uuid: params[:uuid], address: params[:address], primary: params[:primary])
+      email = UniversityEmail.create!(uuid: params[:uuid], address: params[:address], primary: params[:primary])
+      # TODO: handle creating records in Google, Trogdir and the legacy email table
 
       present email, with: UniversityEmailEntity
     end
@@ -56,7 +57,8 @@ class API::V1 < Grape::API
     end
     put ':id' do
       email = UniversityEmail.find(params[:id])
-      email.update primary: params[:primary]
+      email.update! primary: params[:primary]
+      # TODO: handle updating records in Google, Trogdir and the legacy email table
       present email, with: UniversityEmailEntity
     end
   end

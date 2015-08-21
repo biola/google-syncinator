@@ -56,6 +56,12 @@ class UniversityEmail
   validates :address, uniqueness: {scope: :uuid}
   validates :state, inclusion: {in: STATES}
 
+  validate do
+    if state != :deleted && UniversityEmail.where(address: address, :state.ne => :deleted, :uuid.ne => uuid).any?
+      errors.add(:address, 'is already being used')
+    end
+  end
+
   # Is the state currently active?
   # @see #state
   def active?() state == :active; end
