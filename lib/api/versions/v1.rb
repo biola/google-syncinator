@@ -42,8 +42,8 @@ class API::V1 < Grape::API
       optional :primary, type: Boolean, default: true
     end
     post do
-      email = UniversityEmail.create!(uuid: params[:uuid], address: params[:address], primary: params[:primary])
-      # TODO: handle creating records in Google, Trogdir and the legacy email table
+      # NOTE: We need the email object back so don't preform asynchronously here
+      email = Workers::CreateEmail.new.perform(params[:uuid], params[:address], params[:primary])
 
       present email, with: UniversityEmailEntity
     end

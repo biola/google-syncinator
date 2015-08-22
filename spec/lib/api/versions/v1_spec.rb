@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe API::V1 do
+describe API::V1, type: :unit do
   include Rack::Test::Methods
   include HMACHelpers
 
@@ -66,7 +66,9 @@ describe API::V1 do
 
   describe 'POST /v1/emails' do
     let(:method) { :post }
-    let(:params) { {uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu', primary: false} }
+    let(:ross_uuid) { '11111111-1111-1111-1111-111111111111' }
+    let(:ross_address) { 'ross.perot@biola.edu' }
+    let(:params) { {uuid: ross_uuid, address: ross_address, primary: false} }
 
     context 'when unauthenticated' do
       before { post url, params }
@@ -74,14 +76,20 @@ describe API::V1 do
       it { expect(subject.status).to eql 401 }
     end
 
-    it { expect(subject.status).to eql 201 }
+    context 'when authenticated' do
+      before do
+        expect(TrogdirPerson).to receive(:new).with(ross_uuid).and_return double(biola_id: 1234567)
+      end
 
-    it 'creates an email object' do
-      expect { subject }.to change(UniversityEmail, :count).from(1).to 2
-    end
+      it { expect(subject.status).to eql 201 }
 
-    it 'returns an email object' do
-      expect(json).to include id: an_instance_of(String), uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu', primary: false, state: 'active', deprovision_schedules: [], exclusions: []
+      it 'creates an email object' do
+        expect { subject }.to change(UniversityEmail, :count).from(1).to 2
+      end
+
+      it 'returns an email object' do
+        expect(json).to include id: an_instance_of(String), uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu', primary: false, state: 'active', deprovision_schedules: [], exclusions: []
+      end
     end
   end
 

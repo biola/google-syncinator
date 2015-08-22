@@ -51,6 +51,7 @@ describe 'add an employee affiliation', type: :feature  do
 
   context 'when no reprovisionable email exists' do
     it 'creates a trogdir, university and legacy email' do
+      expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: biola_id)
       allow_any_instance_of(UniversityEmail).to receive(:available?).and_return(true)
       allow_any_instance_of(GoogleAccount).to receive(:available?).and_return(true)
 

@@ -13,23 +13,16 @@ describe ServiceObjects::AssignEmailAddress, type: :unit do
   end
 
   context 'when creating an employee' do
+    let(:address) { 'bob.dole@biola.edu' }
     let(:fixture) { 'create_employee_without_university_email'}
 
     before do
-      expect_any_instance_of(UniqueEmailAddress).to receive(:best).and_return('bob.dole@biola.edu')
-      expect(UniversityEmail).to receive :create!
+      expect_any_instance_of(UniqueEmailAddress).to receive(:best).and_return(address)
+      expect(Workers::CreateEmail).to receive(:perform_async).with(change_hash['person_id'], address)
     end
 
     it 'creates a university email' do
       expect(subject.call).to eql :create
-    end
-
-    it 'creates a trogdir email' do
-      expect { subject.call }.to change(Workers::CreateTrogdirEmail.jobs, :size).by(1)
-    end
-
-    it 'updates the legacy table' do
-      expect { subject.call }.to change(Workers::InsertIntoLegacyEmailTable.jobs, :size).by(1)
     end
   end
 
