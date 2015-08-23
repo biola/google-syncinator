@@ -40,7 +40,7 @@ describe API::V1::ExclusionsAPI, type: :unit do
       end
 
       it 'returns an exclusion object' do
-        expect(json).to include id: an_instance_of(String), creator_uuid: creator_uuid, starts_at: starts_at.to_s, ends_at: ends_at.to_s, reason: reason
+        expect(json).to include id: an_instance_of(String), email_id: email.id.to_s, creator_uuid: creator_uuid, starts_at: starts_at.to_s, ends_at: ends_at.to_s, reason: reason
       end
     end
   end
