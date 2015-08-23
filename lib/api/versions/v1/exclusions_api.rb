@@ -27,7 +27,7 @@ class API::V1::ExclusionsAPI < Grape::API
 
       exclusion.destroy!
 
-      present exclusion, with: ExclusionEntity
+      present exclusion, with: API::V1::ExclusionEntity
     end
   end
 end
