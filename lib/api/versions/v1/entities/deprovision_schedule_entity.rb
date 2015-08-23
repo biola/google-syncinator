@@ -1,5 +1,5 @@
 # DeprovisionSchedule Grape entity. Used to serialize DeprovisionSchedule objects to JSON.
-class DeprovisionScheduleEntity < Grape::Entity
+class API::V1::DeprovisionScheduleEntity < Grape::Entity
   expose :action
   expose :reason
   expose :scheduled_for

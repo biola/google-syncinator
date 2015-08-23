@@ -5,6 +5,6 @@ class API::V1::UniversityEmailEntity < Grape::Entity
   expose :address
   expose :primary
   expose :state
-  expose :deprovision_schedules, using: DeprovisionScheduleEntity
-  expose :exclusions, using: ExclusionEntity
+  expose :deprovision_schedules, using: API::V1::DeprovisionScheduleEntity
+  expose :exclusions, using: API::V1::ExclusionEntity
 end
