@@ -3,63 +3,9 @@ class API::V1 < Grape::API
   require './lib/api/versions/v1/entities/deprovision_schedule_entity'
   require './lib/api/versions/v1/entities/exclusion_entity'
   require './lib/api/versions/v1/entities/university_email_entity'
-
-  include Grape::Kaminari
+  require './lib/api/versions/v1/emails.rb'
 
   version 'v1', using: :path, vendor: :google_syncinator
 
-  resource :emails do
-    desc 'Gets a list of email objects with pagination and optional search params'
-    params do
-      optional :q, type: String
-    end
-    paginate
-    get do
-      emails = if params[:q].present?
-        regex = Regexp.new(params[:q].gsub(/\s/, '.*'), Regexp::IGNORECASE)
-        UniversityEmail.where(address: regex)
-      else
-        UniversityEmail.asc(:address).asc(:address)
-      end
-
-      present paginate(emails), with: UniversityEmailEntity
-    end
-
-    desc 'Gets an individual email'
-    params do
-      requires :id, type: String
-    end
-    get ':id' do
-      email = UniversityEmail.find(params[:id])
-
-      present email, with: UniversityEmailEntity
-    end
-
-    desc 'Create an email'
-    params do
-      requires :uuid, type: String
-      requires :address, type: String
-      optional :primary, type: Boolean, default: true
-    end
-    post do
-      # NOTE: We need the email object back so don't preform asynchronously here
-      email = Workers::CreateEmail.new.perform(params[:uuid], params[:address], params[:primary])
-
-      present email, with: UniversityEmailEntity
-    end
-
-    desc 'Update an email'
-    params do
-      requires :id, type: String
-      # NOTE: eventually primary shouldn't be required, but since it's the only
-      #   thing that makes sense to update now, might as well require it.
-      requires :primary, type: Boolean
-    end
-    put ':id' do
-      email = UniversityEmail.find(params[:id])
-      email.update! primary: params[:primary]
-      # TODO: handle updating records in Google, Trogdir and the legacy email table
-      present email, with: UniversityEmailEntity
-    end
-  end
+  mount Emails
 end
