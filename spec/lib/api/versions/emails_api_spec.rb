@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe API::V1, type: :unit do
+describe API::V1::EmailsAPI, type: :unit do
   include Rack::Test::Methods
   include HMACHelpers
 

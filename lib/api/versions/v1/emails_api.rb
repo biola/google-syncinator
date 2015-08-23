@@ -1,5 +1,5 @@
 # Version 1 of the Emails Grape API
-class API::V1::Emails < Grape::API
+class API::V1::EmailsAPI < Grape::API
   include Grape::Kaminari
 
   resource :emails do
