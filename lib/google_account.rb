@@ -84,7 +84,7 @@ class GoogleAccount
   end
 
   def join!(group, role = 'MEMBER')
-    return false unless exists_in_group?(group)
+    return false if exists_in_group?(group)
     group = GoogleAccount.group_to_email(group)
     params = {email: full_email, role: role}
 
@@ -96,7 +96,7 @@ class GoogleAccount
   end
 
   def leave!(group)
-    return false if exists_in_group?(group)
+    return false unless exists_in_group?(group)
     group = GoogleAccount.group_to_email(group)
     result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
     raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
