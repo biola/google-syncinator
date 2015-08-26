@@ -77,7 +77,14 @@ class GoogleAccount
     true
   end
 
+  def exists_in_group?(group)
+    group = GoogleAccount.group_to_email(group)
+    result = api.execute( api_method: directory.members.get, parameters: {groupKey: group, memberKey: full_email} )
+    return result.success?
+  end
+
   def join!(group, role = 'MEMBER')
+    return false unless exists_in_group?(group)
     group = GoogleAccount.group_to_email(group)
     params = {email: full_email, role: role}
 
@@ -85,12 +92,15 @@ class GoogleAccount
 
     result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
     raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    return true if result.succes?
   end
 
   def leave!(group)
+    return false if exists_in_group?(group)
     group = GoogleAccount.group_to_email(group)
     result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
     raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    return true if result.success?
   end
 
   def full_email
