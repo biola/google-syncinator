@@ -77,20 +77,36 @@ class GoogleAccount
     true
   end
 
-  def join!(group, role = 'MEMBER')
+  def exists_in_group?(full_email, group)
     group = GoogleAccount.group_to_email(group)
-    params = {email: full_email, role: role}
+    result = api.execute( api_method: directory.members.get, parameters: {groupKey: group, memberKey: full_email} )
+    return result.success?
+  end
 
-    new_member = directory.members.insert.request_schema.new(params)
+  def join!(group, role = 'MEMBER')
+    unless exists_in_group?(full_email, group)
+      group = GoogleAccount.group_to_email(group)
+      params = {email: full_email, role: role}
 
-    result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+      new_member = directory.members.insert.request_schema.new(params)
+
+      result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
+      raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+      return true if result.succes?
+    else
+      return false
+    end
   end
 
   def leave!(group)
-    group = GoogleAccount.group_to_email(group)
-    result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
-    raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+    if exists_in_group?(full_email, group)
+      group = GoogleAccount.group_to_email(group)
+      result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
+      raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
+      return true if result.success?
+    else
+      return false
+    end
   end
 
   def full_email
