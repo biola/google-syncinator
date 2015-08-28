@@ -106,12 +106,9 @@ class UniversityEmail
   end
 
   # Cancel the pending deprovisions for this email
-  # @return [Array<DeprovisionSchedule>]
+  # @return [Array<String>] sidekiq job IDs
   def cancel_deprovisioning!
-    deprovision_schedules.where(completed_at: nil).each { |schedule|
-      Sidekiq::Status.cancel schedule.job_id
-      schedule.update canceled: true
-    }.to_a
+    deprovision_schedules.where(completed_at: nil).each(&:cancel!).to_a
   end
 
   # The UUID and address and a string

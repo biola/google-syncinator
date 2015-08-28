@@ -82,9 +82,60 @@ class DeprovisionSchedule
     !(completed_at? || canceled?)
   end
 
+  # Creates a DeprovisionSchedule and schedules the job in Sidekiq
+  # @return [String, nil] Sidekiq job ID
+  def save_and_schedule!
+    jid = nil
+
+    # We won't schedule this during a dry run because even though it would be safe to do now, dry_run could be off when it actually runs
+    if !Settings.dry_run?
+      cancel_job! if pending? && job_id?
+
+      save!
+
+      if pending?
+        jid = worker_class.perform_at(scheduled_for, id.to_s)
+        update! job_id: jid
+      end
+    end
+
+    job_id
+  end
+
+  # Cancels the sidekiq worker and updates canceled attribute
+  # @return [String] Sidekiq job ID
+  def cancel!
+    cancel_job!
+    update! canceled: true
+
+    job_id
+  end
+
+  # Cancel the sidekiq job and destroy the schedule record
+  # @return [Boolean]
+  def cancel_and_destroy!
+    cancel_job!
+    destroy!
+  end
+
   after_save do
     if completed_at_changed? && completed_at.present?
       university_email.update state: STATE_MAP[action]
     end
+  end
+
+  private
+
+  # Get the worker class associated with this schedule's action
+  # @return [Class]
+  def worker_class
+    Workers::Deprovisioning.const_get(action.to_s.classify)
+  end
+
+  # Cancel the associated sidekiq job
+  # @return [String] sidekiq job ID
+  def cancel_job!
+    Sidekiq::Status.cancel(job_id) if job_id?
+    job_id
   end
 end

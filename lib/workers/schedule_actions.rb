@@ -1,6 +1,6 @@
 module Workers
   # Schedules actions by creating deprovision schedules on university emails
-  #   and scheduling sidekiq workers to be run in the future 
+  #   and scheduling sidekiq workers to be run in the future
   class ScheduleActions
     include Sidekiq::Worker
 
@@ -18,7 +18,7 @@ module Workers
       # Because of Sidekiq's JSON serialization actions come across as strings
       # so convert them to symbols to match how they are in the rest of the code
       actions_and_durations.map! { |ad| ad.is_a?(String) ? ad.to_sym : ad }
-      university_emails = nil
+      primary_emails = nil
       seconds = 0
 
       unless actions_and_durations.all? { |ad| ad.is_a?(Integer) || ad.is_a?(Symbol) }
@@ -40,20 +40,16 @@ module Workers
           seconds += duration
         else
            if action == :activate
-            university_emails = [UniversityEmail.find_reprovisionable(uuid)]
+            primary_emails = [UniversityEmail.find_reprovisionable(uuid)]
           else
-            university_emails ||= UniversityEmail.where(uuid: uuid, state: :active, primary: true).to_a
+            primary_emails ||= UniversityEmail.where(uuid: uuid, state: :active, primary: true).to_a
           end
 
-          university_emails.each do |univ_email|
+          primary_emails.each do |univ_email|
             scheduled_for = Time.now + seconds
 
-            # We won't schedule this during a dry run because even though it would be safe to do now, dry_run could be off when it actually runs
-            if !Settings.dry_run?
-              schedule = univ_email.deprovision_schedules.create(action: action, scheduled_for: scheduled_for)
-              job_id = Workers::Deprovisioning.const_get(action.to_s.classify).perform_in(seconds, schedule.id.to_s)
-              schedule.update job_id: job_id
-            end
+            schedule = univ_email.deprovision_schedules.build(action: action, scheduled_for: scheduled_for)
+            schedule.save_and_schedule!
 
             Log.info "Scheduled an action of #{action} on #{scheduled_for} for #{univ_email}"
           end
