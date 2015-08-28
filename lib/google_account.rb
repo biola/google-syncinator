@@ -92,7 +92,7 @@ class GoogleAccount
 
     result = api.execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
     raise GoogleAppsAPIError, result.data['error']['message'] unless result.success?
-    return true if result.succes?
+    return true if result.success?
   end
 
   def leave!(group)
