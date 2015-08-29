@@ -40,7 +40,7 @@ class TrogdirPerson
   # The Biola ID of the person
   # @return [String]
   def biola_id
-    Array(hash['ids']).find { |id| id['type'] == 'biola_id' }['identifier']
+    Array(hash['ids']).find { |id| id['type'] == 'biola_id' }.try(:[], 'identifier')
   end
 
   # The persons preferred name or first name if no preferred name exists
