@@ -13,6 +13,7 @@ describe Workers::Deprovisioning::Activate, type: :unit do
       it 'does nothing' do
         subject.perform(schedule.id)
         expect(email.state).to eql :active
+        expect_any_instance_of(GoogleAccount).to_not receive :unsuspend!
         expect(Workers::CreateTrogdirEmail.jobs).to be_empty
         expect(Workers::UnexpireLegacyEmailTable.jobs).to be_empty
       end
@@ -20,6 +21,7 @@ describe Workers::Deprovisioning::Activate, type: :unit do
 
     context 'when email is suspended' do
       let(:state) { :suspended }
+      before { expect_any_instance_of(GoogleAccount).to receive :unsuspend! }
 
       before { expect_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return 1234567 }
 
