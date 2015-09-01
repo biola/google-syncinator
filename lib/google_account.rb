@@ -312,9 +312,9 @@ class GoogleAccount
   # @see #suspend!
   # @see #unsuspend!
   def update_suspension!(suspend = true)
-    user_updates = directory.users.update.request_schema.new(suspend: suspend)
+    user_updates = directory.users.update.request_schema.new(suspended: suspend)
 
-    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+    result = safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end

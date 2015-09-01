@@ -19,10 +19,11 @@ module Workers
         unless email.active?
           biola_id = TrogdirPerson.new(email.uuid).biola_id
 
-          schedule.update completed_at: Time.now unless Settings.dry_run?
-          Log.info "Create activation schedule for #{email}"
+          GoogleAccount.new(email.address).unsuspend!
           Workers::CreateTrogdirEmail.perform_async email.uuid, email.address
           Workers::UnexpireLegacyEmailTable.perform_async(biola_id, email.address)
+          schedule.update completed_at: Time.now unless Settings.dry_run?
+          Log.info "Create activation schedule for #{email}"
         end
 
         nil
