@@ -11,7 +11,7 @@ class API::V1::EmailsAPI < Grape::API
     get do
       emails = if params[:q].present?
         regex = Regexp.new(params[:q].gsub(/\s/, '.*'), Regexp::IGNORECASE)
-        UniversityEmail.where(address: regex)
+        UniversityEmail.or({address: regex}, {uuid: params[:q]})
       else
         UniversityEmail.asc(:address).asc(:address)
       end
