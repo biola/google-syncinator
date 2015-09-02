@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe GoogleAccount, type: :unit do
   let(:email) { 'bob.dole' }
+  before { allow(Settings.google).to receive(:domain).and_return 'example.com' }
   subject { GoogleAccount.new(email) }
 
   describe '#active?' do
