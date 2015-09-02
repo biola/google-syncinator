@@ -35,7 +35,7 @@ class GoogleAccount
 
   # Is the account currently suspended?
   def suspended?
-    data['suspended'].present?
+    !!data.try(:[], 'suspended').try(:present?)
   end
 
   # The date and time of the last login
