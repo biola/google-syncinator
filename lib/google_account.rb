@@ -314,7 +314,7 @@ class GoogleAccount
   def update_suspension!(suspend = true)
     user_updates = directory.users.update.request_schema.new(suspended: suspend)
 
-    result = safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end
@@ -401,13 +401,17 @@ class GoogleAccount
   # @return [Hash]
   def data
     @data ||= (
-      result = execute(
-        api_method: directory.users.get,
-        # This will find by primary email or aliases according to Google's documentation
-        parameters: {userKey: full_email}
-      )
+      begin
+        result = execute(
+          api_method: directory.users.get,
+          # This will find by primary email or aliases according to Google's documentation
+          parameters: {userKey: full_email}
+        )
 
-      result.success? ? result.data : nil
+        result.data
+      rescue GoogleAppsAPIError
+        nil
+      end
     )
   end
 end
