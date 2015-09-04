@@ -16,6 +16,7 @@ describe ServiceObjects::HandleChange, type: :unit do
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :skip)
       expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -36,6 +37,7 @@ describe ServiceObjects::HandleChange, type: :unit do
         expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+        expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to receive(:call).and_return(:create)
         expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
         expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -54,6 +56,7 @@ describe ServiceObjects::HandleChange, type: :unit do
         expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+        expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
         expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
         expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -73,6 +76,7 @@ describe ServiceObjects::HandleChange, type: :unit do
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
       expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -91,6 +95,7 @@ describe ServiceObjects::HandleChange, type: :unit do
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
       expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -109,6 +114,7 @@ describe ServiceObjects::HandleChange, type: :unit do
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
       expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -128,6 +134,7 @@ describe ServiceObjects::HandleChange, type: :unit do
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to receive(:call).and_return(:update)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
       expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -147,6 +154,7 @@ describe ServiceObjects::HandleChange, type: :unit do
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to receive(:call).and_return(:update)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
       expect(Workers::ChangeError).to_not receive(:perform_async)
@@ -159,13 +167,37 @@ describe ServiceObjects::HandleChange, type: :unit do
     let(:fixture) { 'update_person_remove_all_affiliations' }
 
     it 'calls DeprovisionGoogleAccount' do
-      allow(Settings).to receive_message_chain(:groups, :whitelist).and_return(['Politician', 'President'])
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to receive(:call).and_return(:update)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
+      expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
+      expect(Workers::ChangeError).to_not receive(:perform_async)
+
+      subject.call
+    end
+  end
+
+  context 'when being deprovisioned and an affiliation is added' do
+    let(:fixture) { 'update_person_add_affiliation' }
+
+    before do
+      email = UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu'
+      email.deprovision_schedules.create action: :delete, scheduled_for: 1.minute.from_now
+    end
+
+    it 'calls CancelDeprovisioningGoogleAccount' do
+      expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to receive(:call).and_return(:update)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
       expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
       expect(Workers::ChangeError).to_not receive(:perform_async)

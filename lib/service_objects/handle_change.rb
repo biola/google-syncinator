@@ -39,6 +39,11 @@ module ServiceObjects
           actions << DeprovisionGoogleAccount.new(change).call
         end
 
+        unless CancelDeprovisioningGoogleAccount.ignore?(change)
+          Log.info "Cancel deprovisioning of #{change.university_email} for person #{change.person_uuid}"
+          actions << CancelDeprovisioningGoogleAccount.new(change).call
+        end
+
         unless ReprovisionGoogleAccount.ignore?(change)
           Log.info "Begin deprovisioning of #{change.university_email} for person #{change.person_uuid}"
           actions << ReprovisionGoogleAccount.new(change).call
