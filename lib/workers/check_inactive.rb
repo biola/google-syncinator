@@ -13,6 +13,8 @@ module Workers
       GoogleAccount.inactive.each do |email_address|
         email = UniversityEmail.current(email_address)
 
+        raise RuntimeError, "#{email_address} exists in Google Apps but not in the university_emails collection" if email.nil?
+
         unless email.being_deprovisioned? || email.protected?
           person = TrogdirPerson.new(email.uuid)
 
