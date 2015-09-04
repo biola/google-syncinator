@@ -4,8 +4,11 @@ module ServiceObjects
     # Reactivate a suspended or deleted account that used to belong to the user
     # @return [:create]
     def call
+      reprovisionable_email.cancel_deprovisioning!
+
       # We'll delay the worker just a few seconds to prevent race conditions
       Workers::ScheduleActions.perform_async(reprovisionable_email.uuid, 10, :activate)
+
       :create
     end
 
