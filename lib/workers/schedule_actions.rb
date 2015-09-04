@@ -39,7 +39,7 @@ module Workers
         if duration_or_action.is_a? Numeric
           seconds += duration
         else
-           if action == :activate
+          if action == :activate
             primary_emails = [UniversityEmail.find_reprovisionable(uuid)]
           else
             primary_emails ||= UniversityEmail.where(uuid: uuid, state: :active, primary: true).to_a

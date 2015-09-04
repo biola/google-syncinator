@@ -105,8 +105,10 @@ class DeprovisionSchedule
   # Cancels the sidekiq worker and updates canceled attribute
   # @return [String] Sidekiq job ID
   def cancel!
-    cancel_job!
-    update! canceled: true
+    unless Settings.dry_run?
+      cancel_job!
+      update! canceled: true
+    end
 
     job_id
   end
@@ -114,13 +116,15 @@ class DeprovisionSchedule
   # Cancel the sidekiq job and destroy the schedule record
   # @return [Boolean]
   def cancel_and_destroy!
-    cancel_job!
-    destroy!
+    unless Settings.dry_run?
+      cancel_job!
+      destroy!
+    end
   end
 
   after_save do
     if completed_at_changed? && completed_at.present?
-      university_email.update state: STATE_MAP[action]
+      university_email.update state: STATE_MAP[action] unless Settings.dry_run?
     end
   end
 
@@ -135,7 +139,10 @@ class DeprovisionSchedule
   # Cancel the associated sidekiq job
   # @return [String] sidekiq job ID
   def cancel_job!
-    Sidekiq::Status.cancel(job_id) if job_id?
+    unless Settings.dry_run?
+      Sidekiq::Status.cancel(job_id) if job_id?
+    end
+
     job_id
   end
 end
