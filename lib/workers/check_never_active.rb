@@ -18,7 +18,7 @@ module Workers
 
           if EmailAddressOptions.not_required?(person.affiliations)
             if GoogleAccount.new(email_address).never_active?
-              Workers::ScheduleActions.perform_async email.uuid, *Settings.deprovisioning.schedules.allowed.never_active
+              Workers::ScheduleActions.perform_async email.id.to_s, *Settings.deprovisioning.schedules.allowed.never_active
             end
           end
         end

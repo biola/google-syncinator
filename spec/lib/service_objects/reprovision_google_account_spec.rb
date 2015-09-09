@@ -10,7 +10,7 @@ describe ServiceObjects::ReprovisionGoogleAccount, type: :unit do
     let!(:university_email) { UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, state: :suspended) }
 
     it 'calls Workers::Deprovisioning::Activate' do
-      expect(Workers::ScheduleActions).to receive(:perform_async).with(university_email.uuid, 10, :activate)
+      expect(Workers::ScheduleActions).to receive(:perform_async).with(university_email.id.to_s, 10, :activate)
       subject.call
     end
   end

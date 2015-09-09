@@ -70,10 +70,10 @@ module ServiceObjects
       @university_email ||= UniversityEmail.find_by(uuid: change.person_uuid, address: change.university_email)
     end
 
-    # Simple wrapper for the Workers::ScheduleActions worker 
+    # Simple wrapper for the Workers::ScheduleActions worker
     # @return [String] Sidekiq worked job ID
     def schedule_actions!(*actions_and_durations)
-      Workers::ScheduleActions.perform_async(change.person_uuid, *actions_and_durations)
+      Workers::ScheduleActions.perform_async(university_email.id.to_s, *actions_and_durations)
     end
   end
 end
