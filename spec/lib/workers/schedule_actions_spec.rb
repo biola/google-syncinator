@@ -31,6 +31,7 @@ describe Workers::ScheduleActions, type: :unit do
           before { Workers::ScheduleActions.new.perform(email.id.to_s, *actions_and_durations) }
 
           it 'cancels them' do
+            expect(Sidekiq::Status).to receive(:cancel).exactly(4).times
             Workers::ScheduleActions.new.perform(email.id.to_s, 1.day.to_i, :delete)
             expect(email.reload.deprovision_schedules.where(canceled: true).length).to eql 4
             expect(email.reload.deprovision_schedules.where(:canceled.ne => true).length).to eql 1
