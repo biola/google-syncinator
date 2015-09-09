@@ -40,7 +40,7 @@ describe ServiceObjects::CancelDeprovisioningGoogleAccount, type: :unit do
     end
 
     context 'when adding a non-required affilation' do
-      before { expect(Settings).to receive_message_chain(:affiliations, :email_required).and_return [] }
+      before { allow(Settings).to receive(:affiliations).and_return double(employeeish: [], studentish: [], email_required: [], email_allowed: []) }
       it { expect(subject.ignore?).to be true }
     end
 

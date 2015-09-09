@@ -19,7 +19,7 @@ module ServiceObjects
     # @return [Boolean]
     def ignore?
       return true unless change.affiliation_added?
-      return true unless EmailAddressOptions.required?(change.affiliations)
+      return true unless EmailAddressOptions.allowed?(change.affiliations)
 
       UniversityEmail.where(uuid: change.person_uuid).each do |email|
         unless email.excluded?
