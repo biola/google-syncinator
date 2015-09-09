@@ -111,9 +111,9 @@ class TrogdirChange
     changed_attrs.include?('affiliations')
   end
 
-  # Whether or not any affilatons were added to the person record
+  # Whether or not any affiliatons were added to the person record
   def affiliation_added?
-    person? && (create? || update?) && affiliations_changed?
+    person? && (create? || update?) && affiliations_changed? && (modified['affiliations'].to_a - original['affiliations'].to_a).any?
   end
 
   # Whether or not a university email was added to the person record

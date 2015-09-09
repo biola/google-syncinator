@@ -111,6 +111,11 @@ describe TrogdirChange, type: :unit do
 
       it { expect(subject.affiliation_added?).to be false }
     end
+
+    context 'when removing an affiliaton' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person_remove_affiliation.json')) }
+      it { expect(subject.affiliation_added?).to be false }
+    end
   end
 
   describe '#university_email_added?' do

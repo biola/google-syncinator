@@ -24,6 +24,8 @@ module Workers
         end
       end
 
+      # TODO: cancel deprovisioning for emails there were never active but now have been active
+
       nil
     end
   end
