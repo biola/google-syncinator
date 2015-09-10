@@ -62,11 +62,25 @@ describe Workers::CheckInactive, type: :unit do
     end
 
     context 'when email is being deprovisioned' do
-      before { email.deprovision_schedules.create action: :delete, scheduled_for: 1.week.from_now }
+      before { allow_any_instance_of(TrogdirPerson).to receive(:affiliations).and_return ['alumnus'] }
 
       it 'does not schedule deprovisioning' do
+        email.deprovision_schedules.create action: :delete, scheduled_for: 1.week.from_now
         expect { Workers::CheckInactive.new.perform }.to_not change { Workers::ScheduleActions.jobs.length }.from 0
       end
+
+      context 'when email has become active' do
+        let(:other_email) { UniversityEmail.create(uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu') }
+        let!(:schedule) { other_email.deprovision_schedules.create action: :delete, scheduled_for: 1.week.from_now, reason: DeprovisionSchedule::INACTIVE_REASON }
+
+        before { expect_any_instance_of(GoogleAccount).to receive(:inactive?).and_return true }
+
+        it 'cancels the deprovisioning' do
+          expect { Workers::CheckInactive.new.perform }.to change { schedule.reload.canceled? }
+        end
+      end
     end
+
+
   end
 end

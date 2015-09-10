@@ -10,7 +10,9 @@ module Workers
     # Find inactive Google accounts and schedule them to be deprovisioned
     # @return [nil]
     def perform
-      GoogleAccount.inactive.each do |email_address|
+      email_addresses = GoogleAccount.inactive
+
+      email_addresses.each do |email_address|
         email = UniversityEmail.current(email_address)
 
         raise RuntimeError, "#{email_address} exists in Google Apps but not in the university_emails collection" if email.nil?
@@ -26,7 +28,13 @@ module Workers
         end
       end
 
-      # TODO: cancel deprovisioning for emails there were inactive but now have been active
+      # Emails that are pending deprovisioning because they were never active
+      pending_emails = UniversityEmail.where(:deprovision_schedules.elem_match => {reason: DeprovisionSchedule::INACTIVE_REASON, completed_at: nil, canceled: nil})
+
+      pending_emails.each do |email|
+        # Cancel deprovisioning if they have become active
+        email.cancel_deprovisioning! if email_addresses.exclude? email.address
+      end
 
       nil
     end

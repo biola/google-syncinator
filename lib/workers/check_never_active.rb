@@ -10,7 +10,9 @@ module Workers
     # Find never active Google accounts and schedule them to be deprovisioned
     # @return [nil]
     def perform
-      GoogleAccount.never_active.each do |email_address|
+      email_addresses = GoogleAccount.never_active
+
+      email_addresses.each do |email_address|
         email = UniversityEmail.current(email_address)
 
         unless email.being_deprovisioned? || email.protected?
@@ -24,7 +26,14 @@ module Workers
         end
       end
 
-      # TODO: cancel deprovisioning for emails there were never active but now have been active
+      # Emails that are pending deprovisioning because they were never active
+      pending_emails = UniversityEmail.where(:deprovision_schedules.elem_match => {reason: DeprovisionSchedule::NEVER_ACTIVE_REASON, completed_at: nil, canceled: nil})
+
+      pending_emails.each do |email|
+        # Cancel deprovisioning if they have become active
+        email.cancel_deprovisioning! if email_addresses.exclude? email.address
+      end
+
       nil
     end
   end
