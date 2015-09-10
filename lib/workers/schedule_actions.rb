@@ -14,7 +14,7 @@ module Workers
     # @param actions_and_durations [Array<Integer, String>] the actions that
     #   should be taken and the amount of time in seconds between each action
     # @return [nil]
-    def perform(university_email_id, *actions_and_durations)
+    def perform(university_email_id, actions_and_durations, reason = nil)
       # Because of Sidekiq's JSON serialization actions come across as strings
       # so convert them to symbols to match how they are in the rest of the code
       actions_and_durations.map! { |ad| ad.is_a?(String) ? ad.to_sym : ad }
@@ -43,7 +43,7 @@ module Workers
         else
           scheduled_for = Time.now + seconds
 
-          schedule = email.deprovision_schedules.build(action: action, scheduled_for: scheduled_for)
+          schedule = email.deprovision_schedules.build(action: action, scheduled_for: scheduled_for, reason: reason)
           schedule.save_and_schedule!
 
           Log.info "Scheduled an action of #{action} on #{scheduled_for} for #{email}"

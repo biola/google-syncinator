@@ -21,12 +21,12 @@ module ServiceObjects
 
         # Never logged in
         if google_account.never_logged_in?
-          schedule_actions!(*Settings.deprovisioning.schedules.unallowed.never_active)
+          schedule_actions!(settings.unallowed.never_active, DeprovisionSchedule::LOST_AFFILIATION_REASON)
           :update
 
         # Has logged in
         else
-          schedule_actions!(*Settings.deprovisioning.schedules.unallowed.active)
+          schedule_actions!(settings.unallowed.active, DeprovisionSchedule::LOST_AFFILIATION_REASON)
           :update
         end
 
@@ -35,12 +35,12 @@ module ServiceObjects
 
         # Never logged in
         if google_account.never_logged_in?
-          schedule_actions!(*Settings.deprovisioning.schedules.allowed.never_active)
+          schedule_actions!(settings.allowed.never_active, DeprovisionSchedule::NEVER_ACTIVE_REASON)
           :update
 
         # Logged in over a year ago
         elsif google_account.inactive?
-          schedule_actions!(*Settings.deprovisioning.schedules.allowed.inactive)
+          schedule_actions!(settings.allowed.inactive, DeprovisionSchedule::INACTIVE_REASON)
           :update
 
         # Logged in within the last year
@@ -72,8 +72,14 @@ module ServiceObjects
 
     # Simple wrapper for the Workers::ScheduleActions worker
     # @return [String] Sidekiq worked job ID
-    def schedule_actions!(*actions_and_durations)
-      Workers::ScheduleActions.perform_async(university_email.id.to_s, *actions_and_durations)
+    def schedule_actions!(actions_and_durations, reason)
+      Workers::ScheduleActions.perform_async(university_email.id.to_s, actions_and_durations, reason)
+    end
+
+    # Simple wrapper for deprovision schedlue settings
+    # @return [RailsConfig::Options]
+    def settings
+      Settings.deprovisioning.schedules
     end
   end
 end

@@ -14,7 +14,7 @@ describe Workers::ScheduleActions, type: :unit do
         let(:actions_and_durations) { [1.year.to_i, :activate] }
 
         it 'creates an activate deprovision schedule' do
-          Workers::ScheduleActions.new.perform(email.id.to_s, *actions_and_durations)
+          Workers::ScheduleActions.new.perform(email.id.to_s, actions_and_durations)
           expect(email.reload.deprovision_schedules.length).to eql 1
         end
       end
@@ -23,16 +23,16 @@ describe Workers::ScheduleActions, type: :unit do
         let(:state) { :active }
 
         it 'creates notify, suspend and delete deprovision schedules' do
-          Workers::ScheduleActions.new.perform(email.id.to_s, *actions_and_durations)
+          Workers::ScheduleActions.new.perform(email.id.to_s, actions_and_durations)
           expect(email.reload.deprovision_schedules.length).to eql 4
         end
 
         context 'when deprovision schedules arleady exist' do
-          before { Workers::ScheduleActions.new.perform(email.id.to_s, *actions_and_durations) }
+          before { Workers::ScheduleActions.new.perform(email.id.to_s, actions_and_durations) }
 
           it 'cancels them' do
             expect(Sidekiq::Status).to receive(:cancel).exactly(4).times
-            Workers::ScheduleActions.new.perform(email.id.to_s, 1.day.to_i, :delete)
+            Workers::ScheduleActions.new.perform(email.id.to_s, [1.day.to_i, :delete])
             expect(email.reload.deprovision_schedules.where(canceled: true).length).to eql 4
             expect(email.reload.deprovision_schedules.where(:canceled.ne => true).length).to eql 1
           end
@@ -44,7 +44,7 @@ describe Workers::ScheduleActions, type: :unit do
       let(:state) { :deleted }
 
       it 'does nothing' do
-        expect { Workers::ScheduleActions.new.perform(email.id.to_s, *actions_and_durations) }.to_not change { email.deprovision_schedules.length }.from(0)
+        expect { Workers::ScheduleActions.new.perform(email.id.to_s, actions_and_durations) }.to_not change { email.deprovision_schedules.length }.from(0)
       end
     end
   end

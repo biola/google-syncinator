@@ -43,7 +43,7 @@ describe Workers::CheckInactive, type: :unit do
             before { expect_any_instance_of(GoogleAccount).to receive(:inactive?).and_return true }
 
             it 'scheduled deprovisioning' do
-              expect(Workers::ScheduleActions).to receive(:perform_async).with(email.id.to_s, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete)
+              expect(Workers::ScheduleActions).to receive(:perform_async).with(email.id.to_s, [a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::INACTIVE_REASON)
               Workers::CheckInactive.new.perform
             end
           end

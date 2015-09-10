@@ -18,6 +18,10 @@ class DeprovisionSchedule
     suspend: :suspended,
     delete: :deleted
   }
+  NEVER_ACTIVE_REASON = 'Never active'
+  INACTIVE_REASON = 'Inactive'
+  LOST_AFFILIATION_REASON = 'Lost affiliation'
+  GAINED_AFFILIATION_REASON = 'Gained affiliation'
 
   # @!attribute university_email
   #   @return [UniversityEmail]

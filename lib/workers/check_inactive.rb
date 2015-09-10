@@ -20,7 +20,7 @@ module Workers
 
           if EmailAddressOptions.not_required?(person.affiliations)
             if GoogleAccount.new(email_address).inactive?
-              Workers::ScheduleActions.perform_async email.id.to_s, *Settings.deprovisioning.schedules.allowed.inactive
+              Workers::ScheduleActions.perform_async email.id.to_s, Settings.deprovisioning.schedules.allowed.inactive, DeprovisionSchedule::INACTIVE_REASON
             end
           end
         end

@@ -5,7 +5,7 @@ module ServiceObjects
     # @return [:create]
     def call
       # We'll delay the worker just a few seconds to prevent race conditions
-      Workers::ScheduleActions.perform_async(reprovisionable_email.id.to_s, 10, :activate)
+      Workers::ScheduleActions.perform_async(reprovisionable_email.id.to_s, [10, :activate], DeprovisionSchedule::GAINED_AFFILIATION_REASON)
 
       :create
     end
@@ -13,8 +13,8 @@ module ServiceObjects
     # Should this change trigger a reprovisioning
     # @return [Boolean]
     def ignore?
-      return true if UniversityEmail.active? change.person_uuid
       return true unless change.affiliations_changed?
+      return true if UniversityEmail.active? change.person_uuid
       return true if UniversityEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
       !(EmailAddressOptions.required?(change.affiliations) && reprovisionable_email.present?)
     end

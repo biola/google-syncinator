@@ -18,14 +18,13 @@ module Workers
 
           if EmailAddressOptions.not_required?(person.affiliations)
             if GoogleAccount.new(email_address).never_active?
-              Workers::ScheduleActions.perform_async email.id.to_s, *Settings.deprovisioning.schedules.allowed.never_active
+              Workers::ScheduleActions.perform_async email.id.to_s, Settings.deprovisioning.schedules.allowed.never_active, DeprovisionSchedule::NEVER_ACTIVE_REASON
             end
           end
         end
       end
 
       # TODO: cancel deprovisioning for emails there were never active but now have been active
-
       nil
     end
   end
