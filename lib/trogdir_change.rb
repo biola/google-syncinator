@@ -16,6 +16,18 @@ class TrogdirChange
     Array(all_attrs['ids']).find { |id| id['type'] == 'biola_id' }['identifier']
   end
 
+  def biola_id_updated?
+    biola_id? && update? && all_attrs['type'] == 'biola_id'
+  end
+
+  def old_biola_id
+    original['identifier']
+  end
+
+  def new_biola_id
+    modified['identifier']
+  end
+
   def preferred_name
     all_attrs['preferred_name']
   end
@@ -106,6 +118,10 @@ class TrogdirChange
 
   def email?
     hash['scope'] == 'email'
+  end
+
+  def biola_id?
+    hash['scope'] == 'id'
   end
 
   def create?
