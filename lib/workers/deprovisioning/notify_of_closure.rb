@@ -15,7 +15,7 @@ module Workers
         email = schedule.university_email
 
         if deprovisioning_no_longer_warranted?(schedule)
-          schedule.update! canceled: true
+          email.cancel_deprovisioning!
           return nil
         end
 
