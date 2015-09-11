@@ -17,7 +17,7 @@ describe ServiceObjects::UpdateEmailAddress, type: :unit do
     end
 
     it 'updates the legacy email table' do
-      expect(Workers::UpdateLegacyEmailTable).to receive(:perform_async).with 1234567, old_address, new_address
+      expect(Workers::LegacyEmailTable::Update).to receive(:perform_async).with 1234567, old_address, new_address
       expect(subject.call).to eql :update
     end
 

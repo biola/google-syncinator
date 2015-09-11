@@ -14,12 +14,12 @@ describe Workers::Deprovisioning::Suspend, type: :unit do
     end
 
     it 'does not delete trogdir email' do
-      expect(Workers::DeleteTrogdirEmail).to_not receive(:perform_async)
+      expect(Workers::Trogdir::DeleteEmail).to_not receive(:perform_async)
       subject.perform(schedule.id)
     end
 
     it 'does not expire legacy email' do
-      expect(Workers::ExpireLegacyEmailTable).to_not receive(:perform_async)
+      expect(Workers::LegacyEmailTable::Expire).to_not receive(:perform_async)
       subject.perform(schedule.id)
     end
 
@@ -42,13 +42,13 @@ describe Workers::Deprovisioning::Suspend, type: :unit do
 
     it 'deletes the trogdir email' do
       expect(GoogleAccount).to receive_message_chain(:new, :suspend!)
-      expect(Workers::DeleteTrogdirEmail).to receive(:perform_async)
+      expect(Workers::Trogdir::DeleteEmail).to receive(:perform_async)
       subject.perform(schedule.id)
     end
 
     it 'expires the legacy email' do
       expect(GoogleAccount).to receive_message_chain(:new, :suspend!)
-      expect(Workers::ExpireLegacyEmailTable).to receive(:perform_async)
+      expect(Workers::LegacyEmailTable::Expire).to receive(:perform_async)
       subject.perform(schedule.id)
     end
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::UpdateLegacyEmailTable, type: :unit do
+describe Workers::LegacyEmailTable::Update, type: :unit do
   let(:biola_id) { 1234567 }
   let(:old_email) { 'bobby.dole@biola.edu' }
   let(:new_email) { 'bob.dole@biola.edu' }

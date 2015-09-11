@@ -17,10 +17,10 @@ describe Workers::CreateEmail, type: :unit do
   end
 
   it 'creates a trogdir email' do
-    expect { subject.perform(uuid, address) }.to change(Workers::CreateTrogdirEmail.jobs, :size).by(1)
+    expect { subject.perform(uuid, address) }.to change(Workers::Trogdir::CreateEmail.jobs, :size).by(1)
   end
 
   it 'updates the legacy table' do
-    expect { subject.perform(uuid, address) }.to change(Workers::InsertIntoLegacyEmailTable.jobs, :size).by(1)
+    expect { subject.perform(uuid, address) }.to change(Workers::LegacyEmailTable::Insert.jobs, :size).by(1)
   end
 end

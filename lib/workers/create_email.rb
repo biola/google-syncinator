@@ -12,8 +12,8 @@ module Workers
 
       email = UniversityEmail.create! uuid: uuid, address: address, primary: primary if !Settings.dry_run?
       Log.info %{Create UniversityEmail for uuid: "#{uuid}" with address: "#{address}" }
-      Workers::CreateTrogdirEmail.perform_async uuid, address
-      Workers::InsertIntoLegacyEmailTable.perform_async(biola_id, address)
+      Workers::Trogdir::CreateEmail.perform_async uuid, address
+      Workers::LegacyEmailTable::Insert.perform_async(biola_id, address)
       # TODO: we should probably create the email in Google here too
 
       email

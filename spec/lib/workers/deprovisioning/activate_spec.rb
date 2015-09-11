@@ -14,8 +14,8 @@ describe Workers::Deprovisioning::Activate, type: :unit do
         subject.perform(schedule.id)
         expect(email.state).to eql :active
         expect_any_instance_of(GoogleAccount).to_not receive :unsuspend!
-        expect(Workers::CreateTrogdirEmail.jobs).to be_empty
-        expect(Workers::UnexpireLegacyEmailTable.jobs).to be_empty
+        expect(Workers::Trogdir::CreateEmail.jobs).to be_empty
+        expect(Workers::LegacyEmailTable::Unexpire.jobs).to be_empty
       end
     end
 
@@ -34,11 +34,11 @@ describe Workers::Deprovisioning::Activate, type: :unit do
       end
 
       it 'creates a Trogdir email' do
-        expect { subject.perform(schedule.id) }.to change(Workers::CreateTrogdirEmail.jobs, :size).by 1
+        expect { subject.perform(schedule.id) }.to change(Workers::Trogdir::CreateEmail.jobs, :size).by 1
       end
 
       it 'unexpires the legacy email table' do
-        expect { subject.perform(schedule.id) }.to change(Workers::UnexpireLegacyEmailTable.jobs, :size).by 1
+        expect { subject.perform(schedule.id) }.to change(Workers::LegacyEmailTable::Unexpire.jobs, :size).by 1
       end
     end
   end

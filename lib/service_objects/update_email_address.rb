@@ -7,7 +7,7 @@ module ServiceObjects
       # The ID hash does not come through with the hash of the person ids
       # So we have to make a work around for it.
       biola_id = TrogdirPerson.new(change.person_uuid).biola_id
-      Workers::UpdateLegacyEmailTable.perform_async(biola_id, change.old_university_email, change.new_university_email)
+      Workers::LegacyEmailTable::Update.perform_async(biola_id, change.old_university_email, change.new_university_email)
 
       UniversityEmail.where(uuid: change.person_uuid, address: change.old_university_email).update(primary: false) if !Settings.dry_run?
       Log.info %{Update UniversityEmail for uuid: "#{change.person_uuid}" with address: #{change.old_university_email} to be not primary}

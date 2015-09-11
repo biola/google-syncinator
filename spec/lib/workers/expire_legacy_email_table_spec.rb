@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Workers::ExpireLegacyEmailTable, type: :unit do
+describe Workers::LegacyEmailTable::Expire, type: :unit do
   let(:biola_id) { 1234567 }
   let(:email_adddress) { 'bob.dole@biola.edu' }
 
   context 'when record does not exist' do
     it 'raises an error' do
-      expect { subject.perform(biola_id, email_adddress) }.to raise_exception(Workers::ExpireLegacyEmailTable::RowNotFound)
+      expect { subject.perform(biola_id, email_adddress) }.to raise_exception(Workers::LegacyEmailTable::Expire::RowNotFound)
     end
   end
 
