@@ -36,8 +36,8 @@ describe ServiceObjects::HandleChange do
 
     it 'calls SyncGoogleAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to receive(:call).and_return(:update)
-      expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
+      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to receive(:call).and_return(:create)
+      expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
       expect(Workers::ChangeError).to_not receive(:perform_async)
 
       subject.call
@@ -49,8 +49,8 @@ describe ServiceObjects::HandleChange do
 
     it 'calls UpdateEmailAddress' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to receive(:call).and_return(:create)
-      expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
+      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to receive(:call).and_return(:update)
+      expect(Workers::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
       expect(Workers::ChangeError).to_not receive(:perform_async)
 
       subject.call
