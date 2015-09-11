@@ -12,6 +12,22 @@ module Workers
         email = UniversityEmail.find_by('deprovision_schedules._id' => object_id)
         email.deprovision_schedules.find_by(action: class_action, _id: object_id)
       end
+
+      # Checks to see if deprovisioning should still take place
+      # @param schedule [DeprovisionSchedule]
+      # @return [Boolean]
+      def deprovisioning_no_longer_warranted?(schedule)
+        address = schedule.university_email.address
+
+        case schedule.reason
+        when DeprovisionSchedule::NEVER_ACTIVE_REASON
+          return true if GoogleAccount.new(address).logged_in?
+        when DeprovisionSchedule::INACTIVE_REASON
+          return true if GoogleAccount.new(address).active?
+        end
+
+        false
+      end
     end
   end
 end

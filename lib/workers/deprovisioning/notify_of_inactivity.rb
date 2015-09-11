@@ -14,6 +14,11 @@ module Workers
         schedule = find_schedule(deprovision_schedule_id)
         email = schedule.university_email
 
+        if deprovisioning_no_longer_warranted?(schedule)
+          schedule.update! canceled: true
+          return nil
+        end
+
         unless schedule.canceled?
           if GoogleAccount.new(email.address).active?
             email.cancel_deprovisioning!

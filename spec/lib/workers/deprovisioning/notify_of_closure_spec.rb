@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Workers::Deprovisioning::NotifyOfClosure, type: :unit do
   let(:primary) { true }
   let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', primary: primary }
-  let!(:schedule) { email.deprovision_schedules.create action: :notify_of_closure, scheduled_for: 1.minute.ago, canceled: canceled }
+  let(:reason) { nil }
+  let!(:schedule) { email.deprovision_schedules.create action: :notify_of_closure, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
   context 'when deprovision schedule canceled' do
     let(:canceled) { true }
@@ -41,6 +42,15 @@ describe Workers::Deprovisioning::NotifyOfClosure, type: :unit do
     it 'marks the schedule complete' do
       expect(TrogdirPerson).to receive(:new).and_return(double(first_or_preferred_name: 'Bob'))
       expect{ subject.perform(schedule.id) }.to change { schedule.reload.completed_at }.from(nil)
+    end
+
+    context "when email was inactive but now isn't" do
+      let(:reason) { DeprovisionSchedule::INACTIVE_REASON }
+      before { expect_any_instance_of(GoogleAccount).to receive(:active?).and_return true }
+
+      it 'cancels the schedule' do
+        expect { subject.perform(schedule.id) }.to change { schedule.reload.canceled? }.to true
+      end
     end
   end
 end

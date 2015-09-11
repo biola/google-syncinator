@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe Workers::Deprovisioning::Suspend, type: :unit do
   let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
-  let!(:schedule) { email.deprovision_schedules.create action: :suspend, scheduled_for: 1.minute.ago, canceled: canceled }
+  let(:reason) { nil }
+  let!(:schedule) { email.deprovision_schedules.create action: :suspend, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
   context 'when deprovision schedule canceled' do
     let(:canceled) { true }
@@ -30,7 +31,7 @@ describe Workers::Deprovisioning::Suspend, type: :unit do
   context 'when deprovision schedule not canceled' do
     let(:canceled) { false }
 
-    before { expect_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return(1234567) }
+    before { allow_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return(1234567) }
 
     it 'suspends Google account' do
       account = instance_double(GoogleAccount)
@@ -54,6 +55,15 @@ describe Workers::Deprovisioning::Suspend, type: :unit do
     it 'marks the schedule complete' do
       expect(GoogleAccount).to receive_message_chain(:new, :suspend!)
       expect{ subject.perform(schedule.id) }.to change { schedule.reload.completed_at }.from(nil)
+    end
+
+    context "when email was inactive but now isn't" do
+      let(:reason) { DeprovisionSchedule::INACTIVE_REASON }
+      before { expect_any_instance_of(GoogleAccount).to receive(:active?).and_return true }
+
+      it 'cancels the schedule' do
+        expect { subject.perform(schedule.id) }.to change { schedule.reload.canceled? }.to true
+      end
     end
   end
 end
