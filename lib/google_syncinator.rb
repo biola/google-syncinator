@@ -69,20 +69,21 @@ module GoogleSyncinator
     require 'api-auth'
 
     require './lib/api'
-    require './lib/client'
-    require './lib/deprovision_schedule'
     require './lib/email_address_options'
     require './lib/emails'
-    require './lib/exclusion'
     require './lib/google_account'
     require './lib/log'
     require './lib/service_objects'
     require './lib/trogdir_change'
     require './lib/trogdir_person'
     require './lib/unique_email_address'
-    require './lib/university_email'
     require './lib/whitelist'
     require './lib/workers'
+
+    require './lib/mongoid_models/client'
+    require './lib/mongoid_models/deprovision_schedule'
+    require './lib/mongoid_models/exclusion'
+    require './lib/mongoid_models/university_email'
 
     true
   end
