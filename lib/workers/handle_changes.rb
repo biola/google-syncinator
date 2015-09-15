@@ -49,7 +49,7 @@ module Workers
     # Wrapper for the Trogdir change syncs API object
     # @return [Trogdir::APIClient::ChangeSyncs]
     def change_syncs
-      Trogdir::APIClient::ChangeSyncs.new
+      ::Trogdir::APIClient::ChangeSyncs.new
     end
   end
 end

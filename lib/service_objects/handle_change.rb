@@ -65,7 +65,7 @@ module ServiceObjects
     # Should this `change` be processed by any of the other ServiceObjects
     # @return [Boolean]
     def ignore?
-      [AssignEmailAddress, SyncGoogleAccount, UpdateEmailAddress, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, ReprovisionGoogleAccount].all? do |klass|
+      [AssignEmailAddress, SyncGoogleAccount, UpdateEmailAddress, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, CancelDeprovisioningGoogleAccount, ReprovisionGoogleAccount].all? do |klass|
         klass.ignore? change
       end
     end
