@@ -6,3 +6,4 @@
 /vendor/bundle
 /tmp
 /log/*
+log/*.log
