@@ -1,0 +1,8 @@
+##############################
+########## Changes ###########
+##############################
+
+handle_changes:
+  cron: "0 08-20 * * 1-5"
+  class: "Workers::HandleChanges"
+  queue: default
