@@ -28,6 +28,8 @@ trogdir:
   secret_key: # set in settings.local.yml
   api_timeout: 300 # 5 min
 
+dev_mode: false
+
 ws:
   db:
     adapter: mysql2

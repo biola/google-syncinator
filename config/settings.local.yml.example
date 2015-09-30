@@ -17,3 +17,5 @@ ws:
     host: db.example.com
     user: google_syncinator
     password: "************"
+
+dev_mode: # set to true to skip google calls
