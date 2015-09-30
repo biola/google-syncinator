@@ -8,6 +8,7 @@ class GoogleAccount
   end
 
   def exists?
+    return true if Settings.dev_mode
     result = api.execute(
       api_method: directory.users.get,
       # This will find by primary email or aliases according to Google's documentation
@@ -34,6 +35,7 @@ class GoogleAccount
   end
 
   def create!(first_name, last_name, department, title, privacy)
+    return true if Settings.dev_mode
     params = {
       primaryEmail: full_email,
       password: GoogleAccount.random_password,
@@ -57,6 +59,7 @@ class GoogleAccount
   end
 
   def update!(first_name, last_name, department, title, privacy)
+    return true if Settings.dev_mode
     params = {
       name: {
         givenName: first_name,
@@ -78,12 +81,14 @@ class GoogleAccount
   end
 
   def exists_in_group?(group)
+    return true if Settings.dev_mode
     group = GoogleAccount.group_to_email(group)
     result = api.execute( api_method: directory.members.get, parameters: {groupKey: group, memberKey: full_email} )
     return result.success?
   end
 
   def join!(group, role = 'MEMBER')
+    return true if Settings.dev_mode
     return false if exists_in_group?(group)
     group = GoogleAccount.group_to_email(group)
     params = {email: full_email, role: role}
@@ -96,6 +101,7 @@ class GoogleAccount
   end
 
   def leave!(group)
+    return true if Settings.dev_mode
     return false unless exists_in_group?(group)
     group = GoogleAccount.group_to_email(group)
     result = api.execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
