@@ -14,7 +14,7 @@ describe 'join a group', type: :feature do
     # It gets called a second time for the second "page" of results
     expect(Workers::HandleChanges).to receive(:perform_async)
 
-    UniversityEmail.create uuid: uuid, address: address, state: :suspended
+    PersonEmail.create uuid: uuid, address: address, state: :suspended
     DB[:email].insert idnumber: biola_id, email: address, expiration_date: 1.month.ago, reusable_date: 1.week.ago
   end
 
@@ -24,9 +24,9 @@ describe 'join a group', type: :feature do
     expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
     expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
     expect_any_instance_of(GoogleAccount).to_not receive(:create!)
-    expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
+    expect_any_instance_of(GoogleAccount).to_not receive(:create!)
+    expect_any_instance_of(GoogleAccount).to_not receive(:update!)
     expect_any_instance_of(GoogleAccount).to_not receive(:update_suspension!)
-    expect_any_instance_of(GoogleAccount).to_not receive(:rename!)
     expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
     expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
@@ -36,7 +36,7 @@ describe 'join a group', type: :feature do
 
     subject.perform
 
-    expect(UniversityEmail.count).to eql 1
+    expect(PersonEmail.count).to eql 1
     expect(DB[:email].count).to eql 1
   end
 end

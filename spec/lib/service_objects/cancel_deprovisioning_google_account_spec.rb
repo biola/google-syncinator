@@ -4,7 +4,7 @@ describe ServiceObjects::CancelDeprovisioningGoogleAccount, type: :unit do
   let(:fixture) { 'create_employee' }
   let(:change_hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   let(:trogdir_change) { TrogdirChange.new(change_hash) }
-  let!(:university_email) { UniversityEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email || 'john.doe@example.com') }
+  let!(:university_email) { PersonEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email || 'john.doe@example.com') }
   subject { ServiceObjects::CancelDeprovisioningGoogleAccount.new(trogdir_change) }
 
   describe '#call' do

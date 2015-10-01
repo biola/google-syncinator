@@ -14,7 +14,7 @@ describe 'student graduates', type: :feature  do
     # It gets called a second time for the second "page" of results
     expect(Workers::HandleChanges).to receive(:perform_async)
 
-    UniversityEmail.create uuid: uuid, address: address, state: :active, created_at: 31.days.ago
+    PersonEmail.create uuid: uuid, address: address, state: :active, created_at: 31.days.ago
     DB[:email].insert(idnumber: biola_id, email: address)
   end
 
@@ -28,7 +28,8 @@ describe 'student graduates', type: :feature  do
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
-      expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:create!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:suspend!)
       expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
@@ -43,9 +44,9 @@ describe 'student graduates', type: :feature  do
 
       subject.perform
 
-      expect(UniversityEmail.count).to eql 1
-      expect(UniversityEmail.first.deprovision_schedules.count).to eql 3
-      expect(UniversityEmail.first.deprovision_schedules.map(&:canceled?)).to eql [true, true, true]
+      expect(PersonEmail.count).to eql 1
+      expect(PersonEmail.first.deprovision_schedules.count).to eql 3
+      expect(PersonEmail.first.deprovision_schedules.map(&:canceled?)).to eql [true, true, true]
       expect(DB[:email].count).to eql 1
       expect(DB[:email].first[:expiration_date]).to be nil
       expect(DB[:email].first[:reusable_date]).to be nil

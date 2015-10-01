@@ -11,9 +11,9 @@ module Emails
     # @return [String] email subject
     def subject
       if disable_days_from_now.to_i < 7
-        "#{university_email.address} Email Account Closure"
+        "#{account_email.address} Email Account Closure"
       else
-        "#{university_email.address} Email Account Closure in #{disable_days_from_now} DAYS"
+        "#{account_email.address} Email Account Closure in #{disable_days_from_now} DAYS"
       end
     end
 
@@ -24,7 +24,7 @@ module Emails
       raise NotImplementedError, 'Must override #body in child class'
     end
 
-    # Send the email to the UniversityEmail#address associated with the
+    # Send the email to the AccountEmail#address associated with the
     # `deprovision_schedule`
     # @return [Object] Mail object
     # @return [false] if no email sent
@@ -32,7 +32,7 @@ module Emails
       mail_obj = false
 
       if !Settings.dry_run?
-        send_to = university_email.address
+        send_to = account_email.address
         email_body = body
 
         mail_obj = Mail.deliver do
@@ -58,21 +58,22 @@ module Emails
     # @return [Integer] days until the email is suspended or deleted
     # @return [nil] if email is not scheduled for suspension or deletion
     def disable_days_from_now
-      return nil if university_email.disable_date.nil?
-      university_email.disable_date.to_date.mjd - Date.today.mjd
+      return nil if account_email.disable_date.nil?
+      account_email.disable_date.to_date.mjd - Date.today.mjd
     end
 
-    # The UniversityEmail parent of the `deprovision_schedule`
-    # @return [UniversityEmail]
-    def university_email
-      deprovision_schedule.university_email
+    # The AccountEmail parent of the `deprovision_schedule`
+    # @return [AccountEmail]
+    def account_email
+      deprovision_schedule.account_email
     end
 
-    # The TrogdirPerson associated with the `university_email`
+    # The TrogdirPerson associated with the `account_email`
     # @note This is here because it is commonly used in subclasses
     # @return [TrogdirPerson] the trogdir person who the email belongs to
     def trogdir_person
-      @trogdir_person ||= TrogdirPerson.new(university_email.uuid)
+      # TODO: this will have to be reworked to support department emails
+      @trogdir_person ||= TrogdirPerson.new(account_email.uuid)
     end
   end
 end

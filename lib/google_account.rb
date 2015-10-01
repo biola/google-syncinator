@@ -17,15 +17,6 @@ class GoogleAccount
     @email = email
   end
 
-  # Does the email account actually exist?
-  # @note opposite of available?
-  # @see #available?
-  def exists?
-    return false if data.nil?
-
-    data.emails.map{|e| e['address']}.include? full_email
-  end
-
   # Is the email account available?
   # @note opposite of exists?
   # @see #exists?
@@ -36,16 +27,6 @@ class GoogleAccount
   # Is the account currently suspended?
   def suspended?
     !!data.try(:[], 'suspended').try(:present?)
-  end
-
-  # The date and time of the last login
-  # @note currently this only includes logins to the web interface
-  # @return [DateTime]
-  # @return [nil] if never logged in
-  def last_login
-    return nil if data.nil?
-
-    data['lastLoginTime'].to_i == 0 ? nil : data['lastLoginTime']
   end
 
   # Has the user logged in within the configured amount of time?
@@ -73,21 +54,15 @@ class GoogleAccount
   end
   alias :never_active? :never_logged_in?
 
-  # Create a new Google Apps account or update an existing one
-  # @param first_name [String] the users first name
-  # @param last_name [String] the users last name
-  # @param department [String,nil] the users department
-  # @param title [String,nil] the users title
-  # @param privacy [Boolean] the users privacy
-  # @return [:create,:update]
-  def create_or_update!(first_name, last_name, department, title, privacy)
-    if exists?
-      update! first_name, last_name, department, title, privacy
-      :update
-    else
-      create! first_name, last_name, department, title, privacy
-      :create
-    end
+  # Creates Google Apps alias email address
+  # @param address [String] the alias email address to create
+  # @return [true]
+  def create_alias!(address)
+    new_alias = directory.users.aliases.insert.request_schema.new(alias: address)
+
+    safe_execute api_method: directory.users.aliases.insert, parameters: {userKey: full_email}, body_object: new_alias
+
+    true
   end
 
   # Create a new Google Apps account
@@ -119,16 +94,29 @@ class GoogleAccount
     true
   end
 
-  # Change a Google Apps accounts primary email address
-  # @note Google will automatically create a secondary email out of the old email
-  # @param new_email_address [String] users new primary email address
+  # Updates a Google Apps account's details
+  # @param first_name [String] the users first name
+  # @param last_name [String] the users last name
+  # @param department [String,nil] the users department
+  # @param title [String,nil] the users title
+  # @param privacy [Boolean] the users privacy
   # @return [true]
-  def rename!(new_email_address)
-    params = {primaryEmail: new_email_address}
+  def update!(first_name, last_name, department, title, privacy)
+    params = {
+      name: {
+        givenName: first_name,
+        familyName: last_name
+      },
+      organizations: [
+        department: department,
+        title: title
+      ],
+      includeInGlobalAddressList: !privacy
+    }
 
-    user_updates = directory.users.patch.request_schema.new(params)
+    user_updates = directory.users.update.request_schema.new(params)
 
-    safe_execute api_method: directory.users.patch, parameters: {userKey: full_email}, body_object: user_updates
+    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
     true
   end
@@ -172,12 +160,6 @@ class GoogleAccount
   def leave!(group)
     group = GoogleAccount.group_to_email(group)
     safe_execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
-  end
-
-  # The full email address of the Google account
-  # @return [String] a full email address including the domain part
-  def full_email
-    GoogleAccount.full_email(email)
   end
 
   # Gets a list of accounts that have never been active
@@ -271,40 +253,31 @@ class GoogleAccount
     full_email(group_name.to_s.downcase.gsub(/[^a-z0-9]+/, '.'))
   end
 
-  # Generates a random password for use as a temporary account password
-  # @return [String]
-  def self.random_password
-    rand(36**rand(16..42)).to_s(36)
-  end
-
   private
 
-  # Updates a Google Apps account's details
-  # @param first_name [String] the users first name
-  # @param last_name [String] the users last name
-  # @param department [String,nil] the users department
-  # @param title [String,nil] the users title
-  # @param privacy [Boolean] the users privacy
-  # @return [true]
-  # @see #create_or_update!
-  def update!(first_name, last_name, department, title, privacy)
-    params = {
-      name: {
-        givenName: first_name,
-        familyName: last_name
-      },
-      organizations: [
-        department: department,
-        title: title
-      ],
-      includeInGlobalAddressList: !privacy
-    }
+  # The full email address of the Google account
+  # @return [String] a full email address including the domain part
+  def full_email
+    GoogleAccount.full_email(email)
+  end
 
-    user_updates = directory.users.update.request_schema.new(params)
+  # Does the email account actually exist?
+  # @note opposite of available?
+  # @see #available?
+  def exists?
+    return false if data.nil?
 
-    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
+    data.emails.map{|e| e['address']}.include? full_email
+  end
 
-    true
+  # The date and time of the last login
+  # @note currently this only includes logins to the web interface
+  # @return [DateTime]
+  # @return [nil] if never logged in
+  def last_login
+    return nil if data.nil?
+
+    data['lastLoginTime'].to_i == 0 ? nil : data['lastLoginTime']
   end
 
   # Update a Google Apps account to be either active or suspended
@@ -413,5 +386,11 @@ class GoogleAccount
         nil
       end
     )
+  end
+
+  # Generates a random password for use as a temporary account password
+  # @return [String]
+  def self.random_password
+    rand(36**rand(16..42)).to_s(36)
   end
 end

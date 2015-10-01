@@ -13,7 +13,7 @@ describe Workers::CheckNeverActive, type: :unit do
     let(:uuid) { '00000000-0000-0000-0000-000000000000' }
     let(:address) { 'bob.dole@biola.edu' }
     let(:created_at) { 31.days.ago }
-    let!(:email) { UniversityEmail.create(uuid: uuid, address: address, created_at: created_at) }
+    let!(:email) { PersonEmail.create(uuid: uuid, address: address, created_at: created_at) }
 
     before { expect(GoogleAccount).to receive(:never_active).and_return [address] }
 
@@ -70,7 +70,7 @@ describe Workers::CheckNeverActive, type: :unit do
       end
 
       context 'when email has become active' do
-        let(:other_email) { UniversityEmail.create(uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu') }
+        let(:other_email) { PersonEmail.create(uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu') }
         let!(:schedule) { other_email.deprovision_schedules.create action: :delete, scheduled_for: 1.week.from_now, reason: DeprovisionSchedule::NEVER_ACTIVE_REASON }
 
         before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return true }

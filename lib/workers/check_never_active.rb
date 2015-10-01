@@ -13,7 +13,7 @@ module Workers
       email_addresses = GoogleAccount.never_active
 
       email_addresses.each do |email_address|
-        email = UniversityEmail.current(email_address)
+        email = AccountEmail.current(email_address)
 
         unless email.being_deprovisioned? || email.protected?
           person = TrogdirPerson.new(email.uuid)
@@ -27,7 +27,7 @@ module Workers
       end
 
       # Emails that are pending deprovisioning because they were never active
-      pending_emails = UniversityEmail.where(:deprovision_schedules.elem_match => {reason: DeprovisionSchedule::NEVER_ACTIVE_REASON, completed_at: nil, canceled: nil})
+      pending_emails = AccountEmail.where(:deprovision_schedules.elem_match => {reason: DeprovisionSchedule::NEVER_ACTIVE_REASON, completed_at: nil, canceled: nil})
 
       pending_emails.each do |email|
         # Cancel deprovisioning if they have become active

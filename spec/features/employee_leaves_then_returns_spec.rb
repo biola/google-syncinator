@@ -14,7 +14,7 @@ describe 'employee leaves then returns', type: :feature  do
     # It gets called a second time for the second "page" of results
     expect(Workers::HandleChanges).to receive(:perform_async)
 
-    UniversityEmail.create uuid: uuid, address: address, state: :active, created_at: 31.days.ago
+    PersonEmail.create uuid: uuid, address: address, state: :active, created_at: 31.days.ago
     DB[:email].insert(idnumber: biola_id, email: address)
   end
 
@@ -29,7 +29,8 @@ describe 'employee leaves then returns', type: :feature  do
         allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob')
         expect_any_instance_of(Trogdir::APIClient::Emails).to receive(:index).and_return double(perform: double(success?: true, parse: [{'address' => address}]))
 
-        expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
+        expect_any_instance_of(GoogleAccount).to_not receive(:create!)
+        expect_any_instance_of(GoogleAccount).to_not receive(:update!)
         expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
         expect_any_instance_of(GoogleAccount).to_not receive(:join!)
         expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
@@ -42,11 +43,11 @@ describe 'employee leaves then returns', type: :feature  do
 
         subject.perform
 
-        expect(UniversityEmail.count).to eql 1
-        expect(UniversityEmail.first.deprovision_schedules.count).to eql 4
-        expect(UniversityEmail.first.deprovision_schedules.map(&:action)).to eql [:notify_of_closure, :suspend, :delete, :activate]
-        expect(UniversityEmail.first.deprovision_schedules.map(&:canceled?)).to eql [false, false, true, false]
-        expect(UniversityEmail.first.deprovision_schedules.map(&:completed_at?)).to eql [true, true, false, true]
+        expect(PersonEmail.count).to eql 1
+        expect(PersonEmail.first.deprovision_schedules.count).to eql 4
+        expect(PersonEmail.first.deprovision_schedules.map(&:action)).to eql [:notify_of_closure, :suspend, :delete, :activate]
+        expect(PersonEmail.first.deprovision_schedules.map(&:canceled?)).to eql [false, false, true, false]
+        expect(PersonEmail.first.deprovision_schedules.map(&:completed_at?)).to eql [true, true, false, true]
         expect(DB[:email].count).to eql 1
         expect(DB[:email].first[:expiration_date]).to be nil
         expect(DB[:email].first[:reusable_date]).to be nil

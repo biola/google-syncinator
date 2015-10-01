@@ -21,12 +21,6 @@ class TrogdirChange
     hash['person_id']
   end
 
-  # The Biola ID number of the person
-  # @return [String]
-  def biola_id
-    Array(all_attrs['ids']).find { |id| id['type'] == 'biola_id' }['identifier']
-  end
-
   # The person's preferred name
   # @return [String]
   def preferred_name
@@ -51,18 +45,6 @@ class TrogdirChange
     all_attrs['last_name']
   end
 
-  # The person's title
-  # @return [String, nil]
-  def title
-    all_attrs['title']
-  end
-
-  # The person's department
-  # @return [String, nil]
-  def department
-    all_attrs['department']
-  end
-
   # The person's affiliations
   # @return [Array<String>]
   def affiliations
@@ -73,12 +55,6 @@ class TrogdirChange
     end
   end
 
-  # Whether or not the person has chose to have FERPA privacy
-  # @return [Boolean]
-  def privacy
-    all_attrs['privacy']
-  end
-
   # The person's university type email address, if any
   # @return [String, nil]
   def university_email
@@ -87,18 +63,6 @@ class TrogdirChange
     elsif email?
       all_attrs['address']
     end
-  end
-
-  # The person's new university email address if it was changed
-  # @return [String, nil]
-  def new_university_email
-    modified['address']
-  end
-
-  # The person's old university email address if it was changed
-  # @return [String, nil]
-  def old_university_email
-    original['address']
   end
 
   # Whether or not the person has a university email address
@@ -124,11 +88,6 @@ class TrogdirChange
   # Whether or not any info stored in the Google Apps account was changed
   def account_info_updated?
     person? && (create? || update?) && (name_changed? || work_changed? || privacy_changed?)
-  end
-
-  # Whether or not the university email was changed
-  def university_email_updated?
-    email? && update? && all_attrs['type'] == 'university'
   end
 
   # Any groups that the person joined

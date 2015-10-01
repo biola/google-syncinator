@@ -2,7 +2,7 @@
 class API::V1::ExclusionsAPI < Grape::API
   resource :exclusions do
     before do
-      @email = UniversityEmail.find_by(id: params[:email_id])
+      @email = AccountEmail.find_by(id: params[:email_id])
     end
 
     desc 'Create an exclusion'

@@ -18,7 +18,7 @@ describe ServiceObjects::AssignEmailAddress, type: :unit do
 
     before do
       expect_any_instance_of(UniqueEmailAddress).to receive(:best).and_return(address)
-      expect(Workers::CreateEmail).to receive(:perform_async).with(change_hash['person_id'], address)
+      expect(Workers::CreatePersonEmail).to receive(:perform_async).with(change_hash['person_id'], address)
     end
 
     it 'creates a university email' do
@@ -29,7 +29,7 @@ describe ServiceObjects::AssignEmailAddress, type: :unit do
   describe '#ignore?' do
     context 'when creating a user with a university email' do
       let(:fixture) { 'create_employee' }
-      before { UniversityEmail.create uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
+      before { PersonEmail.create uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
       it { expect(subject.ignore?).to be true }
     end
 

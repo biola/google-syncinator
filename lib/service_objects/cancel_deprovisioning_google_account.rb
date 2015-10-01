@@ -4,7 +4,7 @@ module ServiceObjects
     # Cancel the deprovisioning of an email account because affiliations have changed
     # @return [:update]
     def call
-      UniversityEmail.where(uuid: change.person_uuid).each do |email|
+      PersonEmail.where(uuid: change.person_uuid).each do |email|
         email.deprovision_schedules.each do |sched|
           if sched.pending? && sched.action != :activate
             sched.cancel!
@@ -21,7 +21,7 @@ module ServiceObjects
       return true unless change.affiliation_added?
       return true unless EmailAddressOptions.allowed?(change.affiliations)
 
-      UniversityEmail.where(uuid: change.person_uuid).each do |email|
+      PersonEmail.where(uuid: change.person_uuid).each do |email|
         unless email.excluded?
           return false if cancellable_schedules(email).any?
         end

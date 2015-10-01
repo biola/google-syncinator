@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Workers::Deprovisioning::Delete, type: :unit do
   describe '#perform' do
-    let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
+    let!(:email) { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
     let(:reason) { nil }
     let!(:schedule) { email.deprovision_schedules.create action: :delete, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 

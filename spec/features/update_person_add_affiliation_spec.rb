@@ -17,7 +17,7 @@ describe 'add an employee affiliation', type: :feature  do
 
   context 'when a reprovisionable email exists' do
     before do
-      UniversityEmail.create uuid: uuid, address: address, state: :suspended
+      PersonEmail.create uuid: uuid, address: address, state: :suspended
       DB[:email].insert(idnumber: biola_id, email: address, expiration_date: 1.month.ago, reusable_date: 1.week.ago)
     end
 
@@ -25,8 +25,8 @@ describe 'add an employee affiliation', type: :feature  do
       expect(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id)
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
-      expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
-      expect_any_instance_of(GoogleAccount).to_not receive(:rename!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:create!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
@@ -36,12 +36,12 @@ describe 'add an employee affiliation', type: :feature  do
 
       subject.perform
 
-      expect(UniversityEmail.count).to eql 1
-      expect(UniversityEmail.first.address).to eql address
-      expect(UniversityEmail.first.state).to eql :active
-      expect(UniversityEmail.first.deprovision_schedules.count).to eql 1
-      expect(UniversityEmail.first.deprovision_schedules.last.action).to eql :activate
-      expect(UniversityEmail.first.deprovision_schedules.last.completed_at?).to be true
+      expect(PersonEmail.count).to eql 1
+      expect(PersonEmail.first.address).to eql address
+      expect(PersonEmail.first.state).to eql :active
+      expect(PersonEmail.first.deprovision_schedules.count).to eql 1
+      expect(PersonEmail.first.deprovision_schedules.last.action).to eql :activate
+      expect(PersonEmail.first.deprovision_schedules.last.completed_at?).to be true
       expect(DB[:email].count).to eql 1
       expect(DB[:email].first[:primary]).to eql 1
       expect(DB[:email].first[:expiration_date]).to be nil
@@ -50,23 +50,24 @@ describe 'add an employee affiliation', type: :feature  do
   end
 
   context 'when no reprovisionable email exists' do
-    it 'creates a trogdir, university and legacy email' do
-      expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: biola_id)
+    it 'creates a trogdir, university, legacy and Google email' do
+      expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', title: nil, department: nil, privacy: false)
       allow_any_instance_of(UniversityEmail).to receive(:available?).and_return(true)
       allow_any_instance_of(GoogleAccount).to receive(:available?).and_return(true)
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
-      expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:update_suspension!)
       expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
+      expect_any_instance_of(GoogleAccount).to receive(:create!)
       expect_any_instance_of(Trogdir::APIClient::Emails).to receive(:create).and_return(double(perform: double(success?: true)))
 
       subject.perform
 
-      expect(UniversityEmail.count).to eql 1
+      expect(PersonEmail.count).to eql 1
       expect(DB[:email].count).to eql 1
     end
   end

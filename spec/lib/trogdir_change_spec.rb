@@ -13,10 +13,6 @@ describe TrogdirChange, type: :unit do
     it { expect(subject.person_uuid).to eql '00000000-0000-0000-0000-000000000000'}
   end
 
-  describe '#biola_id' do
-    it { expect(subject.biola_id).to eql '234567' }
-  end
-
   describe '#preferred_name' do
     it { expect(subject.preferred_name).to eql 'Bob'}
   end
@@ -33,20 +29,8 @@ describe TrogdirChange, type: :unit do
     it { expect(subject.last_name).to eql 'Dole'}
   end
 
-  describe '#title' do
-    it { expect(subject.title).to eql 'Commander in Chief'}
-  end
-
-  describe '#department' do
-    it { expect(subject.department).to eql 'Office of the President'}
-  end
-
   describe '#affiliations' do
     it { expect(subject.affiliations).to eql ['employee']}
-  end
-
-  describe '#privacy' do
-    it { expect(subject.privacy).to eql false}
   end
 
   describe '#university_email' do
@@ -59,16 +43,6 @@ describe TrogdirChange, type: :unit do
 
       it { expect(subject.university_email).to eql 'bob.dole@biola.edu' }
     end
-  end
-
-  describe '#new_university_email' do
-    let(:fixture) { 'update_email' }
-    it { expect(subject.new_university_email).to eql 'bob.dole@biola.edu' }
-  end
-
-  describe '#old_university_email' do
-    let(:fixture) { 'update_email' }
-    it { expect(subject.old_university_email).to eql 'bobby.dole@biola.edu' }
   end
 
   describe '#university_email_exists?' do
@@ -162,11 +136,6 @@ describe TrogdirChange, type: :unit do
 
       it { expect(subject.account_info_updated?).to be false }
     end
-  end
-
-  describe '#university_email_updated?' do
-    let(:fixture) { 'update_email' }
-    it { expect(subject.university_email_updated?).to be true }
   end
 
   describe '#joined_groups' do

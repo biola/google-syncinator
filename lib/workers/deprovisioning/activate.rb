@@ -14,7 +14,7 @@ module Workers
       # @return [nil]
       def perform(deprovision_schedule_id)
         schedule = find_schedule(deprovision_schedule_id)
-        email = schedule.university_email
+        email = schedule.account_email
 
         unless email.active?
           biola_id = TrogdirPerson.new(email.uuid).biola_id

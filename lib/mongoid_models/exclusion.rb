@@ -4,12 +4,12 @@ class Exclusion
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  # @!attribute university_email
-  # @return [UniversityEmail]
-  # @!method university_email=(university_email)
-  #   @param university_email [UniversityEmail]
-  #   @return [UniversityEmail]
-  embedded_in :university_email
+  # @!attribute account_email
+  # @return [AccountEmail]
+  # @!method account_email=(account_email)
+  #   @param account_email [AccountEmail]
+  #   @return [AccountEmail]
+  embedded_in :account_email
 
   # @!attribute creator_uuid
   #   @return [String] The UUID of the person who created the exception

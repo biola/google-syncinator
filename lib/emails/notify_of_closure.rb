@@ -1,5 +1,5 @@
 module Emails
-  # Sends an email notifying the email owner that their acccount is about to close
+  # Sends an email notifying the email owner that their account is about to close
   class NotifyOfClosure < Base
     # The body of the email
     # @return [String] the body of the email

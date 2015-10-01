@@ -281,3 +281,6 @@ DEPENDENCIES
   turnout
   yard
   yard-mongoid
+
+BUNDLED WITH
+   1.10.6

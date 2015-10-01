@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Exclusion, type: :unit do
-  it { is_expected.to be_embedded_in(:university_email) }
+  it { is_expected.to be_embedded_in(:account_email) }
   it { is_expected.to have_fields(:creator_uuid, :starts_at, :ends_at, :reason) }
   it { is_expected.to be_timestamped_document }
 

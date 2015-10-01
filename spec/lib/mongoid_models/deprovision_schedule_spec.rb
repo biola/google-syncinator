@@ -4,9 +4,9 @@ describe DeprovisionSchedule, type: :unit do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
   let(:job_id) { '1234567890' }
-  let(:university_email) { UniversityEmail.create uuid: uuid, address: address }
+  let(:person_email) { PersonEmail.create uuid: uuid, address: address }
 
-  it { is_expected.to be_embedded_in(:university_email) }
+  it { is_expected.to be_embedded_in(:account_email) }
   it { is_expected.to have_fields(:action, :reason, :scheduled_for, :completed_at, :canceled, :job_id) }
   it { is_expected.to be_timestamped_document }
 
@@ -33,10 +33,10 @@ describe DeprovisionSchedule, type: :unit do
   end
 
   describe '#create_and_schedule!' do
-    subject { university_email.deprovision_schedules.build action: :delete, scheduled_for: 1.day.ago }
+    subject { person_email.deprovision_schedules.build action: :delete, scheduled_for: 1.day.ago }
 
     it 'crease a deprovision schedule' do
-      expect { subject.save_and_schedule! }.to change(UniversityEmail, :count).from(0).to 1
+      expect { subject.save_and_schedule! }.to change { person_email.deprovision_schedules.count }.from(0).to 1
     end
 
     it 'schedules a job' do
@@ -49,7 +49,7 @@ describe DeprovisionSchedule, type: :unit do
   end
 
   describe '#cancel!' do
-    subject { university_email.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now, job_id: job_id }
+    subject { person_email.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now, job_id: job_id }
 
     context 'when job_id is nil' do
       let(:job_id) { nil }
@@ -74,7 +74,7 @@ describe DeprovisionSchedule, type: :unit do
   end
 
   describe '#cancel_and_destroy!' do
-    subject { university_email.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now, job_id: job_id }
+    subject { person_email.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now, job_id: job_id }
 
     context 'when job_id in nil' do
       let(:job_id) { nil }
@@ -99,11 +99,11 @@ describe DeprovisionSchedule, type: :unit do
   end
 
   context 'when setting completed_at' do
-    subject { university_email.deprovision_schedules.create action: :delete, scheduled_for: Time.now }
+    subject { person_email.deprovision_schedules.create action: :delete, scheduled_for: Time.now }
 
-    it 'updates the state of university_email' do
-      expect { subject.update(completed_at: DateTime.now) }.to change(university_email, :state).from(:active).to :deleted
-      expect(university_email.changed?).to be false
+    it 'updates the state of account_email' do
+      expect { subject.update(completed_at: DateTime.now) }.to change(person_email, :state).from(:active).to :deleted
+      expect(person_email.changed?).to be false
     end
   end
 end

@@ -1,8 +1,6 @@
 module ServiceObjects
   # Runs the appropriate other `ServiceObject`s
   class HandleChange < Base
-    # TODO: limit to emails with @biola.edu domain
-
     # Runs the appropriate service objects for this change
     # @return [Array<Symbol>] a list of actions taken
     def call
@@ -12,11 +10,6 @@ module ServiceObjects
         unless AssignEmailAddress.ignore?(change)
           actions << AssignEmailAddress.new(change).call
           Log.info "Assigning email address to person #{change.person_uuid}"
-        end
-
-        unless UpdateEmailAddress.ignore?(change)
-          Log.info "Updating Google account email (#{change.university_email}) for person #{change.person_uuid}"
-          actions << UpdateEmailAddress.new(change).call
         end
 
         unless SyncGoogleAccount.ignore?(change)
@@ -65,7 +58,7 @@ module ServiceObjects
     # Should this `change` be processed by any of the other ServiceObjects
     # @return [Boolean]
     def ignore?
-      [AssignEmailAddress, SyncGoogleAccount, UpdateEmailAddress, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, CancelDeprovisioningGoogleAccount, ReprovisionGoogleAccount].all? do |klass|
+      [AssignEmailAddress, SyncGoogleAccount, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, CancelDeprovisioningGoogleAccount, ReprovisionGoogleAccount].all? do |klass|
         klass.ignore? change
       end
     end

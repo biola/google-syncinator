@@ -14,7 +14,7 @@ describe 'update person name', type: :feature  do
     # It gets called a second time for the second "page" of results
     expect(Workers::HandleChanges).to receive(:perform_async)
 
-    UniversityEmail.create uuid: uuid, address: address, state: :active
+    PersonEmail.create uuid: uuid, address: address, state: :active
     DB[:email].insert(idnumber: biola_id, email: address)
   end
 
@@ -25,16 +25,15 @@ describe 'update person name', type: :feature  do
     expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
     expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
     expect_any_instance_of(GoogleAccount).to_not receive(:update_suspension!)
-    expect_any_instance_of(GoogleAccount).to_not receive(:rename!)
     expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
     expect_any_instance_of(GoogleAccount).to_not receive(:join!)
     expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-    expect_any_instance_of(GoogleAccount).to receive(:create_or_update!).with('B-dizzle', 'Dole', 'Office of the President', 'Commander in Chief', false)
+    expect_any_instance_of(GoogleAccount).to receive(:update!).with('B-dizzle', 'Dole', 'Office of the President', 'Commander in Chief', false)
 
     subject.perform
 
-    expect(UniversityEmail.count).to eql 1
+    expect(PersonEmail.count).to eql 1
     expect(DB[:email].count).to eql 1
   end
 end

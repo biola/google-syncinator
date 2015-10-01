@@ -37,10 +37,6 @@ describe GoogleAccount, type: :unit do
     end
   end
 
-  describe '#full_email' do
-    it { expect(subject.full_email).to eql 'bob.dole@example.com' }
-  end
-
   describe '.full_email' do
     it { expect(GoogleAccount.full_email('john.kerry')).to eql 'john.kerry@example.com' }
   end

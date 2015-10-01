@@ -8,11 +8,11 @@ module ServiceObjects
     def call
       # If the email address was recently created and is in it's protection period,
       # then schedule deprovisioning for the end of the protected period
-      if university_email.protected?
+      if account_email.protected?
         # Add 5 minutes to be sure we're past the protection time
         # We won't schedule this during a dry run because even though it would be safe to do now, dry_run could be off when it actually runs
-        Workers::DeprovisionGoogleAccount.perform_at(university_email.protected_until + 300, change.hash) if !Settings.dry_run?
-        Log.info "Schedule deprovisioning of #{change.person_uuid}/#{change.university_email} for #{university_email.protected_until + 300}"
+        Workers::DeprovisionGoogleAccount.perform_at(account_email.protected_until + 300, change.hash) if !Settings.dry_run?
+        Log.info "Schedule deprovisioning of #{change.person_uuid}/#{change.university_email} for #{account_email.protected_until + 300}"
         return :nothing
       end
 
@@ -57,23 +57,23 @@ module ServiceObjects
     def ignore?
       return true unless change.university_email_exists?
       return true unless change.affiliations_changed?
-      return true if UniversityEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
+      return true if PersonEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
       return false if !EmailAddressOptions.allowed?(change.affiliations)
       EmailAddressOptions.not_required?(change.affiliations) && google_account.active?
     end
 
     private
 
-    # The UniversityEmail associated with the `change`
-    # @return [UniversityEmail]
-    def university_email
-      @university_email ||= UniversityEmail.find_by(uuid: change.person_uuid, address: change.university_email)
+    # The PersonEmail associated with the `change`
+    # @return [PersonEmail]
+    def account_email
+      @account_email ||= PersonEmail.find_by(uuid: change.person_uuid, address: change.university_email)
     end
 
     # Simple wrapper for the Workers::ScheduleActions worker
     # @return [String] Sidekiq worked job ID
     def schedule_actions!(actions_and_durations, reason)
-      Workers::ScheduleActions.perform_async(university_email.id.to_s, actions_and_durations, reason)
+      Workers::ScheduleActions.perform_async(account_email.id.to_s, actions_and_durations, reason)
     end
 
     # Simple wrapper for deprovision schedlue settings

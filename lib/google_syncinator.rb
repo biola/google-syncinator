@@ -80,10 +80,13 @@ module GoogleSyncinator
     require './lib/whitelist'
     require './lib/workers'
 
+    require './lib/mongoid_models/university_email'
+    require './lib/mongoid_models/account_email'
+    require './lib/mongoid_models/person_email'
+    require './lib/mongoid_models/alias_email'
     require './lib/mongoid_models/client'
     require './lib/mongoid_models/deprovision_schedule'
     require './lib/mongoid_models/exclusion'
-    require './lib/mongoid_models/university_email'
 
     true
   end

@@ -3,8 +3,6 @@ module ServiceObjects
   class AssignEmailAddress < Base
     # The email type to use in Trogdir
     EMAIL_TYPE = :university
-    # Whether or not the email we assign should be the primary
-    MAKE_EMAIL_PRIMARY = true
 
     # Asks for a new unique email address and stores it in the university_emails
     #   collection, Trogdir and the legacy email table
@@ -16,7 +14,7 @@ module ServiceObjects
       unique_email = UniqueEmailAddress.new(email_options).best
       full_unique_email = GoogleAccount.full_email(unique_email)
 
-      Workers::CreateEmail.perform_async(change.person_uuid, full_unique_email)
+      Workers::CreatePersonEmail.perform_async(change.person_uuid, full_unique_email)
 
       :create
     end
@@ -27,8 +25,8 @@ module ServiceObjects
     # @return [Boolean]
     def ignore?
       return true unless change.affiliation_added?
-      return true if UniversityEmail.active? change.person_uuid
-      !(EmailAddressOptions.required?(change.affiliations) && UniversityEmail.find_reprovisionable(change.person_uuid).blank?)
+      return true if PersonEmail.active? change.person_uuid
+      !(EmailAddressOptions.required?(change.affiliations) && PersonEmail.find_reprovisionable(change.person_uuid).blank?)
     end
   end
 end

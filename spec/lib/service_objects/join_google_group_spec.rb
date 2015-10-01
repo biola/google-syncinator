@@ -34,7 +34,7 @@ describe ServiceObjects::JoinGoogleGroup, type: :unit do
     end
 
     context 'when no group is joined' do
-      let(:fixture) { 'update_email' }
+      let(:fixture) { 'update_person' }
       it { expect(subject.ignore?).to be true }
     end
   end

@@ -12,7 +12,7 @@ module Workers
       # @return [nil]
       def perform(deprovision_schedule_id)
         schedule = find_schedule(deprovision_schedule_id)
-        email = schedule.university_email
+        email = schedule.account_email
 
         if deprovisioning_no_longer_warranted?(schedule)
           email.cancel_deprovisioning!

@@ -11,7 +11,6 @@ describe ServiceObjects::HandleChange, type: :unit do
 
     it 'does not call any service objects' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
@@ -28,11 +27,10 @@ describe ServiceObjects::HandleChange, type: :unit do
   context 'when affiliation added' do
     context 'when a reprovisionable email exists' do
       let(:fixture) { 'update_person_add_affiliation' }
-      before { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', state: :suspended }
+      before { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', state: :suspended }
 
       it 'calls ReprovisionGoogleAccount' do
         expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-        expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
@@ -51,7 +49,6 @@ describe ServiceObjects::HandleChange, type: :unit do
 
       it 'calls AssignEmailAddress' do
         expect_any_instance_of(ServiceObjects::AssignEmailAddress).to receive(:call).and_return(:create)
-        expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
         expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
@@ -66,50 +63,11 @@ describe ServiceObjects::HandleChange, type: :unit do
     end
   end
 
-  context 'when university email created' do
-    let(:fixture) { 'create_email' }
-
-    it 'calls SyncGoogleAccount' do
-      expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to receive(:call).and_return(:create)
-      expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
-      expect(Workers::Trogdir::ChangeFinish).to receive(:perform_async).with(kind_of(String), :create)
-      expect(Workers::Trogdir::ChangeError).to_not receive(:perform_async)
-
-      subject.call
-    end
-  end
-
-  context 'when university email updated' do
-    let(:fixture) { 'update_email' }
-
-    it 'calls UpdateEmailAddress' do
-      expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to receive(:call).and_return(:update)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
-      expect(Workers::Trogdir::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
-      expect(Workers::Trogdir::ChangeError).to_not receive(:perform_async)
-
-      subject.call
-    end
-  end
-
   context 'when account info updated' do
     let(:fixture) { 'update_person' }
 
     it 'calls SyncGoogleAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to receive(:call).and_return(:create)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
@@ -129,7 +87,6 @@ describe ServiceObjects::HandleChange, type: :unit do
     it 'calls JoinGoogleGroup' do
       allow(Settings).to receive_message_chain(:groups, :whitelist).and_return(['Politician', 'President'])
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to receive(:call).and_return(:update)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
@@ -149,7 +106,6 @@ describe ServiceObjects::HandleChange, type: :unit do
     it 'calls LeaveGoogleGroup' do
       allow(Settings).to receive_message_chain(:groups, :whitelist).and_return(['Politician', 'Congressman'])
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to receive(:call).and_return(:update)
@@ -168,7 +124,6 @@ describe ServiceObjects::HandleChange, type: :unit do
 
     it 'calls DeprovisionGoogleAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
@@ -186,13 +141,12 @@ describe ServiceObjects::HandleChange, type: :unit do
     let(:fixture) { 'update_person_add_affiliation' }
 
     before do
-      email = UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu'
+      email = PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu'
       email.deprovision_schedules.create action: :delete, scheduled_for: 1.minute.from_now
     end
 
     it 'calls CancelDeprovisioningGoogleAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::UpdateEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)

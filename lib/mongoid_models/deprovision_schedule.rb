@@ -1,4 +1,4 @@
-# A record of scheuled actions on a university email. These actions include
+# A record of scheuled actions on a account email. These actions include
 # email notifications, suspensions, deletions and activations, or
 # re-activations really, since a newly created email account doesn't have to
 # be activated.
@@ -23,12 +23,12 @@ class DeprovisionSchedule
   LOST_AFFILIATION_REASON = 'Lost affiliation'
   GAINED_AFFILIATION_REASON = 'Gained affiliation'
 
-  # @!attribute university_email
-  #   @return [UniversityEmail]
-  # @!method university_email=(university_email)
-  #   @param university_email [UniversityEmail]
-  #   @return [UniversityEmail]
-  embedded_in :university_email
+  # @!attribute account_email
+  #   @return [AccountEmail]
+  # @!method account_email=(account_email)
+  #   @param account_email [AccountEmail]
+  #   @return [AccountEmail]
+  embedded_in :account_email
 
   # @!attribute action
   #   @return [Symbol] the action that should be taken
@@ -127,8 +127,8 @@ class DeprovisionSchedule
   end
 
   after_save do
-    if completed_at_changed? && completed_at.present?
-      university_email.update state: STATE_MAP[action] unless Settings.dry_run?
+    if completed_at_changed? && completed_at.present? && STATE_MAP.has_key?(action)
+      account_email.update! state: STATE_MAP[action] unless Settings.dry_run?
     end
   end
 

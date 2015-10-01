@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Workers::Deprovisioning::NotifyOfClosure, type: :unit do
-  let(:primary) { true }
-  let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', primary: primary }
+  let!(:email) { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
   let(:reason) { nil }
   let!(:schedule) { email.deprovision_schedules.create action: :notify_of_closure, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
@@ -23,20 +22,9 @@ describe Workers::Deprovisioning::NotifyOfClosure, type: :unit do
     let(:canceled) { false }
     before { email.deprovision_schedules.create action: :suspend, scheduled_for: 7.days.from_now }
 
-    context 'when email is not the primary' do
-      let(:primary) { false }
-
-      it 'does not send an email' do
-        expect_any_instance_of(Emails::NotifyOfClosure).to_not receive(:send!)
-        subject.perform(schedule.id)
-      end
-    end
-
-    context 'when email is the primary' do
-      it 'sends an email' do
-        expect_any_instance_of(Emails::NotifyOfClosure).to receive(:send!)
-        subject.perform(schedule.id)
-      end
+    it 'sends an email' do
+      expect_any_instance_of(Emails::NotifyOfClosure).to receive(:send!)
+      subject.perform(schedule.id)
     end
 
     it 'marks the schedule complete' do

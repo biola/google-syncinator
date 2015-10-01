@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Workers::Deprovisioning::NotifyOfInactivity, type: :unit do
-  let(:primary) { true }
-  let!(:email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', primary: primary }
+  let!(:email) { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
   let(:reason) { nil }
   let!(:schedule) { email.deprovision_schedules.create action: :notify_of_inactivity, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
@@ -10,7 +9,7 @@ describe Workers::Deprovisioning::NotifyOfInactivity, type: :unit do
     let(:canceled) { true }
 
     it 'does not cancel deprovisioning' do
-      expect_any_instance_of(UniversityEmail).to_not receive :cancel_deprovisioning!
+      expect_any_instance_of(AccountEmail).to_not receive :cancel_deprovisioning!
       subject.perform(schedule.id)
     end
 
@@ -35,7 +34,7 @@ describe Workers::Deprovisioning::NotifyOfInactivity, type: :unit do
       end
 
       it 'cancels deprovisioning' do
-        expect_any_instance_of(UniversityEmail).to receive :cancel_deprovisioning!
+        expect_any_instance_of(AccountEmail).to receive :cancel_deprovisioning!
         subject.perform(schedule.id)
       end
 
@@ -53,25 +52,14 @@ describe Workers::Deprovisioning::NotifyOfInactivity, type: :unit do
       before { allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 366.days.ago }
 
       it 'does not cancel deprovisioning' do
-        expect_any_instance_of(UniversityEmail).to_not receive :cancel_deprovisioning!
+        expect_any_instance_of(AccountEmail).to_not receive :cancel_deprovisioning!
         expect(TrogdirPerson).to receive(:new).and_return(double(first_or_preferred_name: 'Bob'))
         subject.perform(schedule.id)
       end
 
-      context 'when email is not the primary' do
-        let(:primary) { false }
-
-        it 'does not send an email' do
-          expect_any_instance_of(Emails::NotifyOfInactivity).to_not receive(:send!)
-          subject.perform(schedule.id)
-        end
-      end
-
-      context 'when email is the primary' do
-        it 'sends an email' do
-          expect_any_instance_of(Emails::NotifyOfInactivity).to receive(:send!)
-          subject.perform(schedule.id)
-        end
+      it 'sends an email' do
+        expect_any_instance_of(Emails::NotifyOfInactivity).to receive(:send!)
+        subject.perform(schedule.id)
       end
 
       it 'marks the schedule complete' do

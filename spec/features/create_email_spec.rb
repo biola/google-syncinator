@@ -12,19 +12,16 @@ describe 'create accepted student', type: :feature do
     expect(Workers::HandleChanges).to receive(:perform_async)
   end
 
-  it 'creates a google account' do
-    expect(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false)
-    expect_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
-
+  it 'does nothing' do
     expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
     expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
+    expect_any_instance_of(GoogleAccount).to_not receive(:create!)
+    expect_any_instance_of(GoogleAccount).to_not receive(:update!)
     expect_any_instance_of(GoogleAccount).to_not receive(:update_suspension!)
-    expect_any_instance_of(GoogleAccount).to_not receive(:rename!)
     expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
     expect_any_instance_of(GoogleAccount).to_not receive(:join!)
     expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-    expect_any_instance_of(GoogleAccount).to receive(:create_or_update!)
 
     subject.perform
 

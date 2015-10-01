@@ -14,18 +14,18 @@ module ServiceObjects
     # @return [Boolean]
     def ignore?
       return true unless change.affiliations_changed?
-      return true if UniversityEmail.active? change.person_uuid
-      return true if UniversityEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
+      return true if PersonEmail.active? change.person_uuid
+      return true if PersonEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
       !(EmailAddressOptions.required?(change.affiliations) && reprovisionable_email.present?)
     end
 
     private
 
-    # Simple wrapper for UniversityEmail#find_reprovisionable
-    # @return [UniversityEmail] a UniversityEmail that used to belong to the user but is no longer active
-    # @see UniversityEmail#find_reprovisionable
+    # Simple wrapper for PersonEmail#find_reprovisionable
+    # @return [PersonEmail] an PersonEmail that used to belong to the user but is no longer active
+    # @see PersonEmail#find_reprovisionable
     def reprovisionable_email
-      @reprovisionable_email ||= UniversityEmail.find_reprovisionable(change.person_uuid)
+      @reprovisionable_email ||= PersonEmail.find_reprovisionable(change.person_uuid)
     end
   end
 end

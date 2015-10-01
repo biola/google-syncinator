@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Emails::NotifyOfInactivity, type: :unit do
-  let(:university_email) { UniversityEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
+  let(:university_email) { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
   let(:deprovision_schedule) { university_email.deprovision_schedules.create action: :notify_of_inactivity, scheduled_for: 1.minute.ago }
   before { university_email.deprovision_schedules.create action: :suspend, scheduled_for: 7.days.from_now }
 

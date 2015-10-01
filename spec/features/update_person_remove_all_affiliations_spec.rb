@@ -14,7 +14,7 @@ describe 'remove all affiliations', type: :feature  do
     # It gets called a second time for the second "page" of results
     expect(Workers::HandleChanges).to receive(:perform_async)
 
-    UniversityEmail.create uuid: uuid, address: address, state: :active, created_at: 31.days.ago
+    PersonEmail.create uuid: uuid, address: address, state: :active, created_at: 31.days.ago
     DB[:email].insert(idnumber: biola_id, email: address)
   end
 
@@ -24,8 +24,8 @@ describe 'remove all affiliations', type: :feature  do
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return nil
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
-      expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
-      expect_any_instance_of(GoogleAccount).to_not receive(:rename!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:create!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:suspend!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
@@ -38,9 +38,9 @@ describe 'remove all affiliations', type: :feature  do
 
       subject.perform
 
-      expect(UniversityEmail.count).to eql 1
-      expect(UniversityEmail.first.deprovision_schedules.count).to eql 1
-      deletion = UniversityEmail.first.deprovision_schedules.find_by(action: :delete)
+      expect(PersonEmail.count).to eql 1
+      expect(PersonEmail.first.deprovision_schedules.count).to eql 1
+      deletion = PersonEmail.first.deprovision_schedules.find_by(action: :delete)
       expect(deletion.action).to eql :delete
       expect(deletion.completed_at?).to be true
       expect(DB[:email].count).to eql 1
@@ -55,7 +55,8 @@ describe 'remove all affiliations', type: :feature  do
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 366.days.ago
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
-      expect_any_instance_of(GoogleAccount).to_not receive(:create_or_update!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:create!)
+      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
@@ -68,15 +69,15 @@ describe 'remove all affiliations', type: :feature  do
 
       subject.perform
 
-      expect(UniversityEmail.count).to eql 1
-      expect(UniversityEmail.first.deprovision_schedules.count).to eql 3
-      notification = UniversityEmail.first.deprovision_schedules.find_by(action: :notify_of_closure)
+      expect(PersonEmail.count).to eql 1
+      expect(PersonEmail.first.deprovision_schedules.count).to eql 3
+      notification = PersonEmail.first.deprovision_schedules.find_by(action: :notify_of_closure)
       expect(notification.action).to eql :notify_of_closure
       expect(notification.completed_at?).to be true
-      suspension = UniversityEmail.first.deprovision_schedules.find_by(action: :suspend)
+      suspension = PersonEmail.first.deprovision_schedules.find_by(action: :suspend)
       expect(suspension.action).to eql :suspend
       expect(suspension.completed_at?).to be true
-      deletion = UniversityEmail.first.deprovision_schedules.find_by(action: :delete)
+      deletion = PersonEmail.first.deprovision_schedules.find_by(action: :delete)
       expect(deletion.action).to eql :delete
       expect(deletion.completed_at?).to be true
       expect(DB[:email].count).to eql 1
