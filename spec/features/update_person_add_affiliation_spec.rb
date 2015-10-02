@@ -18,7 +18,7 @@ describe 'add an employee affiliation', type: :feature  do
   context 'when a reprovisionable email exists' do
     before do
       PersonEmail.create uuid: uuid, address: address, state: :suspended
-      DB[:email].insert(idnumber: biola_id, email: address, expiration_date: 1.month.ago, reusable_date: 1.week.ago)
+      DB[:email].insert(idnumber: biola_id, email: address, primary: 1, expiration_date: 1.month.ago, reusable_date: 1.week.ago)
     end
 
     it 'creates a Trogdir email, unsuspends the google account and activates the university email and legacy email' do
