@@ -9,7 +9,7 @@ module Workers
       # @param email [String] Email address to unexpire
       # @return [nil]
       def perform(biola_id, email)
-        if !Settings.dry_run?
+        if Enabled.write?
           # @note this will update the primary and the alias emails as well
           DB[:email].where(idnumber: biola_id).update(expiration_date: '0000-00-00 00:00:00', reusable_date: '0000-00-00 00:00:00')
         end

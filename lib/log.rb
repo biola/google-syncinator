@@ -29,7 +29,7 @@ module Log
   #   @return [true]
   LEVELS.each do |level|
     define_singleton_method(level) do |message|
-      message = "DRY RUN: #{message}" if Settings.dry_run?
+      message = "DRY RUN: #{message}" if !Enabled.write?
 
       logger.send(level, message)
     end

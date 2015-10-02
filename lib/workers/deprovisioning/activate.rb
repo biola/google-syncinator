@@ -22,7 +22,7 @@ module Workers
           GoogleAccount.new(email.address).unsuspend!
           Workers::Trogdir::CreateEmail.perform_async email.uuid, email.address
           Workers::LegacyEmailTable::Unexpire.perform_async(biola_id, email.address)
-          schedule.update completed_at: Time.now unless Settings.dry_run?
+          schedule.update completed_at: Time.now if Enabled.write?
           Log.info "Create activation schedule for #{email}"
         end
 

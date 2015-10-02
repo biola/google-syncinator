@@ -31,7 +31,7 @@ module Emails
     def send!
       mail_obj = false
 
-      if !Settings.dry_run?
+      if Enabled.email?
         send_to = account_email.address
         email_body = body
 

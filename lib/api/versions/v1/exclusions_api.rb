@@ -18,7 +18,7 @@ class API::V1::ExclusionsAPI < Grape::API
       end
 
       exclusion = @email.exclusions.build args
-      exclusion.save! unless Settings.dry_run?
+      exclusion.save! if Enabled.write?
 
       present exclusion, with: API::V1::ExclusionEntity
     end
@@ -27,7 +27,7 @@ class API::V1::ExclusionsAPI < Grape::API
     delete ':exclusion_id' do
       exclusion = @email.exclusions.find(params[:exclusion_id])
 
-      exclusion.destroy! unless Settings.dry_run?
+      exclusion.destroy! if Enabled.write?
 
       present exclusion, with: API::V1::ExclusionEntity
     end

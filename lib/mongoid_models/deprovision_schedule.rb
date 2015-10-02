@@ -92,7 +92,7 @@ class DeprovisionSchedule
     jid = nil
 
     # We won't schedule this during a dry run because even though it would be safe to do now, dry_run could be off when it actually runs
-    if !Settings.dry_run?
+    if Enabled.write?
       cancel_job! if pending? && job_id?
 
       save!
@@ -109,7 +109,7 @@ class DeprovisionSchedule
   # Cancels the sidekiq worker and updates canceled attribute
   # @return [String] Sidekiq job ID
   def cancel!
-    unless Settings.dry_run?
+    if Enabled.write?
       cancel_job!
       update! canceled: true
     end
@@ -120,7 +120,7 @@ class DeprovisionSchedule
   # Cancel the sidekiq job and destroy the schedule record
   # @return [Boolean]
   def cancel_and_destroy!
-    unless Settings.dry_run?
+    if Enabled.write?
       cancel_job!
       destroy!
     end
@@ -128,7 +128,7 @@ class DeprovisionSchedule
 
   after_save do
     if completed_at_changed? && completed_at.present? && STATE_MAP.has_key?(action)
-      account_email.update! state: STATE_MAP[action] unless Settings.dry_run?
+      account_email.update! state: STATE_MAP[action] if Enabled.write?
     end
   end
 
@@ -143,7 +143,7 @@ class DeprovisionSchedule
   # Cancel the associated sidekiq job
   # @return [String] sidekiq job ID
   def cancel_job!
-    unless Settings.dry_run?
+    if Enabled.write?
       Sidekiq::Status.cancel(job_id) if job_id?
     end
 

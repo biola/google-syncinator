@@ -331,16 +331,16 @@ class GoogleAccount
   end
 
   # For use with potentially destructive operations against the Google API.
-  #   If dry_run is on, logs the fact that it would have made a change,
-  #   otherwise it will call {#execute}.
+  #   If third-party APIs are disabled, logs the fact that it would have made a
+  #   change, otherwise it will call {#execute}.
   # @param argument_hash [Hash] A specially formatted hash to send to Google
   # @return [Google::APIClient::Result]
-  # @return [true] when in dry_run mode
+  # @return [true] when third-party APIs are disabled
   def safe_execute(argument_hash)
-    if Settings.dry_run?
-      Log.info "Would have called the Google API with #{argument_hash.inspect}"
-    else
+    if Enabled.third_party?
       execute(argument_hash)
+    else
+      Log.info "Would have called the Google API with #{argument_hash.inspect}"
     end
   end
 

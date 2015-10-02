@@ -24,7 +24,7 @@ module Workers
         updates[:reusable_date] = reusable_on if row[:reusable_date].nil? || row[:reusable_date] > reusable_on
 
         # @note this will update the primary and the alias emails as well
-        DB[:email].where(idnumber: biola_id).update(updates) unless updates.empty? || Settings.dry_run?
+        DB[:email].where(idnumber: biola_id).update(updates) unless updates.empty? || !Enabled.write?
         Log.info "Update legacy email table where biola_id = #{biola_id} and email = #{email_address} with #{updates.inspect}"
 
         nil

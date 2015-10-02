@@ -24,7 +24,7 @@ module Workers
             email.cancel_deprovisioning!
           else
             Emails::NotifyOfInactivity.new(schedule).send!
-            schedule.update completed_at: DateTime.now if !Settings.dry_run?
+            schedule.update completed_at: DateTime.now if Enabled.write?
             Log.info "Marked notify_of_inactivity schedule for #{email} complete"
           end
         end

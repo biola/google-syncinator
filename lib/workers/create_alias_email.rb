@@ -12,7 +12,7 @@ module Workers
     def perform(account_email_id, address)
       account_email = AccountEmail.find(account_email_id)
 
-      email = AliasEmail.create! account_email: account_email, address: address if !Settings.dry_run?
+      email = AliasEmail.create! account_email: account_email, address: address if Enabled.write?
       Log.info %{Create AliasEmail for account_email: "#{account_email.address}" with address: "#{address}" }
       # For now we're keeping alias emails out of Trogdir. But if we wanted to turn that on this is where it should be done.
       # Workers::Trogdir::CreateEmail.perform_async account_email_id, address

@@ -71,6 +71,7 @@ module GoogleSyncinator
     require './lib/api'
     require './lib/email_address_options'
     require './lib/emails'
+    require './lib/enabled'
     require './lib/google_account'
     require './lib/log'
     require './lib/service_objects'

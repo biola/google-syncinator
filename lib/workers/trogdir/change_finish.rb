@@ -8,7 +8,7 @@ module Workers
       # @param sync_log_id [String] sync log ID from Trogdir
       # @param action_taken [String] the action that was taken
       def perform(sync_log_id, action_taken)
-        if !Settings.dry_run?
+        if Enabled.write?
           response = trogdir.finish(sync_log_id: sync_log_id, action: action_taken).perform
           raise "Error: #{response.parse['error']}" unless response.success?
         end

@@ -1,5 +1,7 @@
 # Log changes but don't actually do anything
 dry_run: false
+# Interact with third-party API's
+third_party_apis: true
 
 redis:
   url: "redis://localhost:6379/0"

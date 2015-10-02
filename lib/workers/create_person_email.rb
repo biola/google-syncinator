@@ -12,7 +12,7 @@ module Workers
     def perform(uuid, address)
       person = TrogdirPerson.new(uuid)
 
-      email = PersonEmail.create! uuid: uuid, address: address if !Settings.dry_run?
+      email = PersonEmail.create! uuid: uuid, address: address if Enabled.write?
       Log.info %{Create PersonEmail for uuid: "#{uuid}" with address: "#{address}" }
       Workers::Trogdir::CreateEmail.perform_async uuid, address
       Workers::LegacyEmailTable::Insert.perform_async(person.biola_id, address)

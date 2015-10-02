@@ -21,7 +21,7 @@ module Workers
 
         unless schedule.canceled?
           Emails::NotifyOfClosure.new(schedule).send!
-          schedule.update completed_at: DateTime.now if !Settings.dry_run?
+          schedule.update completed_at: DateTime.now if Enabled.write?
           Log.info "Marked notify_of_closure schedule for #{email} complete"
         end
 

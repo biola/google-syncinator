@@ -15,7 +15,7 @@ module Workers
       # @param email [String] email address to create
       # @return [nil]
       def perform(uuid, email)
-        if !Settings.dry_run?
+        if Enabled.write?
           response = ::Trogdir::APIClient::Emails.new.create(uuid: uuid, address: email, type: EMAIL_TYPE, primary: MAKE_EMAIL_PRIMARY).perform
           raise TrogdirAPIError, response.parse['error'] unless response.success?
         end

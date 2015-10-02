@@ -17,7 +17,7 @@ module Workers
         # This is meant to idempotently ensure the email is deleted since it may be run
         # both at suspension and deletion. So fail silently if the email doesn't exist.
         unless email_hash.nil?
-          if !Settings.dry_run?
+          if Enabled.write?
             destroy_response = ::Trogdir::APIClient::Emails.new.destroy(uuid: uuid, email_id: email_hash['id']).perform
             raise TrogdirAPIError, destroy_response.parse['error'] unless destroy_response.success?
           end
