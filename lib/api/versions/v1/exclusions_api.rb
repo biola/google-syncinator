@@ -16,7 +16,9 @@ class API::V1::ExclusionsAPI < Grape::API
       args = [:creator_uuid, :starts_at, :ends_at, :reason].each_with_object({}) do |key, hash|
         hash[key] = params[key]
       end
-      exclusion = @email.exclusions.create args
+
+      exclusion = @email.exclusions.build args
+      exclusion.save! unless Settings.dry_run?
 
       present exclusion, with: API::V1::ExclusionEntity
     end
@@ -25,7 +27,7 @@ class API::V1::ExclusionsAPI < Grape::API
     delete ':exclusion_id' do
       exclusion = @email.exclusions.find(params[:exclusion_id])
 
-      exclusion.destroy!
+      exclusion.destroy! unless Settings.dry_run?
 
       present exclusion, with: API::V1::ExclusionEntity
     end
