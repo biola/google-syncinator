@@ -9,4 +9,5 @@ module ServiceObjects
   require './lib/service_objects/leave_google_group'
   require './lib/service_objects/reprovision_google_account'
   require './lib/service_objects/sync_google_account'
+  require './lib/service_objects/update_biola_id'
 end

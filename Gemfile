@@ -5,7 +5,6 @@ gem 'activesupport'
 #   problems with some Rails hooks in other gems. We'll not require it here, but
 #   require it in google_syncinator.rb instead to work around it.
 gem 'api-auth', require: false
-gem 'blazing'
 gem 'google-api-client'
 gem 'grape'
 gem 'grape-entity'
@@ -23,7 +22,7 @@ gem 'rake'
 gem 'sequel'
 gem 'sidekiq'
 gem 'sidekiq-status'
-gem 'sidetiq'
+gem 'sidekiq-cron'
 gem 'trogdir_api_client'
 gem 'turnout'
 

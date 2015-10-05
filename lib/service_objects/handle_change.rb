@@ -42,6 +42,11 @@ module ServiceObjects
           actions << ReprovisionGoogleAccount.new(change).call
         end
 
+        unless UpdateBiolaID.ignore?(change)
+          Log.info "Begin change from #{change.old_id} to #{change.new_id} for person #{change.person_uuid}"
+          actions << UpdateBiolaID.new(change).call
+        end
+
         action = actions.first || :skip
         Log.info "No changes needed for person #{change.person_uuid}" if actions.empty?
         Workers::Trogdir::ChangeFinish.perform_async change.sync_log_id, action
@@ -58,7 +63,7 @@ module ServiceObjects
     # Should this `change` be processed by any of the other ServiceObjects
     # @return [Boolean]
     def ignore?
-      [AssignEmailAddress, SyncGoogleAccount, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, CancelDeprovisioningGoogleAccount, ReprovisionGoogleAccount].all? do |klass|
+      [AssignEmailAddress, SyncGoogleAccount, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, CancelDeprovisioningGoogleAccount, ReprovisionGoogleAccount, UpdateBiolaID].all? do |klass|
         klass.ignore? change
       end
     end

@@ -16,7 +16,7 @@ describe ServiceObjects::JoinGoogleGroup, type: :unit do
       before { expect(Settings).to receive_message_chain(:groups, :whitelist).and_return ['Republican', 'President'] }
 
       it do
-        expect(subject).to receive_message_chain(:google_account, :join!).with 'President'
+        expect(subject).to receive_message_chain(:google_account, :join!).with('President').and_return true
         expect(subject.call).to eql :update
       end
     end

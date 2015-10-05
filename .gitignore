@@ -1,3 +1,4 @@
+/certs/*
 *.p12
 .bundle
 .yardoc/*
@@ -7,3 +8,6 @@
 /log/*
 /vendor/bundle
 /tmp
+/log/*
+log/*.log
+.gitconfig

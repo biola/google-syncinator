@@ -21,6 +21,18 @@ class TrogdirChange
     hash['person_id']
   end
 
+  def biola_id_updated?
+    biola_id? && update?
+  end
+
+  def old_id
+    original['identifier']
+  end
+
+  def new_id
+    modified['identifier']
+  end
+
   # The person's preferred name
   # @return [String]
   def preferred_name
@@ -114,6 +126,10 @@ class TrogdirChange
   # Is an email record being changed?
   def email?
     hash['scope'] == 'email'
+  end
+
+  def biola_id?
+    hash['scope'] == 'id' && all_attrs['type'] == 'biola_id' && changed_attrs.include?('identifier')
   end
 
   # Is a record being created?

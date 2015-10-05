@@ -5,10 +5,10 @@ module ServiceObjects
     # @return [:update, :skip] action taken
     def call
       changes = Whitelist.filter(change.left_groups).each do |group|
-        google_account.leave! group
+        @changed = true if google_account.leave! group
       end
 
-      changes.any? ? :update : :skip
+      changes.any? && @changed ? :update : :skip
     end
 
     # Should this change trigger a group leaving

@@ -81,9 +81,21 @@ describe ServiceObjects::HandleChange, type: :unit do
     end
   end
 
+  context 'when biola id updated' do
+    let(:change_hash) { JSON.parse(File.read('./spec/fixtures/update_biola_id.json')) }
+
+    it 'calls UpdateBiolaID' do
+      expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::UpdateBiolaID).to receive(:call).and_return(:update)
+      expect(Workers::Trogdir::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
+      expect(Workers::Trogdir::ChangeError).to_not receive(:perform_async)
+
+      subject.call
+    end
+  end
+
   context 'when a group is joined' do
     let(:fixture) { 'join_group' }
-
     it 'calls JoinGoogleGroup' do
       allow(Settings).to receive_message_chain(:groups, :whitelist).and_return(['Politician', 'President'])
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)

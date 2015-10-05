@@ -2,16 +2,11 @@ module Workers
   # Scheduled Sidekiq worker to proccess changes fro Trogdir
   class HandleChanges
     include Sidekiq::Worker
-    include Sidetiq::Schedulable
 
     # Exception for when an error occurs with Trogdir
     class TrogdirAPIError < StandardError; end
 
     sidekiq_options retry: false
-
-    recurrence do
-      hourly.hour_of_day(*(8..20).to_a).day(:monday, :tuesday, :wednesday, :thursday, :friday)
-    end
 
     # Get the queued changes from Trogdir and pass them off to
     # Workers::HandleChange to process asynchronously

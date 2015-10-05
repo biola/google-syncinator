@@ -3,9 +3,6 @@ module Workers
   #   required and have never been active and schedule them for deprovisioning
   class CheckNeverActive
     include Sidekiq::Worker
-    include Sidetiq::Schedulable
-
-    recurrence { weekly }
 
     # Find never active Google accounts and schedule them to be deprovisioned
     # @return [nil]

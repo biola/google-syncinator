@@ -4,6 +4,8 @@ module Workers
     class ChangeFinish
       include Sidekiq::Worker
 
+      sidekiq_options retry: false
+
       # Sends a finished status to Trogdir
       # @param sync_log_id [String] sync log ID from Trogdir
       # @param action_taken [String] the action that was taken

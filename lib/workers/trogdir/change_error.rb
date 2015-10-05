@@ -4,6 +4,8 @@ module Workers
     class ChangeError
       include Sidekiq::Worker
 
+      sidekiq_options retry: false
+
       # Sends an error status to Trogdir
       # @param sync_log_id [String] sync log ID from Trogdir
       # @param message [String] error message

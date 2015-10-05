@@ -146,20 +146,28 @@ class GoogleAccount
   # @param role [String] the role the user should have in the group
   # @return [Object]
   def join!(group, role = 'MEMBER')
-    group = GoogleAccount.group_to_email(group)
+    return false if exists_in_group?(group)
+
+    full_group = GoogleAccount.group_to_email(group)
     params = {email: full_email, role: role}
 
     new_member = directory.members.insert.request_schema.new(params)
 
-    safe_execute api_method: directory.members.insert, parameters: {groupKey: group}, body_object: new_member
+    safe_execute api_method: directory.members.insert, parameters: {groupKey: full_group}, body_object: new_member
+
+    true
   end
 
   # Make the Google Apps account leave a Google group
   # @param group [String] the name of the group to leave
   # @return [Object]
   def leave!(group)
-    group = GoogleAccount.group_to_email(group)
-    safe_execute api_method: directory.members.delete, parameters: {groupKey: group, memberKey: full_email}
+    return false unless exists_in_group?(group)
+
+    full_group = GoogleAccount.group_to_email(group)
+    safe_execute api_method: directory.members.delete, parameters: {groupKey: full_group, memberKey: full_email}
+
+    true
   end
 
   # Gets a list of accounts that have never been active
@@ -167,6 +175,8 @@ class GoogleAccount
   #   always best to check GoogleAccount#never_active? too
   # @return [Array<String>] email addresses of those who have never been active
   def self.never_active
+    return [] unless Enabled.third_party?
+
     page_token = nil
     never_active_emails = []
 
@@ -200,6 +210,8 @@ class GoogleAccount
   #   always best to check GoogleAccount#never_active? too
   # @return [Array<String>] email addresses of those who are inactive
   def self.inactive
+    return [] unless Enabled.third_party?
+
     page_token = nil
     inactive_emails = []
 
@@ -270,6 +282,13 @@ class GoogleAccount
     data.emails.map{|e| e['address']}.include? full_email
   end
 
+  def exists_in_group?(group)
+    full_group = GoogleAccount.group_to_email(group)
+
+    result = execute(api_method: directory.groups.list, parameters: {userKey: full_email} )
+    result.data.groups.any? { |g| g.email == full_group }
+  end
+
   # The date and time of the last login
   # @note currently this only includes logins to the web interface
   # @return [DateTime]
@@ -325,6 +344,8 @@ class GoogleAccount
   # @param argument_hash [Hash] A specially formatted hash to send to Google
   # @return [Google::APIClient::Result]
   def self.execute(argument_hash)
+    return nil unless Enabled.third_party?
+
     result = api.execute(argument_hash)
     raise GoogleAppsAPIError,  result.data['error']['message'] unless result.success?
     result
@@ -337,7 +358,7 @@ class GoogleAccount
   # @return [Google::APIClient::Result]
   # @return [true] when third-party APIs are disabled
   def safe_execute(argument_hash)
-    if Enabled.third_party?
+    if Enabled.write_third_party?
       execute(argument_hash)
     else
       Log.info "Would have called the Google API with #{argument_hash.inspect}"
@@ -381,7 +402,7 @@ class GoogleAccount
           parameters: {userKey: full_email}
         )
 
-        result.data
+        result.try(:data)
       rescue GoogleAppsAPIError
         nil
       end

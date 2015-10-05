@@ -16,7 +16,7 @@ describe ServiceObjects::LeaveGoogleGroup, type: :unit do
       before { expect(Settings).to receive_message_chain(:groups, :whitelist).and_return ['Republican', 'Congressman'] }
 
       it do
-        expect(subject).to receive_message_chain(:google_account, :leave!).with 'Congressman'
+        expect(subject).to receive_message_chain(:google_account, :leave!).with('Congressman').and_return true
         expect(subject.call).to eql :update
       end
     end
