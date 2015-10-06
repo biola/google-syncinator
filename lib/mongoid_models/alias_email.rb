@@ -1,3 +1,4 @@
+# Represents an alias email address tied to an account email
 class AliasEmail < UniversityEmail
   # @!attribute account_email
   #   @return [AccountEmail]
@@ -10,6 +11,8 @@ class AliasEmail < UniversityEmail
 
   protected
 
+  # Default the state to the state of the associated account_email
+  # @note an ailas' state should always be the same as the associated account_email
   def set_state
     self.state = account_email.state
   end

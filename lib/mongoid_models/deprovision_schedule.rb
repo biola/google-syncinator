@@ -18,9 +18,13 @@ class DeprovisionSchedule
     suspend: :suspended,
     delete: :deleted
   }
+  # Person never logged in
   NEVER_ACTIVE_REASON = 'Never active'
+  # Person hasn't logged for longer than Settings.deprovisoning.inactive_after
   INACTIVE_REASON = 'Inactive'
+  # Person no longer has an affiliaton that entitles them to an account
   LOST_AFFILIATION_REASON = 'Lost affiliation'
+  # The person now has an affiliation that entitles them to an account
   GAINED_AFFILIATION_REASON = 'Gained affiliation'
 
   # @!attribute account_email

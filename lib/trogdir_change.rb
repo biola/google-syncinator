@@ -25,10 +25,16 @@ class TrogdirChange
     biola_id? && update?
   end
 
+  # The identifier before the change
+  # @return [String] the identifier
+  # @note Only works if the change is to an ID scope
   def old_id
     original['identifier']
   end
 
+  # The identifier after the change
+  # @return [String] the identifier
+  # @note Only works if the change is to an ID scope
   def new_id
     modified['identifier']
   end
