@@ -358,7 +358,7 @@ class GoogleAccount
   # @return [Google::APIClient::Result]
   # @return [true] when third-party APIs are disabled
   def safe_execute(argument_hash)
-    if Enabled.write_third_party?
+    if Enabled.write_to_third_party?
       execute(argument_hash)
     else
       Log.info "Would have called the Google API with #{argument_hash.inspect}"
