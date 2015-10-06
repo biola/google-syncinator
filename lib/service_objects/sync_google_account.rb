@@ -8,6 +8,8 @@ module ServiceObjects
       person = TrogdirPerson.new(change.person_uuid)
       google_account.unsuspend! if google_account.suspended?
       google_account.update!(person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy)
+
+      :update
     end
 
     # Should this change trigger a Google account sync
