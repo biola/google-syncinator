@@ -6,14 +6,32 @@ class API::V1::EmailsAPI < Grape::API
     desc 'Gets a list of email objects with pagination and optional search params'
     params do
       optional :q, type: String
+      optional :state, type: String
+      optional :pending, type: String
     end
     paginate
     get do
-      emails = if params[:q].present?
-        regex = Regexp.new(params[:q].gsub(/\s/, '.*'), Regexp::IGNORECASE)
-        UniversityEmail.or({address: regex}, {uuid: params[:q]})
+      ors = []
+      ands = []
+
+      if params[:q].present?
+        ors << {address: Regexp.new(params[:q].gsub(/\s/, '.*'), Regexp::IGNORECASE)}
+        ors << {uuid: params[:q]}
+      end
+
+      if params[:state].present?
+        ands << {state: params[:state]}
+      end
+
+      if params[:pending].present?
+        ands << {:'deprovision_schedules.scheduled_for'.ne => nil, 'deprovision_schedules.completed_at' => nil, 'deprovision_schedules.canceled' => nil}
+      end
+
+
+      emails = if ors.any? || ands.any?
+        UniversityEmail.or(*ors).and(*ands)
       else
-        UniversityEmail.asc(:address).asc(:address)
+        UniversityEmail.asc(:address)
       end
 
       present paginate(emails), with: API::V1::UniversityEmailEntity
