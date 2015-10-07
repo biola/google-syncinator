@@ -83,6 +83,10 @@ Scheduled Jobs
 - `Workers::CheckNeverActive` checks for accounts that don't need to have an email account and have never logged in
 - `Workers::CheckInactive` checks for accounts that don't need to have an email account and haven't logged in in a long time.
 
+Rake Tasks
+----------
+- `rake import:legacy_email_table` imports all of the records from the the legacy email table to the new MongoDB university_emails collection. Logs are stored as `log/import_legacy_email_table-[timestamp].log`
+
 Notes
 -----
 
