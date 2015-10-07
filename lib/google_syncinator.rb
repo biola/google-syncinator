@@ -73,6 +73,8 @@ module GoogleSyncinator
     #   is loaded, when it isn't.
     require 'api-auth'
 
+    require './lib/mixins/activity_check'
+
     require './lib/api'
     require './lib/email_address_options'
     require './lib/emails'

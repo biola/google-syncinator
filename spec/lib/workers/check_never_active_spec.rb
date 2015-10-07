@@ -38,24 +38,12 @@ describe Workers::CheckNeverActive, type: :unit do
         end
 
         context 'when person is just an alumnus' do
-          context "when they're really inactive" do
-            let(:affiliations) { ['alumnus'] }
-            before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return true }
+          let(:affiliations) { ['alumnus'] }
+          # before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return true }
 
-            it 'scheduled deprovisioning' do
-              expect(Workers::ScheduleActions).to receive(:perform_async).with(email.id.to_s, [a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::NEVER_ACTIVE_REASON)
-              Workers::CheckNeverActive.new.perform
-            end
-          end
-
-          context 'when they really have been active recently' do
-            let(:affiliations) { ['alumnus'] }
-            before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return false }
-
-            it 'does nothing' do
-              expect(Workers::ScheduleActions).to_not receive(:perform_async)
-              Workers::CheckNeverActive.new.perform
-            end
+          it 'scheduled deprovisioning' do
+            expect(Workers::ScheduleActions).to receive(:perform_async).with(email.id.to_s, [a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::NEVER_ACTIVE_REASON)
+            Workers::CheckNeverActive.new.perform
           end
         end
       end
@@ -72,8 +60,6 @@ describe Workers::CheckNeverActive, type: :unit do
       context 'when email has become active' do
         let(:other_email) { PersonEmail.create(uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu') }
         let!(:schedule) { other_email.deprovision_schedules.create action: :delete, scheduled_for: 1.week.from_now, reason: DeprovisionSchedule::NEVER_ACTIVE_REASON }
-
-        before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return true }
 
         it 'cancels the deprovisioning' do
           expect { Workers::CheckNeverActive.new.perform }.to change { schedule.reload.canceled? }
