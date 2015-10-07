@@ -1,4 +1,8 @@
+# Mixin for deprovisioning accounts that are not active enough
 module ActivityCheck
+  # Finds and deprovisions accounts that have either never ben logged into, or have not been logged into in a long time.
+  # @param type [Symbol] either :never_active or :inactive
+  # @return [nil]
   def run_activity_check(type)
     unless [:never_active, :inactive].include? type
       raise ArgumentError, 'type must me :never_active or :inactive'
