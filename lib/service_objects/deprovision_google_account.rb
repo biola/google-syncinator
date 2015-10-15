@@ -57,7 +57,11 @@ module ServiceObjects
     def ignore?
       return true unless change.university_email_exists?
       return true unless change.affiliations_changed?
-      return true if PersonEmail.where(uuid: change.person_uuid, address: change.university_email).first.try(:excluded?)
+
+      email = PersonEmail.where(uuid: change.person_uuid, address: change.university_email).first
+      return true if email.try(:excluded?)
+      return true if email.try(:being_deprovisioned?)
+
       return false if !EmailAddressOptions.allowed?(change.affiliations)
       EmailAddressOptions.not_required?(change.affiliations) && google_account.active?
     end

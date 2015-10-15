@@ -94,6 +94,14 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
       it { expect(subject.ignore?).to be true }
     end
 
+    context 'when email is already being deprovisioned' do
+      before do
+        e = PersonEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email)
+        e.deprovision_schedules.create action: :suspend, scheduled_for: 1.minute.from_now
+      end
+      it { expect(subject.ignore?).to be true }
+    end
+
     context 'when removing affiliation leaving only allowed affiliaton' do
       let(:fixture) { 'update_person_remove_affiliation' }
 
