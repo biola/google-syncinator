@@ -8,7 +8,7 @@ module ActivityCheck
       raise ArgumentError, 'type must me :never_active or :inactive'
     end
 
-    email_addresses = GoogleAccount.send(type)
+    email_addresses = GoogleAccount.public_send(type)
     reason = DeprovisionSchedule.const_get("#{type}_reason".upcase)
 
     email_addresses.each do |email_address|
@@ -19,6 +19,8 @@ module ActivityCheck
           Log.info "#{email_address} is already being deprovisioned. Skipping."
         elsif email.protected?
           Log.info "#{email_address} is protected. Skipping."
+        elsif email.excluded?
+          Log.info "#{email_address} is excluded. Skipping."
         else
           person = TrogdirPerson.new(email.uuid)
 

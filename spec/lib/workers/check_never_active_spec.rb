@@ -66,5 +66,13 @@ describe Workers::CheckNeverActive, type: :unit do
         end
       end
     end
+
+    context 'when email is excluded' do
+      before { email.exclusions.create! creator_uuid: uuid, starts_at: 1.minute.ago }
+
+      it 'does not schedule deprovisioning' do
+        expect { Workers::CheckNeverActive.new.perform }.to_not change { Workers::ScheduleActions.jobs.length }.from 0
+      end
+    end
   end
 end
