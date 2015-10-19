@@ -24,5 +24,16 @@ class API::V1::PersonEmailsAPI < Grape::API
 
       present email, with: API::V1::PersonEmailEntity
     end
+
+    desc 'Rename a person email'
+    params do
+      requires :address, type: String
+    end
+    put ':id' do
+      # NOTE: We need the email object back so don't preform asynchronously here
+      email = Workers::RenamePersonEmail.new.perform params['id'], params['address']
+
+      present email, with: API::V1::PersonEmailEntity
+    end
   end
 end

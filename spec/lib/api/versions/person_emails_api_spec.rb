@@ -64,4 +64,34 @@ describe API::V1::EmailsAPI, type: :unit do
       end
     end
   end
+
+  describe 'PUT /v1/person_emails/:id' do
+    let(:method) { :put }
+    let(:url) { "/v1/person_emails/#{email.id}" }
+    let(:new_address) { 'bobby.dole@biola.edu' }
+    let(:params) { {uuid: uuid, address: new_address} }
+
+    context 'when unauthenticated' do
+      before { post url, params }
+      subject { last_response }
+      it { expect(subject.status).to eql 401 }
+    end
+
+    context 'when authenticated' do
+      before do
+        expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: 1234567)
+        expect_any_instance_of(GoogleAccount).to receive(:rename!).with(new_address)
+      end
+
+      it { expect(subject.status).to eql 200 }
+
+      it 'creates an email object' do
+        expect { subject }.to change { email.reload.address }.from('bob.dole@biola.edu').to 'bobby.dole@biola.edu'
+      end
+
+      it 'returns an email object' do
+        expect(json).to include id: an_instance_of(String), uuid: '00000000-0000-0000-0000-000000000000', address: 'bobby.dole@biola.edu', state: 'active', deprovision_schedules: [], exclusions: []
+      end
+    end
+  end
 end
