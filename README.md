@@ -33,12 +33,12 @@ In order to access the Google API, a client cert needs to be created and configu
 5. Set the private key's password in `config/settings.local.yml` under `google.api_client.secret`
 6. Set the Service Account `Email address` in `config/settings.local.yml` under `google.api_client.issuer`
 7. Set `google.api_client.key_path` in `config/settings.local.yml` to the path of the `.p12` file you just downloaded.
-8. Login to `admin.google.com`. Go to `Security` > `Show more` > `Advanced settings` > `Manage API client access`
-9. Add a new Authorized API client using the `Client ID` from the Developer Console as the `Client Name` and set the `API Scopes` field to the follow comma separated list of scopes:
+8. Set `google.api_client.person` to the email address of the account you'd like to perform the actions as. This account will need to be a Super Admin and must have logged in to accept Google's terms of service.
+9. Login to `admin.google.com`. Go to `Security` > `Show more` > `Advanced settings` > `Manage API client access`
+10. Add a new Authorized API client using the `Client ID` from the Developer Console as the `Client Name` and set the `API Scopes` field to the follow comma separated list of scopes:
 ```
 https://www.googleapis.com/auth/admin.directory.group,https://www.googleapis.com/auth/admin.directory.group.member,https://www.googleapis.com/auth/admin.directory.user,https://www.googleapis.com/auth/admin.reports.usage.readonly
 ```
-10. Set `google.api_client.person` to the email address of the account you'd like to perform the actions as. This account will need to be a Super Admin and must have logged in to accept Google's terms of service.
 
 Configuration
 -------------
