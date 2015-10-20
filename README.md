@@ -38,6 +38,7 @@ In order to access the Google API, a client cert needs to be created and configu
 ```
 https://www.googleapis.com/auth/admin.directory.group,https://www.googleapis.com/auth/admin.directory.group.member,https://www.googleapis.com/auth/admin.directory.user,https://www.googleapis.com/auth/admin.reports.usage.readonly
 ```
+10. Set `google.api_client.person` to the email address of the account you'd like to perform the actions as. This account will need to be a Super Admin and must have logged in to accept Google's terms of service.
 
 Configuration
 -------------
