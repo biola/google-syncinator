@@ -72,7 +72,7 @@ class GoogleAccount
   # @param title [String,nil] the users title
   # @param privacy [Boolean] the users privacy
   # @return [true]
-  def create!(first_name, last_name, department, title, privacy)
+  def create!(first_name, last_name, department, title, privacy, org_unit_path = '/')
     params = {
       primaryEmail: full_email,
       password: GoogleAccount.random_password,
@@ -84,7 +84,8 @@ class GoogleAccount
         department: department,
         title: title
       ],
-      includeInGlobalAddressList: !privacy
+      includeInGlobalAddressList: !privacy,
+      orgUnitPath: org_unit_path
     }
 
     new_user = directory.users.insert.request_schema.new(params)
@@ -101,7 +102,7 @@ class GoogleAccount
   # @param title [String,nil] the users title
   # @param privacy [Boolean] the users privacy
   # @return [true]
-  def update!(first_name, last_name, department, title, privacy)
+  def update!(first_name, last_name, department, title, privacy, org_unit_path = '/')
     params = {
       name: {
         givenName: first_name,
@@ -111,7 +112,8 @@ class GoogleAccount
         department: department,
         title: title
       ],
-      includeInGlobalAddressList: !privacy
+      includeInGlobalAddressList: !privacy,
+      orgUnitPath: org_unit_path
     }
 
     user_updates = directory.users.update.request_schema.new(params)

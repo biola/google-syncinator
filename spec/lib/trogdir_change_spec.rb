@@ -29,6 +29,14 @@ describe TrogdirChange, type: :unit do
     it { expect(subject.last_name).to eql 'Dole'}
   end
 
+  describe '#old_affiliations' do
+    it { expect(subject.old_affiliations).to eql []}
+  end
+
+  describe '#new_affiliations' do
+    it { expect(subject.new_affiliations).to eql ['employee']}
+  end
+
   describe '#affiliations' do
     it { expect(subject.affiliations).to eql ['employee']}
   end

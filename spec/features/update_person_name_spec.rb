@@ -19,7 +19,7 @@ describe 'update person name', type: :feature  do
   end
 
   it 'syncs the google account data' do
-    expect(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, first_or_preferred_name: 'B-dizzle', last_name: 'Dole', department: 'Office of the President', title: 'Commander in Chief', privacy: false)
+    expect(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, first_or_preferred_name: 'B-dizzle', last_name: 'Dole', department: 'Office of the President', title: 'Commander in Chief', privacy: false, affiliations: ['employee'])
     expect_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
 
     expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
@@ -29,7 +29,7 @@ describe 'update person name', type: :feature  do
     expect_any_instance_of(GoogleAccount).to_not receive(:join!)
     expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-    expect_any_instance_of(GoogleAccount).to receive(:update!).with('B-dizzle', 'Dole', 'Office of the President', 'Commander in Chief', false)
+    expect_any_instance_of(GoogleAccount).to receive(:update!).with('B-dizzle', 'Dole', 'Office of the President', 'Commander in Chief', false, '/Employees')
 
     subject.perform
 

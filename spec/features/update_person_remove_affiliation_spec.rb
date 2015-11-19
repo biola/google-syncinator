@@ -20,15 +20,16 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
 
   context 'when never active' do
     it 'schedules a suspension and deletion' do
-      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id)
+      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return nil
+      allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
       expect_any_instance_of(GoogleAccount).to_not receive(:create!)
-      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
+      expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/'
       expect_any_instance_of(GoogleAccount).to receive(:suspend!)
       api_double = double
       expect(api_double).to receive(:index).twice.and_return double(perform: double(success?: true, parse: [{'id' => '42', 'address' => address}]))
@@ -54,15 +55,16 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
 
   context 'when a long time since active' do
     it 'schedules two notices of inactivity, a suspension and a deletion' do
-      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob')
+      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 366.days.ago
+      allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
       expect_any_instance_of(GoogleAccount).to_not receive(:create!)
-      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
+      expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/'
       expect_any_instance_of(GoogleAccount).to receive(:suspend!)
       api_double = double
       expect(api_double).to receive(:index).twice.and_return double(perform: double(success?: true, parse: [{'id' => '42', 'address' => address}]))
@@ -88,17 +90,19 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
 
   context 'when recently active' do
     it 'does nothing' do
-      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob')
+      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 364.days.ago
+      allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:destroy)
       expect_any_instance_of(GoogleAccount).to_not receive(:create!)
-      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:suspend!)
       expect_any_instance_of(GoogleAccount).to_not receive(:delete!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
+
+      expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/'
 
       subject.perform
 

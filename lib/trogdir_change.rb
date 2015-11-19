@@ -63,6 +63,18 @@ class TrogdirChange
     all_attrs['last_name']
   end
 
+  # The affiliations before the change
+  # @return [Array<String>]
+  def old_affiliations
+    Array(original['affiliations'])
+  end
+
+  # The affiliations after the change
+  # @return [Array<String>]
+  def new_affiliations
+    Array(modified['affiliations'])
+  end
+
   # The person's affiliations
   # @return [Array<String>]
   def affiliations
@@ -93,7 +105,7 @@ class TrogdirChange
     changed_attrs.include?('affiliations')
   end
 
-  # Whether or not any affiliatons were added to the person record
+  # Whether or not any affiliations were added to the person record
   def affiliation_added?
     person? && (create? || update?) && affiliations_changed? && (modified['affiliations'].to_a - original['affiliations'].to_a).any?
   end

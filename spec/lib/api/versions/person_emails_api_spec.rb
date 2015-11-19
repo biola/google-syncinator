@@ -49,7 +49,7 @@ describe API::V1::EmailsAPI, type: :unit do
 
     context 'when authenticated' do
       before do
-        expect(TrogdirPerson).to receive(:new).with(ross_uuid).and_return double(biola_id: 1234567, first_or_preferred_name: 'Bob', last_name: 'Dole', title: nil, department: nil, privacy: false)
+        expect(TrogdirPerson).to receive(:new).with(ross_uuid).and_return double(biola_id: 1234567, first_or_preferred_name: 'Bob', last_name: 'Dole', title: nil, department: nil, privacy: false, affiliations: ['alumnus'])
         expect_any_instance_of(GoogleAccount).to receive(:create!)
       end
 

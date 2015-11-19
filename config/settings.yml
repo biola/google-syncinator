@@ -113,6 +113,15 @@ affiliations:
   email_allowed:
     - alumnus
 
+# Maps affiliations to Google Orgnizational Units
+# NOTE: The key should be the orgUnitPath used by Google. Values should match Trogdir affiliationsn.
+# NOTE: Order is important. Google accounts can only be in one org unit so the top match in the list takes precedence.
+organizational_units:
+  /Employees:
+    - employee
+  /Alumni:
+    - alumnus
+
 groups:
   whitelist:
     - Alpha 1st East

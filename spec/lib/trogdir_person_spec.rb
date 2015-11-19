@@ -34,7 +34,7 @@ describe TrogdirPerson, type: :unit do
     it { expect(subject.biola_id).to eql 1234567 }
   end
 
-  describe '#affiliatons' do
+  describe '#affiliations' do
     let(:hash) { {'affiliations' => ['alumnus', 'employee']} }
     it { expect(subject.affiliations).to eql ['alumnus', 'employee'] }
   end

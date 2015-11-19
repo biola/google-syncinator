@@ -20,16 +20,17 @@ describe 'remove all affiliations', type: :feature  do
 
   context 'when never active' do
     it 'schedules a deletion' do
-      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id)
+      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return nil
+      allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
       expect_any_instance_of(GoogleAccount).to_not receive(:create!)
-      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:suspend!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
+      expect_any_instance_of(GoogleAccount).to receive(:update!)
       api_double = double
       expect(api_double).to receive(:index).and_return double(perform: double(success?: true, parse: [{'id' => '42', 'address' => address}]))
       expect(api_double).to receive(:destroy).and_return double(perform: double(success?: true))
@@ -51,15 +52,16 @@ describe 'remove all affiliations', type: :feature  do
 
   context 'when has been active' do
     it 'schedules a notice of closure, suspension and deletion' do
-      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob')
+      allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 366.days.ago
+      allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
 
       expect_any_instance_of(Trogdir::APIClient::Emails).to_not receive(:create)
       expect_any_instance_of(GoogleAccount).to_not receive(:create!)
-      expect_any_instance_of(GoogleAccount).to_not receive(:update!)
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
+      expect_any_instance_of(GoogleAccount).to receive(:update!)
       expect_any_instance_of(GoogleAccount).to receive(:suspend!)
       api_double = double
       expect(api_double).to receive(:index).twice.and_return double(perform: double(success?: true, parse: [{'id' => '42', 'address' => address}]))

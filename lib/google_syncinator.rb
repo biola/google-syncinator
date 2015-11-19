@@ -81,6 +81,7 @@ module GoogleSyncinator
     require './lib/enabled'
     require './lib/google_account'
     require './lib/log'
+    require './lib/organizational_unit'
     require './lib/service_objects'
     require './lib/trogdir_change'
     require './lib/trogdir_person'

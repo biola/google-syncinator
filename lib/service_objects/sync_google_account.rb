@@ -6,8 +6,10 @@ module ServiceObjects
     # @return [:create, :update] the action
     def call
       person = TrogdirPerson.new(change.person_uuid)
+      org_unit_path = OrganizationalUnit.path_for(person)
+
       google_account.unsuspend! if google_account.suspended?
-      google_account.update!(person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy)
+      google_account.update!(person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy, org_unit_path)
 
       :update
     end
@@ -15,7 +17,14 @@ module ServiceObjects
     # Should this change trigger a Google account sync
     # @return [Boolean]
     def ignore?
-      !(change.account_info_updated? && change.university_email_exists?)
+      org_unit_changed = org_unit(change.old_affiliations) != org_unit(change.new_affiliations)
+      !(change.university_email_exists? && (change.account_info_updated? || org_unit_changed))
+    end
+
+    private
+
+    def org_unit(affiliations)
+      OrganizationalUnit.path_for(affiliations)
     end
   end
 end

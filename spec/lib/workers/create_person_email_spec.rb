@@ -7,7 +7,7 @@ describe Workers::CreatePersonEmail, type: :unit do
   subject { Workers::CreatePersonEmail.new }
 
   before do
-    expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', title: nil, department: nil, privacy: false)
+    expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', title: nil, department: nil, privacy: false, affiliations: nil)
     expect_any_instance_of(GoogleAccount).to receive(:create!)
   end
 

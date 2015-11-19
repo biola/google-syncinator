@@ -11,12 +11,13 @@ module Workers
     # @return [nil]
     def perform(uuid, address)
       person = TrogdirPerson.new(uuid)
+      org_unit_path = OrganizationalUnit.path_for(person)
 
       email = PersonEmail.create! uuid: uuid, address: address if Enabled.write?
       Log.info %{Create PersonEmail for uuid: "#{uuid}" with address: "#{address}" }
       Workers::Trogdir::CreateEmail.perform_async uuid, address
       Workers::LegacyEmailTable::Insert.perform_async(person.biola_id, address)
-      GoogleAccount.new(address).create! person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy
+      GoogleAccount.new(address).create! person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy, org_unit_path
 
       email
     end

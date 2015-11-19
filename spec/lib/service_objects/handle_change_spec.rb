@@ -136,12 +136,12 @@ describe ServiceObjects::HandleChange, type: :unit do
 
     it 'calls DeprovisionGoogleAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
-      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::DeprovisionGoogleAccount).to receive(:call).and_return(:update)
       expect_any_instance_of(ServiceObjects::CancelDeprovisioningGoogleAccount).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::ReprovisionGoogleAccount).to_not receive(:call)
+      expect_any_instance_of(ServiceObjects::SyncGoogleAccount).to receive(:call)
       expect(Workers::Trogdir::ChangeFinish).to receive(:perform_async).with(kind_of(String), :update)
       expect(Workers::Trogdir::ChangeError).to_not receive(:perform_async)
 

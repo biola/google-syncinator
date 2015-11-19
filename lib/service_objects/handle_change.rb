@@ -1,6 +1,10 @@
 module ServiceObjects
   # Runs the appropriate other `ServiceObject`s
   class HandleChange < Base
+    # Trogdir SyncLogs only accept one action. This array is ordered by which action
+    # should take precedence over the other when multiple actions are performed.
+    PRIORITIZED_ACTIONS = [:destroy, :create, :update, :skip]
+
     # Runs the appropriate service objects for this change
     # @return [Array<Symbol>] a list of actions taken
     def call
@@ -47,7 +51,7 @@ module ServiceObjects
           actions << UpdateBiolaID.new(change).call
         end
 
-        action = actions.first || :skip
+        action = most_important_action(actions) || :skip
         Log.info "No changes needed for person #{change.person_uuid}" if actions.empty?
         Workers::Trogdir::ChangeFinish.perform_async change.sync_log_id, action
 
@@ -74,6 +78,15 @@ module ServiceObjects
     # @return [Trogdir::APIClient::ChangeSyncs]
     def change_syncs
       Trogdir::APIClient::ChangeSyncs.new
+    end
+
+    # Returns the single most important actions
+    # @param actions [Array<Symbol>]
+    # @return [Symbol]
+    def most_important_action(actions)
+      PRIORITIZED_ACTIONS.find do |action|
+        actions.include? action
+      end
     end
   end
 end

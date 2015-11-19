@@ -10,7 +10,7 @@ describe ServiceObjects::SyncGoogleAccount, type: :unit do
     let(:account) { instance_double(GoogleAccount, suspended?: false) }
 
     before do
-      expect(TrogdirPerson).to receive(:new).and_return(double(first_or_preferred_name: 'Bob', last_name: 'Dole', department: 'Office of the president', title: 'POTUS', privacy: false))
+      expect(TrogdirPerson).to receive(:new).and_return(double(first_or_preferred_name: 'Bob', last_name: 'Dole', department: 'Office of the president', title: 'POTUS', privacy: false, affiliations: ['alumnus']))
       expect(account).to receive(:update!)
       expect(subject).to receive(:google_account).and_return(account).at_least(:once)
     end
