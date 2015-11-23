@@ -92,6 +92,7 @@ module GoogleSyncinator
     require './lib/mongoid_models/university_email'
     require './lib/mongoid_models/account_email'
     require './lib/mongoid_models/person_email'
+    require './lib/mongoid_models/department_email'
     require './lib/mongoid_models/alias_email'
     require './lib/mongoid_models/client'
     require './lib/mongoid_models/deprovision_schedule'

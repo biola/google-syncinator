@@ -5,6 +5,7 @@ describe AccountEmail, type: :unit do
 
   it { is_expected.to embed_many(:deprovision_schedules) }
   it { is_expected.to embed_many(:exclusions) }
+  it { is_expected.to have_many(:alias_emails) }
   it { is_expected.to have_fields(:address, :state) }
   it { is_expected.to be_timestamped_document }
 

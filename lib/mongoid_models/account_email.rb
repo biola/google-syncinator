@@ -14,6 +14,14 @@ class AccountEmail < UniversityEmail
   #   @return [Array<Exclusion>]
   embeds_many :exclusions
 
+  # @!attribute alias_emails
+  #   @return [Array<AliasEmail>]
+  # @!method alias_emails=(alias_emails)
+  #   @param alias_emails [Array<AliasEmail>]
+  #   @return [Array<AliasEmail>]
+  has_many :alias_emails
+
+
   after_save :update_alias_state
 
   # Get the date when the email will be either suspended or deleted
