@@ -186,6 +186,35 @@ class GoogleAccount
     true
   end
 
+  # Gets a all Google Apps accounts
+  # @return [Array<Google::APIClient::Schema::Admin::DirectoryV1::User>]
+  def self.all
+    return [] unless Enabled.third_party?
+
+    page_token = nil
+    all_emails = []
+
+    loop do
+      result = execute(
+        api_method: directory.users.list,
+        parameters: {
+          domain: Settings.google.domain,
+          fields: 'nextPageToken,users(aliases,creationTime,isAdmin,primaryEmail,suspended)',
+          maxResults: 500,
+          pageToken: page_token
+        }
+      )
+
+      result.data.users.each do |user|
+        all_emails << user
+      end
+
+      break unless page_token = result.next_page_token
+    end
+
+    all_emails
+  end
+
   # Gets a list of accounts that have never been active
   # @note The usage report from Google isn't available up to the minute so it's
   #   always best to check GoogleAccount#never_active? too

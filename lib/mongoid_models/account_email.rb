@@ -19,7 +19,7 @@ class AccountEmail < UniversityEmail
   # @!method alias_emails=(alias_emails)
   #   @param alias_emails [Array<AliasEmail>]
   #   @return [Array<AliasEmail>]
-  has_many :alias_emails
+  has_many :alias_emails, dependent: :destroy
 
 
   after_save :update_alias_state
