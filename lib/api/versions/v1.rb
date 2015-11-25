@@ -5,8 +5,10 @@ class API::V1 < Grape::API
   require './lib/api/versions/v1/entities/account_email_entity'
   require './lib/api/versions/v1/entities/alias_email_entity'
   require './lib/api/versions/v1/entities/person_email_entity'
+  require './lib/api/versions/v1/entities/department_email_entity'
   require './lib/api/versions/v1/entities/university_email_entity'
   require './lib/api/versions/v1/person_emails_api'
+  require './lib/api/versions/v1/department_emails_api'
   require './lib/api/versions/v1/alias_emails_api'
   require './lib/api/versions/v1/deprovision_schedules_api'
   require './lib/api/versions/v1/emails_api'
@@ -16,6 +18,7 @@ class API::V1 < Grape::API
 
   mount EmailsAPI
   mount PersonEmailsAPI
+  mount DepartmentEmailsAPI
   mount AliasEmailsAPI
 
   resource 'emails/:email_id' do

@@ -1,4 +1,4 @@
-# Version 1 of the Emails Grape API
+# Version 1 of the person emails Grape API
 class API::V1::PersonEmailsAPI < Grape::API
   include Grape::Kaminari
 
