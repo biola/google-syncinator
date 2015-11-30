@@ -17,8 +17,8 @@ class API::V1::DepartmentEmailsAPI < Grape::API
     params do
       requires :address, type: String
       requires :uuids, type: Array
-      optional :first_name, type: String
-      optional :last_name, type: String
+      requires :first_name, type: String
+      requires :last_name, type: String
       optional :department, type: String
       optional :title, type: String
       optional :privacy, type: Boolean
@@ -29,5 +29,7 @@ class API::V1::DepartmentEmailsAPI < Grape::API
 
       present email, with: API::V1::DepartmentEmailEntity
     end
+
+    # TOOD: update
   end
 end
