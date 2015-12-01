@@ -3,8 +3,9 @@ module Emails
   class Base
     # Initializes a new Email object
     # @param deprovision_schedule [DeprovisionSchedule]
-    def initialize(deprovision_schedule)
+    def initialize(deprovision_schedule, account_email)
       @deprovision_schedule = deprovision_schedule
+      @account_email = account_email
     end
 
     # The subject line of the email
@@ -54,18 +55,16 @@ module Emails
     #   @return [DeprovisionSchedule] the deprovision schedule for which an email will be sent
     attr_reader :deprovision_schedule
 
+    # @!attribute [r] account_eamil
+    #   @return [AccountEmail] the account email to which an email will be sent
+    attr_reader :account_email
+
     # How many days it will be until the email is suspended or deleted
     # @return [Integer] days until the email is suspended or deleted
     # @return [nil] if email is not scheduled for suspension or deletion
     def disable_days_from_now
       return nil if account_email.disable_date.nil?
       account_email.disable_date.to_date.mjd - Date.today.mjd
-    end
-
-    # The AccountEmail parent of the `deprovision_schedule`
-    # @return [AccountEmail]
-    def account_email
-      deprovision_schedule.account_email
     end
 
     # The TrogdirPerson associated with the `account_email`

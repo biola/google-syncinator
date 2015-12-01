@@ -23,7 +23,10 @@ module Workers
           if GoogleAccount.new(email.address).active?
             email.cancel_deprovisioning!
           else
-            Emails::NotifyOfInactivity.new(schedule).send!
+            email.notification_recipients.each do |account_email|
+              Emails::NotifyOfInactivity.new(schedule, account_email).send!
+            end
+
             schedule.update completed_at: DateTime.now if Enabled.write?
             Log.info "Marked notify_of_inactivity schedule for #{email} complete"
           end

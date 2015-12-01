@@ -20,11 +20,17 @@ module Workers
         end
 
         unless schedule.canceled?
-          biola_id = TrogdirPerson.new(email.uuid).biola_id
-
           GoogleAccount.new(email.address).delete!
-          Trogdir::DeleteEmail.perform_async(email.uuid, email.address)
-          LegacyEmailTable::Expire.perform_async(biola_id, email.address)
+
+          if email.class.sync_to_trogdir?
+            Trogdir::DeleteEmail.perform_async(email.uuid, email.address)
+          end
+
+          if email.class.sync_to_legacy_email_table?
+            biola_id = TrogdirPerson.new(email.uuid).biola_id
+            LegacyEmailTable::Expire.perform_async(biola_id, email.address)
+          end
+
           schedule.update completed_at: DateTime.now if Enabled.write?
           Log.info "Marked delete schedule for #{email} complete"
         end

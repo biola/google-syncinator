@@ -13,6 +13,24 @@ describe AccountEmail, type: :unit do
   it { is_expected.to validate_presence_of(:state) }
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }
 
+  describe '#notification_recipients' do
+    it 'is not implemented' do
+      expect { subject.notification_recipients }.to raise_error(NotImplementedError)
+    end
+  end
+
+  describe '.sync_to_trogdir?' do
+    it 'is not implemented' do
+      expect { subject.class.sync_to_trogdir? }.to raise_error(NotImplementedError)
+    end
+  end
+
+  describe '.sync_to_legacy_email_table?' do
+    it 'is not implemented' do
+      expect { subject.class.sync_to_legacy_email_table? }.to raise_error(NotImplementedError)
+    end
+  end
+
   describe '#disable_date' do
     subject { AccountEmail.new(address: address) }
 

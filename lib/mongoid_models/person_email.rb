@@ -10,6 +10,24 @@ class PersonEmail < AccountEmail
   validates :uuid, presence: true
   validates :address, uniqueness: {scope: :uuid}
 
+  # Email addresses who should recieve notifications about this account
+  # @return [Array<String>] email addresses
+  def notification_recipients
+    [self]
+  end
+
+  # Whether or not this record should be synced to Trogdir
+  # @return [Boolean]
+  def self.sync_to_trogdir?
+    true
+  end
+
+  # Whether or not this record should be synced to the legacy email table
+  # @return [Boolean]
+  def self.sync_to_legacy_email_table?
+    true
+  end
+
   # Does the person have an active {UniversityEmail}?
   # @param uuid [String] the Trogdir UUID of the person
   def self.active?(uuid)

@@ -20,7 +20,10 @@ module Workers
         end
 
         unless schedule.canceled?
-          Emails::NotifyOfClosure.new(schedule).send!
+          email.notification_recipients.each do |account_email|
+            Emails::NotifyOfClosure.new(schedule, account_email).send!
+          end
+
           schedule.update completed_at: DateTime.now if Enabled.write?
           Log.info "Marked notify_of_closure schedule for #{email} complete"
         end

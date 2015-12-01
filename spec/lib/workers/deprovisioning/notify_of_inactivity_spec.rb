@@ -67,6 +67,28 @@ describe Workers::Deprovisioning::NotifyOfInactivity, type: :unit do
         expect{ subject.perform(schedule.id) }.to change { schedule.reload.completed_at }.from(nil)
       end
 
+      context 'when multiple recipients' do
+        let(:bob) { PersonEmail.create!(uuid: '00000000-0000-0000-0000-000000000001', address: 'bob.dole@biola.edu') }
+        let(:liz) { PersonEmail.create!(uuid: '00000000-0000-0000-0000-000000000002', address: 'ezilabeth.dole@biola.edu') }
+        let!(:email) { DepartmentEmail.create uuids: [bob.uuid, liz.uuid], address: 'dole.for.pres@biola.edu' }
+
+        it 'sends multiple emails' do
+          dept_email = instance_double(Emails::NotifyOfInactivity)
+          expect(Emails::NotifyOfInactivity).to receive(:new).with(schedule, email).and_return(dept_email)
+          expect(dept_email).to receive(:send!)
+
+          bob_email = instance_double(Emails::NotifyOfInactivity)
+          expect(Emails::NotifyOfInactivity).to receive(:new).with(schedule, bob).and_return(bob_email)
+          expect(bob_email).to receive(:send!)
+
+          liz_email = instance_double(Emails::NotifyOfInactivity)
+          expect(Emails::NotifyOfInactivity).to receive(:new).with(schedule, liz).and_return(liz_email)
+          expect(liz_email).to receive(:send!)
+
+          subject.perform(schedule.id)
+        end
+      end
+
       context "when email was inactive but now isn't" do
         let(:reason) { DeprovisionSchedule::INACTIVE_REASON }
         before { expect_any_instance_of(GoogleAccount).to receive(:active?).and_return true }

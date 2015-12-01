@@ -17,11 +17,17 @@ module Workers
         email = schedule.account_email
 
         unless email.active?
-          biola_id = TrogdirPerson.new(email.uuid).biola_id
-
           GoogleAccount.new(email.address).unsuspend!
-          Workers::Trogdir::CreateEmail.perform_async email.uuid, email.address
-          Workers::LegacyEmailTable::Unexpire.perform_async(biola_id, email.address)
+
+          if email.class.sync_to_trogdir?
+            Workers::Trogdir::CreateEmail.perform_async email.uuid, email.address
+          end
+
+          if email.class.sync_to_legacy_email_table?
+            biola_id = TrogdirPerson.new(email.uuid).biola_id
+            Workers::LegacyEmailTable::Unexpire.perform_async(biola_id, email.address)
+          end
+          
           schedule.update completed_at: Time.now if Enabled.write?
           Log.info "Create activation schedule for #{email}"
         end

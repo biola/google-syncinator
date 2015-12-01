@@ -23,22 +23,44 @@ describe Workers::Deprovisioning::Activate, type: :unit do
       let(:state) { :suspended }
       before { expect_any_instance_of(GoogleAccount).to receive :unsuspend! }
 
-      before { expect_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return 1234567 }
+      context 'when a PersonEmail' do
+        before { expect_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return 1234567 }
 
-      it 'activates the email' do
-        expect { subject.perform(schedule.id) }.to change { email.reload.state }.from(:suspended).to :active
+        it 'activates the email' do
+          expect { subject.perform(schedule.id) }.to change { email.reload.state }.from(:suspended).to :active
+        end
+
+        it 'adds an activate deprovision schedule' do
+          expect { subject.perform(schedule.id) }.to change { email.reload.deprovision_schedules.count }.by 1
+        end
+
+        it 'creates a Trogdir email' do
+          expect { subject.perform(schedule.id) }.to change(Workers::Trogdir::CreateEmail.jobs, :size).by 1
+        end
+
+        it 'unexpires the legacy email table' do
+          expect { subject.perform(schedule.id) }.to change(Workers::LegacyEmailTable::Unexpire.jobs, :size).by 1
+        end
       end
 
-      it 'adds an activate deprovision schedule' do
-        expect { subject.perform(schedule.id) }.to change { email.reload.deprovision_schedules.count }.by 1
-      end
+      context 'when a DepartmentEmail' do
+        let(:email) { DepartmentEmail.create uuids: [uuid], address: address, state: state }
 
-      it 'creates a Trogdir email' do
-        expect { subject.perform(schedule.id) }.to change(Workers::Trogdir::CreateEmail.jobs, :size).by 1
-      end
+        it 'activates the email' do
+          expect { subject.perform(schedule.id) }.to change { email.reload.state }.from(:suspended).to :active
+        end
 
-      it 'unexpires the legacy email table' do
-        expect { subject.perform(schedule.id) }.to change(Workers::LegacyEmailTable::Unexpire.jobs, :size).by 1
+        it 'adds an activate deprovision schedule' do
+          expect { subject.perform(schedule.id) }.to change { email.reload.deprovision_schedules.count }.by 1
+        end
+
+        it 'does not create a Trogdir email' do
+          expect { subject.perform(schedule.id) }.to_not change(Workers::Trogdir::CreateEmail.jobs, :size)
+        end
+
+        it 'does not unexpire the legacy email table' do
+          expect { subject.perform(schedule.id) }.to_not change(Workers::LegacyEmailTable::Unexpire.jobs, :size)
+        end
       end
     end
   end

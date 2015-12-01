@@ -24,6 +24,24 @@ class AccountEmail < UniversityEmail
 
   after_save :update_alias_state
 
+  # Email addresses who should recieve notifications about this account
+  # @return [Array<String>] email addresses
+  def notification_recipients
+    raise NotImplementedError, 'This method should be overridden in child clasess'
+  end
+
+  # Whether or not this record should be synced to Trogdir
+  # @return [Boolean]
+  def self.sync_to_trogdir?
+    raise NotImplementedError, 'This method should be overridden in child clasess'
+  end
+
+  # Whether or not this record should be synced to the legacy email table
+  # @return [Boolean]
+  def self.sync_to_legacy_email_table?
+    raise NotImplementedError, 'This method should be overridden in child clasess'
+  end
+
   # Get the date when the email will be either suspended or deleted
   # @return [DateTime] when a suspend or delete action is scheduled
   # @return [nil] when there is no suspend or delete action scheduled

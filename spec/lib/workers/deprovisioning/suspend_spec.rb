@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe Workers::Deprovisioning::Suspend, type: :unit do
-  let!(:email) { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
+  let(:uuid) { '00000000-0000-0000-0000-000000000000' }
+  let(:address) { 'bob.dole@biola.edu' }
+  let!(:email) { PersonEmail.create uuid: uuid, address: address }
   let(:reason) { nil }
   let!(:schedule) { email.deprovision_schedules.create action: :suspend, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
@@ -31,38 +33,74 @@ describe Workers::Deprovisioning::Suspend, type: :unit do
   context 'when deprovision schedule not canceled' do
     let(:canceled) { false }
 
-    before { allow_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return(1234567) }
-
-    it 'suspends Google account' do
-      account = instance_double(GoogleAccount)
-      expect(GoogleAccount).to receive(:new).with('bob.dole@biola.edu').and_return(account)
-      expect(account).to receive(:suspend!)
-      subject.perform(schedule.id)
+    before do
+      allow_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return(1234567)
+      allow_any_instance_of(GoogleAccount).to receive(:suspend!)
     end
 
-    it 'deletes the trogdir email' do
-      expect(GoogleAccount).to receive_message_chain(:new, :suspend!)
-      expect(Workers::Trogdir::DeleteEmail).to receive(:perform_async)
-      subject.perform(schedule.id)
+    context 'when a PersonEmail' do
+      it 'suspends Google account' do
+        account = instance_double(GoogleAccount)
+        expect(GoogleAccount).to receive(:new).with('bob.dole@biola.edu').and_return(account)
+        expect(account).to receive(:suspend!)
+        subject.perform(schedule.id)
+      end
+
+      it 'deletes the trogdir email' do
+        expect(Workers::Trogdir::DeleteEmail).to receive(:perform_async)
+        subject.perform(schedule.id)
+      end
+
+      it 'expires the legacy email' do
+        expect(Workers::LegacyEmailTable::Expire).to receive(:perform_async)
+        subject.perform(schedule.id)
+      end
+
+      it 'marks the schedule complete' do
+        expect{ subject.perform(schedule.id) }.to change { schedule.reload.completed_at }.from(nil)
+      end
+
+      context "when email was inactive but now isn't" do
+        let(:reason) { DeprovisionSchedule::INACTIVE_REASON }
+        before { expect_any_instance_of(GoogleAccount).to receive(:active?).and_return true }
+
+        it 'cancels the schedule' do
+          expect { subject.perform(schedule.id) }.to change { schedule.reload.canceled? }.to true
+        end
+      end
     end
 
-    it 'expires the legacy email' do
-      expect(GoogleAccount).to receive_message_chain(:new, :suspend!)
-      expect(Workers::LegacyEmailTable::Expire).to receive(:perform_async)
-      subject.perform(schedule.id)
-    end
+    context 'when a DepartmentEmail' do
+      let!(:email) { DepartmentEmail.create uuids: [uuid], address: address }
 
-    it 'marks the schedule complete' do
-      expect(GoogleAccount).to receive_message_chain(:new, :suspend!)
-      expect{ subject.perform(schedule.id) }.to change { schedule.reload.completed_at }.from(nil)
-    end
+      it 'suspends Google account' do
+        account = instance_double(GoogleAccount)
+        expect(GoogleAccount).to receive(:new).with('bob.dole@biola.edu').and_return(account)
+        expect(account).to receive(:suspend!)
+        subject.perform(schedule.id)
+      end
 
-    context "when email was inactive but now isn't" do
-      let(:reason) { DeprovisionSchedule::INACTIVE_REASON }
-      before { expect_any_instance_of(GoogleAccount).to receive(:active?).and_return true }
+      it 'does not delete a trogdir email' do
+        expect(Workers::Trogdir::DeleteEmail).to_not receive(:perform_async)
+        subject.perform(schedule.id)
+      end
 
-      it 'cancels the schedule' do
-        expect { subject.perform(schedule.id) }.to change { schedule.reload.canceled? }.to true
+      it 'does not expire a legacy email' do
+        expect(Workers::LegacyEmailTable::Expire).to_not receive(:perform_async)
+        subject.perform(schedule.id)
+      end
+
+      it 'marks the schedule complete' do
+        expect{ subject.perform(schedule.id) }.to change { schedule.reload.completed_at }.from(nil)
+      end
+
+      context "when email was inactive but now isn't" do
+        let(:reason) { DeprovisionSchedule::INACTIVE_REASON }
+        before { expect_any_instance_of(GoogleAccount).to receive(:active?).and_return true }
+
+        it 'cancels the schedule' do
+          expect { subject.perform(schedule.id) }.to change { schedule.reload.canceled? }.to true
+        end
       end
     end
   end

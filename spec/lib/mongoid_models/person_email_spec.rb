@@ -15,6 +15,27 @@ describe PersonEmail, type: :unit do
   it { is_expected.to validate_uniqueness_of(:address).scoped_to(:uuid) }
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }
 
+  describe '#notification_recipients' do
+    subject { PersonEmail.new address: address }
+
+    it 'is the address in an array' do
+      expect(subject.notification_recipients).to eql [subject]
+    end
+  end
+
+  describe '.sync_to_trogdir?' do
+    it 'is true' do
+      expect(subject.class.sync_to_trogdir?).to be true
+    end
+  end
+
+  describe '.sync_to_legacy_email_table?' do
+    it 'is true' do
+      expect(subject.class.sync_to_legacy_email_table?).to be true
+    end
+  end
+
+
   describe '#to_s' do
     subject { PersonEmail.new(uuid: uuid, address: address) }
 
