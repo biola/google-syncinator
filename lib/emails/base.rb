@@ -67,12 +67,19 @@ module Emails
       account_email.disable_date.to_date.mjd - Date.today.mjd
     end
 
+    # Filter notification_recipients to just PeopleEmails
+    # @return [Array<PersonEmail>]
+    def person_emails
+      @people ||= account_email.notification_recipients.select do |account_eamil|
+        account_email.is_a? PersonEmail
+      end
+    end
+
     # The TrogdirPerson associated with the `account_email`
     # @note This is here because it is commonly used in subclasses
-    # @return [TrogdirPerson] the trogdir person who the email belongs to
-    def trogdir_person
-      # TODO: this will have to be reworked to support department emails
-      @trogdir_person ||= TrogdirPerson.new(account_email.uuid)
+    # @return [Array<TrogdirPerson>] the trogdir person who the email belongs to
+    def trogdir_people
+      @trogdir_people ||= person_emails.map { |ae| TrogdirPerson.new(ae.uuid) }
     end
   end
 end

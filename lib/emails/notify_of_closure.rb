@@ -5,7 +5,7 @@ module Emails
     # @return [String] the body of the email
     def body
 <<EOD
-Dear #{trogdir_person.first_or_preferred_name},
+Dear #{trogdir_people.map(&:first_or_preferred_name).to_sentence},
 
 This is to inform you that this email account will automatically be disabled in #{disable_days_from_now} days with no further notice. Please back up any data you would like to keep.
 

@@ -5,7 +5,7 @@ module Emails
     # @return [String] the body of the email
     def body
 <<EOD
-Dear #{trogdir_person.first_or_preferred_name},
+Dear #{trogdir_people.map(&:first_or_preferred_name).to_sentence},
 
 Your #{account_email.address} email account will be disabled in #{disable_days_from_now} days due to inactivity. To keep this Biola University email account, simply sign in before your account is disabled. If you no longer use your #{account_email.address} email account, no action is required. Your account will be disabled automatically.
 
