@@ -24,12 +24,32 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       optional :privacy, type: Boolean
     end
     post do
-      GoogleAccount.new(params[:address]).create! params[:first_name], params[:last_name], params[:department], params[:title], params[:privacy]
+      GoogleAccount.new(params[:address]).create! params.slice(:first_name, :last_name, :department, :title, :privacy)
       email = DepartmentEmail.create! address: params[:address], uuids: params[:uuids]
 
       present email, with: API::V1::DepartmentEmailEntity
     end
 
-    # TOOD: update
+    desc 'Update a department email'
+    params do
+      optional :address, type: String
+      optional :uuids, type: Array
+      optional :first_name, type: String
+      optional :last_name, type: String
+      optional :department, type: String
+      optional :title, type: String
+      optional :privacy, type: Boolean
+    end
+    put ':department_email_id' do
+      email = DepartmentEmail.find(params[:department_email_id])
+
+      model_args = params.slice(:address, :uuids).to_hash
+      email.update! model_args if model_args.any?
+
+      api_args = params.slice(:first_name, :last_name, :department, :title, :privacy)
+      GoogleAccount.new(email.address).update! api_args if api_args.any?
+
+      present email, with: API::V1::DepartmentEmailEntity
+    end
   end
 end

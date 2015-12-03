@@ -29,7 +29,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-      expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/'
+      expect_any_instance_of(GoogleAccount).to receive(:update!).with first_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, org_unit_path: '/'
       expect_any_instance_of(GoogleAccount).to receive(:suspend!)
       api_double = double
       expect(api_double).to receive(:index).twice.and_return double(perform: double(success?: true, parse: [{'id' => '42', 'address' => address}]))
@@ -64,7 +64,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-      expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/'
+      expect_any_instance_of(GoogleAccount).to receive(:update!).with first_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, org_unit_path: '/'
       expect_any_instance_of(GoogleAccount).to receive(:suspend!)
       api_double = double
       expect(api_double).to receive(:index).twice.and_return double(perform: double(success?: true, parse: [{'id' => '42', 'address' => address}]))
@@ -102,7 +102,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-      expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/'
+      expect_any_instance_of(GoogleAccount).to receive(:update!).with first_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, org_unit_path: '/'
 
       subject.perform
 

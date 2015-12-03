@@ -9,7 +9,14 @@ module ServiceObjects
       org_unit_path = OrganizationalUnit.path_for(person)
 
       google_account.unsuspend! if google_account.suspended?
-      google_account.update!(person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy, org_unit_path)
+      google_account.update!(
+        first_name: person.first_or_preferred_name,
+        last_name: person.last_name,
+        department: person.department,
+        title: person.title,
+        privacy: person.privacy,
+        org_unit_path: org_unit_path
+      )
 
       :update
     end

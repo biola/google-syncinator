@@ -35,7 +35,7 @@ describe 'student graduates', type: :feature  do
       expect_any_instance_of(GoogleAccount).to_not receive(:join!)
       expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-      expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/Alumni'
+      expect_any_instance_of(GoogleAccount).to receive(:update!).with first_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, org_unit_path: '/Alumni'
       # We stub these to keep them from running immediately. Normally they would
       # run in 5 days which would leave time for the jobs to be canceled.
       expect_any_instance_of(Workers::Deprovisioning::NotifyOfClosure).to receive(:perform)

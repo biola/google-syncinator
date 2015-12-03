@@ -17,7 +17,14 @@ module Workers
       Log.info %{Create PersonEmail for uuid: "#{uuid}" with address: "#{address}" }
       Workers::Trogdir::CreateEmail.perform_async uuid, address
       Workers::LegacyEmailTable::Insert.perform_async(person.biola_id, address)
-      GoogleAccount.new(address).create! person.first_or_preferred_name, person.last_name, person.department, person.title, person.privacy, org_unit_path
+      GoogleAccount.new(address).create!(
+        first_name: person.first_or_preferred_name,
+        last_name: person.last_name,
+        department: person.department,
+        title: person.title,
+        privacy: person.privacy,
+        org_unit_path: org_unit_path
+      )
 
       email
     end

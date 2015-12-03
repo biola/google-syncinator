@@ -29,7 +29,7 @@ describe 'update person name', type: :feature  do
     expect_any_instance_of(GoogleAccount).to_not receive(:join!)
     expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-    expect_any_instance_of(GoogleAccount).to receive(:update!).with('B-dizzle', 'Dole', 'Office of the President', 'Commander in Chief', false, '/Employees')
+    expect_any_instance_of(GoogleAccount).to receive(:update!).with(first_name: 'B-dizzle', last_name: 'Dole', department: 'Office of the President', title: 'Commander in Chief', privacy: false, org_unit_path: '/Employees')
 
     subject.perform
 

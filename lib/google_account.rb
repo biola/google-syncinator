@@ -66,29 +66,23 @@ class GoogleAccount
   end
 
   # Create a new Google Apps account
-  # @param first_name [String] the users first name
-  # @param last_name [String] the users last name
-  # @param department [String,nil] the users department
-  # @param title [String,nil] the users title
-  # @param privacy [Boolean] the users privacy
+  # @option params [String] :first_name The users first name
+  # @option params [String] :last_name The users last name
+  # @option params [String, nil] :department The users department
+  # @option params [String, nil] :title The users title
+  # @option params [Boolean] :privacy The users privacy setting
+  # @option params [String] :org_unit_path ('/') The users organization unit path
   # @return [true]
-  def create!(first_name, last_name, department, title, privacy, org_unit_path = '/')
-    params = {
-      primaryEmail: full_email,
-      password: GoogleAccount.random_password,
-      name: {
-        familyName: last_name,
-        givenName: first_name
-      },
-      organizations: [
-        department: department,
-        title: title
-      ],
-      includeInGlobalAddressList: !privacy,
-      orgUnitPath: org_unit_path
-    }
+  # @note first_name and last_name are required
+  def create!(params)
+    params[:address] = full_email
+    # Defaults
+    params[:org_unit_path] = '/' unless params.has_key? :org_unit_path
+    params[:password] = GoogleAccount.random_password unless params.has_key? :password
 
-    new_user = directory.users.insert.request_schema.new(params)
+    google_params = to_google_params(params)
+
+    new_user = directory.users.insert.request_schema.new(google_params)
 
     safe_execute api_method: directory.users.insert, body_object: new_user
 
@@ -96,27 +90,17 @@ class GoogleAccount
   end
 
   # Updates a Google Apps account's details
-  # @param first_name [String] the users first name
-  # @param last_name [String] the users last name
-  # @param department [String,nil] the users department
-  # @param title [String,nil] the users title
-  # @param privacy [Boolean] the users privacy
+  # @option params [String] :first_name The users first name
+  # @option params [String] :last_name The users last name
+  # @option params [String, nil] :department The users department
+  # @option params [String, nil] :title The users title
+  # @option params [Boolean] :privacy The users privacy setting
+  # @option params [String] :org_unit_path The users organization unit path
   # @return [true]
-  def update!(first_name, last_name, department, title, privacy, org_unit_path = '/')
-    params = {
-      name: {
-        givenName: first_name,
-        familyName: last_name
-      },
-      organizations: [
-        department: department,
-        title: title
-      ],
-      includeInGlobalAddressList: !privacy,
-      orgUnitPath: org_unit_path
-    }
+  def update!(params)
+    google_params = to_google_params(params)
 
-    user_updates = directory.users.update.request_schema.new(params)
+    user_updates = directory.users.update.request_schema.new(google_params)
 
     safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 
@@ -452,6 +436,31 @@ class GoogleAccount
         nil
       end
     )
+  end
+
+  def self.to_google_params(params)
+    def self.map_it(hash, mappings)
+      sliced_hash = hash.slice(*mappings.keys)
+      Hash[sliced_hash.map {|k, v| [mappings[k], v] }]
+    end
+
+    # Our style is exclude = true. Google's is include = true. So we need to invert the value.
+    params[:privacy] = !params[:privacy] if params.has_key? :privacy
+
+    google_params = map_it(params,
+      address: :primaryEmail,
+      password: :password,
+      privacy: :includeInGlobalAddressList,
+      org_unit_path: :orgUnitPath
+    )
+
+    name_params = map_it(params, first_name: :givenName, last_name: :familyName)
+    google_params[:name] = name_params if name_params.any?
+
+    org_params = map_it(params, department: :department, title: :title)
+    google_params[:organizations] = [org_params] if org_params.any?
+
+    google_params
   end
 
   # Generates a random password for use as a temporary account password

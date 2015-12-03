@@ -35,7 +35,7 @@ describe 'employee leaves then returns', type: :feature  do
         expect_any_instance_of(GoogleAccount).to_not receive(:join!)
         expect_any_instance_of(GoogleAccount).to_not receive(:leave!)
 
-        expect_any_instance_of(GoogleAccount).to receive(:update!).with 'Bob', 'Dole', nil, nil, false, '/Employees'
+        expect_any_instance_of(GoogleAccount).to receive(:update!).with first_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, org_unit_path: '/Employees'
         expect_any_instance_of(GoogleAccount).to receive(:suspend!)
         expect_any_instance_of(Trogdir::APIClient::Emails).to receive(:destroy).and_return double(perform: double(success?: true))
         expect(Sidekiq::Status).to receive(:cancel).twice
