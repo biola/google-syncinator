@@ -17,6 +17,56 @@ class GoogleAccount
     @email = email
   end
 
+  # The account's givenName in Google
+  # @return [String]
+  def first_name
+    data['name']['givenName']
+  end
+
+  # The account's familyName in Google
+  # @return [String]
+  def last_name
+    data['name']['familyName']
+  end
+
+  # The account's organization department in Google
+  # @return [String]
+  def department
+    data['organizations'].first['department']
+  end
+
+  # The account's organization title in Google
+  # @return [String]
+  def title
+    data['organizations'].first['title']
+  end
+
+  # The account's includeInGlobalAddressList value in Google
+  # @return [Boolean]
+  def privacy
+    !data['includeInGlobalAddressList']
+  end
+
+  # The account's orgUnitPath in Google
+  # @return [String]
+  def org_unit_path
+    data['orgUnitPath']
+  end
+
+  # The object's properties as a hash
+  # @return [Hash<Symbol, Object>]
+  def to_hash
+    {
+      address: full_email,
+      first_name: first_name,
+      last_name: last_name,
+      department: department,
+      title: title,
+      privacy: privacy,
+      org_unit_path: org_unit_path
+    }
+  end
+
   # Is the email account available?
   # @note opposite of exists?
   # @see #exists?
@@ -80,7 +130,7 @@ class GoogleAccount
     params[:org_unit_path] = '/' unless params.has_key? :org_unit_path
     params[:password] = GoogleAccount.random_password unless params.has_key? :password
 
-    google_params = to_google_params(params)
+    google_params = self.class.to_google_params(params)
 
     new_user = directory.users.insert.request_schema.new(google_params)
 
@@ -98,7 +148,7 @@ class GoogleAccount
   # @option params [String] :org_unit_path The users organization unit path
   # @return [true]
   def update!(params)
-    google_params = to_google_params(params)
+    google_params = self.class.to_google_params(params)
 
     user_updates = directory.users.update.request_schema.new(google_params)
 
@@ -448,16 +498,16 @@ class GoogleAccount
     params[:privacy] = !params[:privacy] if params.has_key? :privacy
 
     google_params = map_it(params,
-      address: :primaryEmail,
-      password: :password,
-      privacy: :includeInGlobalAddressList,
-      org_unit_path: :orgUnitPath
+      'address' => :primaryEmail,
+      'password' => :password,
+      'privacy' => :includeInGlobalAddressList,
+      'org_unit_path' => :orgUnitPath
     )
 
-    name_params = map_it(params, first_name: :givenName, last_name: :familyName)
+    name_params = map_it(params, 'first_name' => :givenName, 'last_name' => :familyName)
     google_params[:name] = name_params if name_params.any?
 
-    org_params = map_it(params, department: :department, title: :title)
+    org_params = map_it(params, 'department' => :department, 'title' => :title)
     google_params[:organizations] = [org_params] if org_params.any?
 
     google_params

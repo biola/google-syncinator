@@ -19,6 +19,15 @@ describe API::V1::EmailsAPI, type: :unit do
 
   subject { response }
 
+  before do
+    allow_any_instance_of(GoogleAccount).to receive(:data).and_return(
+      'name' => {'givenName' => 'Bob', 'familyName' => 'Dole'},
+      'organizations' => ['department' => 'Office of the Pres', 'title' => 'Pres'],
+      'includeInGlobalAddressList' => true,
+      'orgUnitPath' => '/BabyKissers'
+    )
+  end
+
   describe 'GET /v1/department_emails/:id' do
     let(:url) { "/v1/department_emails/#{email.id}" }
 
@@ -31,7 +40,20 @@ describe API::V1::EmailsAPI, type: :unit do
     it { expect(subject.status).to eql 200 }
 
     it 'returns an email objects' do
-      expect(json).to eql id: email.id.to_s, address: email.address, uuids: email.uuids, state: email.state.to_s, deprovision_schedules: [], exclusions: []
+      expect(json).to eql(
+        id: email.id.to_s,
+        address: email.address,
+        uuids: email.uuids,
+        first_name: 'Bob',
+        last_name: 'Dole',
+        department: 'Office of the Pres',
+        title: 'Pres',
+        privacy: false,
+        org_unit_path: '/BabyKissers',
+        state: email.state.to_s,
+        deprovision_schedules: [],
+        exclusions: []
+      )
     end
   end
 
@@ -75,7 +97,7 @@ describe API::V1::EmailsAPI, type: :unit do
       end
 
       it 'does not update the Google API' do
-        expect_any_instance_of(GoogleAccount).to_not receive(:update!)
+        expect_any_instance_of(GoogleAccount).to_not receive :update!
         subject
       end
     end
@@ -84,6 +106,7 @@ describe API::V1::EmailsAPI, type: :unit do
       let(:params) { {first_name: 'Bobby'} }
 
       it 'does not update the email object' do
+        expect_any_instance_of(GoogleAccount).to receive :update!
         expect { subject }.to_not change { email.reload.uuids }
       end
 
@@ -96,13 +119,14 @@ describe API::V1::EmailsAPI, type: :unit do
     context 'with DepartmentEmail model and Google API attributes set' do
       let(:params) { {uuids: alt_uuids, first_name: 'Bobby'} }
 
-      it 'updates the email object' do
+      it 'updates the email object and Google API' do
+        expect_any_instance_of(GoogleAccount).to receive(:update!).with first_name: 'Bobby'
         expect { subject }.to change { email.reload.uuids }.from(uuids).to alt_uuids
       end
 
-      it 'updates the Google API' do
-        expect_any_instance_of(GoogleAccount).to receive(:update!).with first_name: 'Bobby'
-        subject
+      it 'returns an email object' do
+        expect_any_instance_of(GoogleAccount).to receive :update!
+        expect(json).to include id: an_instance_of(String), address: 'dole.for.pres@biola.edu', uuids: ['00000000-0000-0000-0000-000000000001'], state: 'active', deprovision_schedules: [], exclusions: []
       end
     end
   end
