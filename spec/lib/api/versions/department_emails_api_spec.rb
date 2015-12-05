@@ -128,6 +128,15 @@ describe API::V1::EmailsAPI, type: :unit do
         expect_any_instance_of(GoogleAccount).to receive :update!
         expect(json).to include id: an_instance_of(String), address: 'dole.for.pres@biola.edu', uuids: ['00000000-0000-0000-0000-000000000001'], state: 'active', deprovision_schedules: [], exclusions: []
       end
+
+      context 'when changing the address' do
+        let(:params) { {address: 'vote.for.dole@biola.edu'} }
+
+        it 'creates an Alias' do
+          expect_any_instance_of(GoogleAccount).to receive(:update!).with address: 'vote.for.dole@biola.edu'
+          expect { subject }.to change { AliasEmail.where(address: 'dole.for.pres@biola.edu').length }.from(0).to 1
+        end
+      end
     end
   end
 end

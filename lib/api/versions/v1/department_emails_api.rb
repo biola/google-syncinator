@@ -50,7 +50,7 @@ class API::V1::DepartmentEmailsAPI < Grape::API
 
       # Google will automatically create an alias of the old email when renaming the email address
       # so we need to reflect that locally
-      if old_address != params[:address]
+      if params.has_key?(:address) && params[:address] != old_address
         AliasEmail.create! address: old_address, account_email: email
       end
 
