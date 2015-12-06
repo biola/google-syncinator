@@ -7,6 +7,7 @@ class API::V1 < Grape::API
   require './lib/api/versions/v1/entities/person_email_entity'
   require './lib/api/versions/v1/entities/department_email_entity'
   require './lib/api/versions/v1/entities/university_email_entity'
+  require './lib/api/versions/v1/account_emails_api'
   require './lib/api/versions/v1/person_emails_api'
   require './lib/api/versions/v1/department_emails_api'
   require './lib/api/versions/v1/alias_emails_api'
@@ -17,6 +18,7 @@ class API::V1 < Grape::API
   version 'v1', using: :path, vendor: :google_syncinator
 
   mount EmailsAPI
+  mount AccountEmailsAPI
   mount PersonEmailsAPI
   mount DepartmentEmailsAPI
   mount AliasEmailsAPI
