@@ -17,12 +17,13 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       requires :uuids, type: Array
       requires :first_name, type: String
       requires :last_name, type: String
+      optional :password, type: String
       optional :department, type: String
       optional :title, type: String
       optional :privacy, type: Boolean
     end
     post do
-      GoogleAccount.new(params[:address]).create! params.slice(:first_name, :last_name, :department, :title, :privacy)
+      GoogleAccount.new(params[:address]).create! params.slice(:first_name, :last_name, :password, :department, :title, :privacy)
       email = DepartmentEmail.create! address: params[:address], uuids: params[:uuids]
 
       present_email email
@@ -32,6 +33,7 @@ class API::V1::DepartmentEmailsAPI < Grape::API
     params do
       optional :address, type: String
       optional :uuids, type: Array
+      optional :password, type: String
       optional :first_name, type: String
       optional :last_name, type: String
       optional :department, type: String
@@ -42,7 +44,7 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       email = DepartmentEmail.find(params[:department_email_id])
       old_address = email.address.dup
 
-      api_args = params.slice(:address, :first_name, :last_name, :department, :title, :privacy)
+      api_args = params.slice(:address, :password, :first_name, :last_name, :department, :title, :privacy)
       GoogleAccount.new(email.address).update! api_args if api_args.any?
 
       model_args = params.slice(:address, :uuids).to_hash

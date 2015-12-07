@@ -142,6 +142,7 @@ class GoogleAccount
   # Updates a Google Apps account's details
   # @option params [String] :first_name The users first name
   # @option params [String] :last_name The users last name
+  # @option params [String] :password The users password
   # @option params [String, nil] :department The users department
   # @option params [String, nil] :title The users title
   # @option params [Boolean] :privacy The users privacy setting
