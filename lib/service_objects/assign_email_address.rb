@@ -24,6 +24,7 @@ module ServiceObjects
     #   ReprovisionGoogleAccount will handle it instead
     # @return [Boolean]
     def ignore?
+      return true if Settings.prevent_creation.include? change.person_uuid
       return true unless change.affiliation_added?
       return true if PersonEmail.active? change.person_uuid
       !(EmailAddressOptions.required?(change.affiliations) && PersonEmail.find_reprovisionable(change.person_uuid).blank?)

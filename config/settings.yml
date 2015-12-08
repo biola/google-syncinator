@@ -54,6 +54,9 @@ email:
   delivery_method: test
   options: {}
 
+# UUIDs of people who should not have accounts created
+prevent_creation: []
+
 # all times should be in seconds
 deprovisioning:
   # period to protect new accounts from being deprovisioned

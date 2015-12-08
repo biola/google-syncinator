@@ -27,6 +27,15 @@ describe ServiceObjects::AssignEmailAddress, type: :unit do
   end
 
   describe '#ignore?' do
+    context "when the user's UUID is in Settings.prevent_creation" do
+      let(:fixture) { 'create_employee_without_university_email'}
+
+      it 'is true' do
+        expect(Settings).to receive(:prevent_creation).and_return [change_hash['person_id']]
+        expect(subject.ignore?).to be true
+      end
+    end
+
     context 'when creating a user with a university email' do
       let(:fixture) { 'create_employee' }
       before { PersonEmail.create uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
