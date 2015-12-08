@@ -9,7 +9,7 @@ module OrganizationalUnit
   def self.path_for(affiliations)
     affiliations = affiliations.affiliations if affiliations.respond_to? :affiliations
 
-    Settings.organizational_units.each do |org_unit, affils|
+    Settings.organizational_units.person_emails.each do |org_unit, affils|
       return org_unit.to_s if (affiliations.to_a & affils).any?
     end
 

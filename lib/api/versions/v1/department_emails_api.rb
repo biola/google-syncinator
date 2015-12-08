@@ -23,7 +23,10 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       optional :privacy, type: Boolean
     end
     post do
-      GoogleAccount.new(params[:address]).create! params.slice(:first_name, :last_name, :password, :department, :title, :privacy)
+      args = params.slice(:first_name, :last_name, :password, :department, :title, :privacy)
+      params[:org_unit_path] = Settings.organizational_units.department_emails
+
+      GoogleAccount.new(params[:address]).create! args
       email = DepartmentEmail.create! address: params[:address], uuids: params[:uuids]
 
       present_email email
