@@ -22,11 +22,18 @@ module ActivityCheck
         elsif email.excluded?
           Log.info "#{email_address} is excluded. Skipping."
         else
-          person = TrogdirPerson.new(email.uuid)
+          can_deprovision = if email.is_a? DepartmentEmail
+            true
+          elsif email.is_a? PersonEmail
+            person = TrogdirPerson.new(email.uuid)
+            EmailAddressOptions.not_required?(person.affiliations)
+          end
 
-          if EmailAddressOptions.not_required?(person.affiliations)
+          if can_deprovision
             Log.info "Scheduling deprovision of #{email_address}"
-            Workers::ScheduleActions.perform_async email.id.to_s, Settings.deprovisioning.schedules.allowed.send(type), reason
+            schedule = Workers::Deprovisioning.schedule_for(email, type, true)
+
+            Workers::ScheduleActions.perform_async email.id.to_s, schedule, reason
           else
             Log.info "#{email_address} is a required email. Skipping."
           end

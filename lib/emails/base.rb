@@ -33,7 +33,7 @@ module Emails
       mail_obj = false
 
       if Enabled.email?
-        send_to = account_email.address
+        send_to = [account_email.address] + person_emails.map(&:address)
         email_body = body
 
         mail_obj = Mail.deliver do

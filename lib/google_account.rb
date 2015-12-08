@@ -32,13 +32,13 @@ class GoogleAccount
   # The account's organization department in Google
   # @return [String]
   def department
-    data['organizations'].first['department']
+    data['organizations'].try(:first).try :[], 'department'
   end
 
   # The account's organization title in Google
   # @return [String]
   def title
-    data['organizations'].first['title']
+    data['organizations'].try(:first).try :[], 'title'
   end
 
   # The account's includeInGlobalAddressList value in Google

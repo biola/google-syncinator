@@ -16,31 +16,31 @@ module ServiceObjects
         return :nothing
       end
 
+
       # Not allowed to have an email?
       if !EmailAddressOptions.allowed?(change.affiliations)
+        activity = google_account.never_logged_in? ? :never_active : :active
 
-        # Never logged in
-        if google_account.never_logged_in?
-          schedule_actions!(settings.unallowed.never_active, DeprovisionSchedule::LOST_AFFILIATION_REASON)
-          :update
-
-        # Has logged in
-        else
-          schedule_actions!(settings.unallowed.active, DeprovisionSchedule::LOST_AFFILIATION_REASON)
-          :update
-        end
-
+        schedule_actions!(
+          Workers::Deprovisioning.schedule_for(account_email, activity, false),
+          DeprovisionSchedule::LOST_AFFILIATION_REASON
+        )
       # Email address allowed but not required such as an alumnus
       elsif EmailAddressOptions.not_required?(change.affiliations)
-
         # Never logged in
         if google_account.never_logged_in?
-          schedule_actions!(settings.allowed.never_active, DeprovisionSchedule::NEVER_ACTIVE_REASON)
+          schedule_actions!(
+            Workers::Deprovisioning.schedule_for(account_email, :never_active, true),
+            DeprovisionSchedule::NEVER_ACTIVE_REASON
+          )
           :update
 
         # Logged in over a year ago
         elsif google_account.inactive?
-          schedule_actions!(settings.allowed.inactive, DeprovisionSchedule::INACTIVE_REASON)
+          schedule_actions!(
+            Workers::Deprovisioning.schedule_for(account_email, :inactive, true),
+            DeprovisionSchedule::INACTIVE_REASON
+          )
           :update
 
         # Logged in within the last year
@@ -78,12 +78,6 @@ module ServiceObjects
     # @return [String] Sidekiq worked job ID
     def schedule_actions!(actions_and_durations, reason)
       Workers::ScheduleActions.perform_async(account_email.id.to_s, actions_and_durations, reason)
-    end
-
-    # Simple wrapper for deprovision schedlue settings
-    # @return [RailsConfig::Options]
-    def settings
-      Settings.deprovisioning.schedules
     end
   end
 end

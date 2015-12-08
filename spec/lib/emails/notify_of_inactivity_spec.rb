@@ -15,6 +15,6 @@ describe Emails::NotifyOfInactivity, type: :unit do
   it 'sends to the right recipient' do
     expect(TrogdirPerson).to receive(:new).and_return(double(first_or_preferred_name: 'Bob'))
     Emails::NotifyOfInactivity.new(deprovision_schedule, account_email).send!
-    expect(Mail::TestMailer.deliveries.first.to).to eql ['bob.dole@biola.edu']
+    expect(Mail::TestMailer.deliveries.first.to).to eql ['bob.dole@biola.edu', account_email.address]
   end
 end
