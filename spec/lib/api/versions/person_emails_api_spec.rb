@@ -31,7 +31,7 @@ describe API::V1::EmailsAPI, type: :unit do
     it { expect(subject.status).to eql 200 }
 
     it 'returns an email objects' do
-      expect(json).to eql id: email.id.to_s, uuid: email.uuid, address: email.address, state: email.state.to_s, deprovision_schedules: [], exclusions: []
+      expect(json).to eql id: email.id.to_s, uuid: email.uuid, address: email.address, state: email.state.to_s, deprovision_schedules: [], exclusions: [], alias_emails: []
     end
   end
 

@@ -12,4 +12,5 @@ class API::V1::DepartmentEmailEntity < Grape::Entity
   expose :state
   expose :deprovision_schedules, using: API::V1::DeprovisionScheduleEntity
   expose :exclusions, using: API::V1::ExclusionEntity
+  expose :alias_emails, using: API::V1::AliasEmailEntity
 end

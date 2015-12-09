@@ -72,6 +72,7 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       attribs.merge! id: department_email.id # attributes uses _id
       attribs.merge! deprovision_schedules: department_email.deprovision_schedules
       attribs.merge! exclusions: department_email.exclusions
+      attribs.merge! alias_emails: department_email.alias_emails
       email = OpenStruct.new(attribs)
 
       present email, with: API::V1::DepartmentEmailEntity
