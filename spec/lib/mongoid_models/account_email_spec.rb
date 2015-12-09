@@ -19,72 +19,6 @@ describe AccountEmail, type: :unit do
     end
   end
 
-  describe '.sync_to_trogdir?' do
-    it 'is not implemented' do
-      expect { subject.class.sync_to_trogdir? }.to raise_error(NotImplementedError)
-    end
-  end
-
-  describe '.sync_to_legacy_email_table?' do
-    it 'is not implemented' do
-      expect { subject.class.sync_to_legacy_email_table? }.to raise_error(NotImplementedError)
-    end
-  end
-
-  describe '#disable_date' do
-    subject { AccountEmail.new(address: address) }
-
-    context 'when no deprovision_schedules' do
-      it { expect(subject.disable_date).to be nil }
-    end
-
-    context 'when only delete is scheduled' do
-      before { subject.deprovision_schedules.build action: :delete, scheduled_for: 1.day.from_now.end_of_day }
-
-      it 'uses the delete time' do
-        expect(subject.disable_date.to_time).to eql 1.day.from_now.end_of_day
-      end
-    end
-
-    context 'when suspend and delete is scheduled' do
-      before do
-        subject.deprovision_schedules.build action: :suspend, scheduled_for: 1.day.from_now.end_of_day
-        subject.deprovision_schedules.build action: :delete, scheduled_for: 2.days.from_now.end_of_day
-      end
-
-      it "it uses the suspend time because it's scheduled first" do
-        expect(subject.disable_date.to_time).to eql 1.day.from_now.end_of_day
-      end
-    end
-  end
-
-  describe '#protected?' do
-    context 'when created_at is recent' do
-      subject { AccountEmail.new(address: address, created_at: 29.days.ago) }
-      it { expect(subject.protected?).to be true }
-    end
-
-    context 'when created at is a long time ago' do
-      subject { AccountEmail.new(address: address, created_at: 31.days.ago) }
-      it { expect(subject.protected?).to be false }
-    end
-  end
-
-  describe '#protected_until' do
-    let(:now) { Time.now }
-    subject { AccountEmail.new(address: address, created_at: created_at) }
-
-    context 'when created before the protection period' do
-      let(:created_at) { now - Settings.deprovisioning.protect_for - 86400 }
-      it { expect(subject.protected_until).to eql now - 86400 }
-    end
-
-    context 'when created within the protection peroid' do
-      let(:created_at) { now - Settings.deprovisioning.protect_for + 86400 }
-      it { expect(subject.protected_until).to eql now + 86400 }
-    end
-  end
-
   describe '#excluded?' do
     let(:creator_uuid) { '00000000-0000-0000-0000-000000000000' }
     let(:now) { Time.now }
@@ -114,46 +48,20 @@ describe AccountEmail, type: :unit do
     end
   end
 
-  describe '#being_deprovisioned?' do
-    subject { AccountEmail.create(address: address) }
-
-    context 'when no deprovision schedules' do
-      it { expect(subject.being_deprovisioned?).to be false }
-    end
-
-    context 'when completed deprovision schedules' do
-      before { subject.deprovision_schedules.create action: :delete, scheduled_for: 1.day.ago, completed_at: 1.day.ago }
-      it { expect(subject.being_deprovisioned?).to be false }
-    end
-
-    context 'when canceled deprovision schedules' do
-      before { subject.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now, canceled: true }
-      it { expect(subject.being_deprovisioned?).to be false }
-    end
-
-    context 'when incomplete deprovision schedules' do
-      before { subject.deprovision_schedules.create action: :delete, scheduled_for: 1.day.from_now }
-      it { expect(subject.being_deprovisioned?).to be true }
-    end
-  end
-
-  describe '#cancel_deprovisioning!' do
-    let!(:email) { AccountEmail.create! address: address }
-    let!(:completed) { email.deprovision_schedules.create(action: :notify_of_inactivity, scheduled_for: 1.day.ago, completed_at: 1.day.ago) }
-    let!(:incomplete) { email.deprovision_schedules.create(action: :notify_of_inactivity, scheduled_for: 1.day.ago, job_id: '123') }
-
-    before { expect(Sidekiq::Status).to receive(:cancel).once.with('123') }
-
-    it { expect { email.cancel_deprovisioning! }.to_not change { completed } }
-    it { expect { email.cancel_deprovisioning! }.to change { incomplete.canceled? }.from(false).to true }
-  end
-
   describe 'after_save' do
     let(:account_email) { AccountEmail.create! address: address }
     let!(:alias_email) { AliasEmail.create! account_email: account_email, address: 'test@example.com' }
 
     it 'updates the state of associated alias emails' do
       expect { account_email.update state: 'deleted' }.to change { alias_email.reload.state }.from(:active).to :deleted
+    end
+
+    context 'when AliasEmail is deleted' do
+      before { alias_email.update! state: :deleted }
+
+      it 'does not update the state of associated alias emails' do
+        expect { account_email.update state: :suspended }.to_not change { alias_email.reload.state }
+      end
     end
   end
 end

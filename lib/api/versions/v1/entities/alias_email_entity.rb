@@ -4,4 +4,5 @@ class API::V1::AliasEmailEntity < Grape::Entity
   expose(:account_email_id) { |email| email.account_email.id.to_s }
   expose :address
   expose :state
+  expose :deprovision_schedules, using: API::V1::DeprovisionScheduleEntity
 end

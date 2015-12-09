@@ -23,15 +23,15 @@ describe PersonEmail, type: :unit do
     end
   end
 
-  describe '.sync_to_trogdir?' do
+  describe '#sync_to_trogdir?' do
     it 'is true' do
-      expect(subject.class.sync_to_trogdir?).to be true
+      expect(subject.sync_to_trogdir?).to be true
     end
   end
 
-  describe '.sync_to_legacy_email_table?' do
+  describe '#sync_to_legacy_email_table?' do
     it 'is true' do
-      expect(subject.class.sync_to_legacy_email_table?).to be true
+      expect(subject.sync_to_legacy_email_table?).to be true
     end
   end
 

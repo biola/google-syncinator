@@ -17,19 +17,19 @@ class DepartmentEmail < AccountEmail
 
   # Whether or not this record should be synced to Trogdir
   # @return [Boolean]
-  def self.sync_to_trogdir?
+  def sync_to_trogdir?
     false
   end
 
   # Whether or not this record should be synced to the legacy email table
   # @return [Boolean]
-  def self.sync_to_legacy_email_table?
+  def sync_to_legacy_email_table?
     false
   end
 
   # The address as a string
   # @return [String]
-  # @example account_email.to_s #=> "bob.dole@biola.edu"
+  # @example department_email.to_s #=> "bob.dole@biola.edu"
   def to_s
     address
   end

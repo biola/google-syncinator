@@ -14,20 +14,20 @@ module Workers
       # @return [nil]
       def perform(deprovision_schedule_id)
         schedule = find_schedule(deprovision_schedule_id)
-        email = schedule.account_email
+        email = schedule.university_email
 
         unless email.active?
           GoogleAccount.new(email.address).unsuspend!
 
-          if email.class.sync_to_trogdir?
+          if email.sync_to_trogdir?
             Workers::Trogdir::CreateEmail.perform_async email.uuid, email.address
           end
 
-          if email.class.sync_to_legacy_email_table?
+          if email.sync_to_legacy_email_table?
             biola_id = TrogdirPerson.new(email.uuid).biola_id
             Workers::LegacyEmailTable::Unexpire.perform_async(biola_id, email.address)
           end
-          
+
           schedule.update completed_at: Time.now if Enabled.write?
           Log.info "Create activation schedule for #{email}"
         end

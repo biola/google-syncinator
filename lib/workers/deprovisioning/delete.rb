@@ -12,7 +12,7 @@ module Workers
       # @return [nil]
       def perform(deprovision_schedule_id)
         schedule = find_schedule(deprovision_schedule_id)
-        email = schedule.account_email
+        email = schedule.university_email
 
         if deprovisioning_no_longer_warranted?(schedule)
           email.cancel_deprovisioning!
@@ -20,13 +20,17 @@ module Workers
         end
 
         unless schedule.canceled?
-          GoogleAccount.new(email.address).delete!
+          if email.is_a? AliasEmail
+            GoogleAccount.new(email.account_email.address).delete_alias! email.address
+          else
+            GoogleAccount.new(email.address).delete!
+          end
 
-          if email.class.sync_to_trogdir?
+          if email.sync_to_trogdir?
             Trogdir::DeleteEmail.perform_async(email.uuid, email.address)
           end
 
-          if email.class.sync_to_legacy_email_table?
+          if email.sync_to_legacy_email_table?
             biola_id = TrogdirPerson.new(email.uuid).biola_id
             LegacyEmailTable::Expire.perform_async(biola_id, email.address)
           end

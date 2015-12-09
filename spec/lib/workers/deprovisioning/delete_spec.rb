@@ -105,6 +105,37 @@ describe Workers::Deprovisioning::Delete, type: :unit do
           end
         end
       end
+
+      context 'when an AliasEmail' do
+        let(:person_email) { PersonEmail.create address: 'bobby.dole@biola.edu', uuid: uuid }
+        let!(:email) { AliasEmail.create account_email: person_email, address: address }
+
+        before do
+          allow_any_instance_of(GoogleAccount).to receive(:delete_alias!)
+          allow_any_instance_of(TrogdirPerson).to receive(:biola_id).and_return(1234567)
+        end
+
+        it 'deletes Google alias account' do
+          account = instance_double(GoogleAccount)
+          expect(GoogleAccount).to receive(:new).with('bobby.dole@biola.edu').and_return(account)
+          expect(account).to receive(:delete_alias!).with(address)
+          subject.perform(schedule.id)
+        end
+
+        it 'does not delete the trogdir email' do
+          expect(Workers::Trogdir::DeleteEmail).to_not receive(:perform_async)
+          subject.perform(schedule.id)
+        end
+
+        it 'expires the legacy email' do
+          expect(Workers::LegacyEmailTable::Expire).to receive(:perform_async)
+          subject.perform(schedule.id)
+        end
+
+        it 'marks the schedule complete' do
+          expect{ subject.perform(schedule.id) }.to change { schedule.reload.completed_at }.from(nil)
+        end
+      end
     end
   end
 end

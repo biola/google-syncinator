@@ -24,15 +24,15 @@ describe DepartmentEmail do
     end
   end
 
-  describe '.sync_to_trogdir?' do
+  describe '#sync_to_trogdir?' do
     it 'is false' do
-      expect(subject.class.sync_to_trogdir?).to be false
+      expect(subject.sync_to_trogdir?).to be false
     end
   end
 
-  describe '.sync_to_legacy_email_table?' do
+  describe '#sync_to_legacy_email_table?' do
     it 'is false' do
-      expect(subject.class.sync_to_legacy_email_table?).to be false
+      expect(subject.sync_to_legacy_email_table?).to be false
     end
   end
 

@@ -19,4 +19,31 @@ describe AliasEmail, type: :unit do
       expect { alias_email.save! }.to change { alias_email.state }.from(:active).to :suspended
     end
   end
+
+  describe '#sync_to_trogdir?' do
+    it 'is false' do
+      expect(subject.sync_to_trogdir?).to be false
+    end
+  end
+
+  describe '#sync_to_legacy_email_table?' do
+    subject { AliasEmail.new account_email: account_email }
+
+    context 'when account_email is a PersonEmail' do
+      let(:account_email) { PersonEmail.new }
+
+      it 'is true' do
+        expect(subject.sync_to_legacy_email_table?).to be true
+      end
+    end
+
+    context 'when account_email is a DepartmentEmail' do
+      let(:account_email) { DepartmentEmail.new }
+
+      it 'is false' do
+        expect(subject.sync_to_legacy_email_table?).to be false
+      end
+    end
+  end
+
 end

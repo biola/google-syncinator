@@ -6,7 +6,7 @@ describe DeprovisionSchedule, type: :unit do
   let(:job_id) { '1234567890' }
   let(:person_email) { PersonEmail.create uuid: uuid, address: address }
 
-  it { is_expected.to be_embedded_in(:account_email) }
+  it { is_expected.to be_embedded_in(:university_email) }
   it { is_expected.to have_fields(:action, :reason, :scheduled_for, :completed_at, :canceled, :job_id) }
   it { is_expected.to be_timestamped_document }
 
@@ -14,6 +14,21 @@ describe DeprovisionSchedule, type: :unit do
   it { is_expected.to validate_presence_of(:scheduled_for) }
   it { is_expected.to validate_presence_of(:completed_at) }
   it { is_expected.to validate_inclusion_of(:action).to_allow(:notify_of_inactivity, :notify_of_closure, :suspend, :delete, :activate) }
+
+  describe 'validate' do
+    let(:alias_email) { AliasEmail.create! address: 'bobby.dole@biola.edu', account_email: person_email }
+    subject { DeprovisionSchedule.new university_email: alias_email, action: action, scheduled_for: 1.day.from_now }
+
+    context 'when action is delete' do
+      let(:action) { :delete }
+      it { expect(subject).to be_valid }
+    end
+
+    context 'when action is not delete' do
+      let(:action) { :suspend }
+      it { expect(subject).to be_invalid }
+    end
+  end
 
   describe '#pending?' do
     context 'when completed_at and canceled blank' do
@@ -101,7 +116,7 @@ describe DeprovisionSchedule, type: :unit do
   context 'when setting completed_at' do
     subject { person_email.deprovision_schedules.create action: :delete, scheduled_for: Time.now }
 
-    it 'updates the state of account_email' do
+    it 'updates the state of university_email' do
       expect { subject.update(completed_at: DateTime.now) }.to change(person_email, :state).from(:active).to :deleted
       expect(person_email.changed?).to be false
     end

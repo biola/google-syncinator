@@ -33,7 +33,7 @@ describe API::V1::AliasEmailsAPI, type: :unit do
     it { expect(subject.status).to eql 200 }
 
     it 'returns an alias email object' do
-      expect(json).to eql id: alias_email.id.to_s, account_email_id: account_email.id.to_s, address: alias_email.address, state: alias_email.state.to_s
+      expect(json).to eql id: alias_email.id.to_s, account_email_id: account_email.id.to_s, address: alias_email.address, state: alias_email.state.to_s, deprovision_schedules: []
     end
   end
 

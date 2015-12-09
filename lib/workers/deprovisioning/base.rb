@@ -9,7 +9,7 @@ module Workers
         object_id = BSON::ObjectId.from_string id.to_s
         class_action = self.class.to_s.demodulize.underscore.to_sym # law suit?
 
-        email = AccountEmail.find_by('deprovision_schedules._id' => object_id)
+        email = UniversityEmail.find_by('deprovision_schedules._id' => object_id)
         email.deprovision_schedules.find_by(action: class_action, _id: object_id)
       end
 
@@ -17,7 +17,7 @@ module Workers
       # @param schedule [DeprovisionSchedule]
       # @return [Boolean]
       def deprovisioning_no_longer_warranted?(schedule)
-        address = schedule.account_email.address
+        address = schedule.university_email.address
 
         case schedule.reason
         when DeprovisionSchedule::NEVER_ACTIVE_REASON

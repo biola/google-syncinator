@@ -18,13 +18,13 @@ class PersonEmail < AccountEmail
 
   # Whether or not this record should be synced to Trogdir
   # @return [Boolean]
-  def self.sync_to_trogdir?
+  def sync_to_trogdir?
     true
   end
 
   # Whether or not this record should be synced to the legacy email table
   # @return [Boolean]
-  def self.sync_to_legacy_email_table?
+  def sync_to_legacy_email_table?
     true
   end
 
@@ -46,7 +46,7 @@ class PersonEmail < AccountEmail
 
   # The UUID and address as a string
   # @return [String]
-  # @example account_email.to_s #=> "00000000-0000-0000-0000-000000000000/bob.dole@biola.edu"
+  # @example person_email.to_s #=> "00000000-0000-0000-0000-000000000000/bob.dole@biola.edu"
   def to_s
     "#{uuid}/#{address}"
   end

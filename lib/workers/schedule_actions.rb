@@ -1,24 +1,24 @@
 module Workers
-  # Schedules actions by creating deprovision schedules on account emails
+  # Schedules actions by creating deprovision schedules on university emails
   #   and scheduling sidekiq workers to be run in the future
   class ScheduleActions
     include Sidekiq::Worker
 
-    # Schedules actions by creating deprovision schedules on account emails
+    # Schedules actions by creating deprovision schedules on university emails
     #   and scheduling sidekiq workers to be run in the future
     # @note This keeps track of the duration between each step so you can just pass in the time from the last step
     #   instead of always having to figure out the time from now
     # @example
     #   schedule_actions! 5.days.to_i, :notify_of_closure, 1.week.to_i, :suspend, 6.months.to_i, :delete
-    # @param account_email_id [String] ID of the AccountEmail that should be acted upon
+    # @param university_email_id [String] ID of the UniversityEmail that should be acted upon
     # @param actions_and_durations [Array<Integer, String>] the actions that
     #   should be taken and the amount of time in seconds between each action
     # @return [nil]
-    def perform(account_email_id, actions_and_durations, reason = nil)
+    def perform(university_email_id, actions_and_durations, reason = nil)
       # Because of Sidekiq's JSON serialization actions come across as strings
       # so convert them to symbols to match how they are in the rest of the code
       actions_and_durations.map! { |ad| ad.is_a?(String) ? ad.to_sym : ad }
-      email = AccountEmail.find(account_email_id)
+      email = UniversityEmail.find(university_email_id)
       seconds = 0
 
       unless actions_and_durations.all? { |ad| ad.is_a?(Integer) || ad.is_a?(Symbol) }

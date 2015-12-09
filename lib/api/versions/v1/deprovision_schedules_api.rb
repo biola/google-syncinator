@@ -2,7 +2,7 @@
 class API::V1::DeprovisionSchedulesAPI < Grape::API
   resource :deprovision_schedules do
     before do
-      @email = AccountEmail.find_by(id: params[:email_id])
+      @email = UniversityEmail.find_by(id: params[:email_id])
     end
 
     desc 'Create a deprovision schedule'

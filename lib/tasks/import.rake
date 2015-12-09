@@ -112,7 +112,7 @@ namespace :import do
 
       if account.suspended
         sched = email.deprovision_schedules.build action: :suspend, reason: REASON, scheduled_for: Time.now, completed_at: Time.now
-        sched.account_email.save! validate: false
+        sched.university_email.save! validate: false
         log.info "Created suspension record for #{email.address} id=#{email.id}"
       end
 

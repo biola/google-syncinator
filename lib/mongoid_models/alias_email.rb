@@ -9,6 +9,20 @@ class AliasEmail < UniversityEmail
 
   before_create :set_state
 
+  delegate :uuid, to: :account_email
+
+  # Whether or not this record should be synced to Trogdir
+  # @return [Boolean]
+  def sync_to_trogdir?
+    false
+  end
+
+  # Whether or not this record should be synced to the legacy email table
+  # @return [Boolean]
+  def sync_to_legacy_email_table?
+    account_email.is_a?(PersonEmail)
+  end
+
   protected
 
   # Default the state to the state of the associated account_email

@@ -184,6 +184,14 @@ class GoogleAccount
     update_suspension! false
   end
 
+  # Delete an alias of this Google Apps account
+  # @return [true]
+  def delete_alias!(alias_address)
+    safe_execute api_method: directory.users.aliases.delete, parameters: {userKey: email, alias: alias_address}
+
+    true
+  end
+
   # Delete the Google Apps account
   # @return [true]
   def delete!
