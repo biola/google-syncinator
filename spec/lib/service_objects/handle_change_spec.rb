@@ -27,7 +27,7 @@ describe ServiceObjects::HandleChange, type: :unit do
   context 'when affiliation added' do
     context 'when a reprovisionable email exists' do
       let(:fixture) { 'update_person_add_affiliation' }
-      before { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', state: :suspended }
+      before { create :person_email, uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu', state: :suspended }
 
       it 'calls ReprovisionGoogleAccount' do
         expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
@@ -153,7 +153,7 @@ describe ServiceObjects::HandleChange, type: :unit do
     let(:fixture) { 'update_person_add_affiliation' }
 
     before do
-      email = PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu'
+      email = create :person_email, uuid: '00000000-0000-0000-0000-000000000000'
       email.deprovision_schedules.create action: :delete, scheduled_for: 1.minute.from_now
     end
 

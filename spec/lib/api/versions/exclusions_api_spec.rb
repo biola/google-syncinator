@@ -6,7 +6,7 @@ describe API::V1::ExclusionsAPI, type: :unit do
 
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let!(:email) { PersonEmail.create uuid: uuid, address: address }
+  let!(:email) { create :person_email, uuid: uuid, address: address }
   let(:creator_uuid) { '11111111-1111-1111-1111-111111111111' }
   let(:starts_at) { Time.now.iso8601(3) }
   let(:ends_at) { 1.month.from_now.iso8601(3) }

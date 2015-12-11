@@ -5,7 +5,7 @@ describe Workers::RenamePersonEmail do
   let(:old_address) { 'bob.dole@biola.edu' }
   let(:new_address) { 'bobby.dole@biola.edu' }
   let(:biola_id) { 1234567 }
-  let!(:email) { PersonEmail.create! uuid: uuid, address: old_address }
+  let!(:email) { create :person_email, uuid: uuid, address: old_address }
   subject { Workers::RenamePersonEmail.new }
 
   before do

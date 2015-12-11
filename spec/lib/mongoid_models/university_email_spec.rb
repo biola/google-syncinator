@@ -12,8 +12,8 @@ describe UniversityEmail, type: :unit do
 
   describe 'validation' do
     context 'when the email address already exists' do
-      before { UniversityEmail.create(address: address, state: state)}
-      subject { UniversityEmail.new address: address }
+      before { create :university_email, address: address, state: state }
+      subject { build :university_email, address: address }
 
       context 'when the email is active' do
         let(:state) { :active }
@@ -42,7 +42,7 @@ describe UniversityEmail, type: :unit do
   end
 
   describe '#disable_date' do
-    subject { AccountEmail.new(address: address) }
+    subject { build :account_email, address: address }
 
     context 'when no deprovision_schedules' do
       it { expect(subject.disable_date).to be nil }
@@ -70,19 +70,19 @@ describe UniversityEmail, type: :unit do
 
   describe '#protected?' do
     context 'when created_at is recent' do
-      subject { AccountEmail.new(address: address, created_at: 29.days.ago) }
+      subject { build :account_email, address: address, created_at: 29.days.ago }
       it { expect(subject.protected?).to be true }
     end
 
     context 'when created at is a long time ago' do
-      subject { AccountEmail.new(address: address, created_at: 31.days.ago) }
+      subject { build :account_email, address: address, created_at: 31.days.ago }
       it { expect(subject.protected?).to be false }
     end
   end
 
   describe '#protected_until' do
     let(:now) { Time.now }
-    subject { AccountEmail.new(address: address, created_at: created_at) }
+    subject { build :account_email, address: address, created_at: created_at }
 
     context 'when created before the protection period' do
       let(:created_at) { now - Settings.deprovisioning.protect_for - 86400 }
@@ -96,7 +96,7 @@ describe UniversityEmail, type: :unit do
   end
 
   describe '#being_deprovisioned?' do
-    subject { AccountEmail.create(address: address) }
+    subject { create :account_email, address: address }
 
     context 'when no deprovision schedules' do
       it { expect(subject.being_deprovisioned?).to be false }
@@ -119,7 +119,7 @@ describe UniversityEmail, type: :unit do
   end
 
   describe '#cancel_deprovisioning!' do
-    let!(:email) { AccountEmail.create! address: address }
+    let!(:email) { create :account_email, address: address }
     let!(:completed) { email.deprovision_schedules.create(action: :notify_of_inactivity, scheduled_for: 1.day.ago, completed_at: 1.day.ago) }
     let!(:incomplete) { email.deprovision_schedules.create(action: :notify_of_inactivity, scheduled_for: 1.day.ago, job_id: '123') }
 
@@ -130,7 +130,7 @@ describe UniversityEmail, type: :unit do
   end
 
   describe '#to_s' do
-    subject { UniversityEmail.new(address: address) }
+    subject { build :university_email, address: address }
 
     it 'returns the address as a string' do
       expect(subject.to_s).to eql 'bob.dole@biola.edu'
@@ -155,7 +155,7 @@ describe UniversityEmail, type: :unit do
     end
 
     context 'with a record' do
-      before { UniversityEmail.create address: 'bob.dole@biola.edu', state: state }
+      before { create :university_email, address: 'bob.dole@biola.edu', state: state }
 
       context 'when active' do
         let(:state) { :active }

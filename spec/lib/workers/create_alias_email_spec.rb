@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Workers::CreateAliasEmail, type: :unit do
-  let(:account_email) { AccountEmail.create address: 'bob.dole@biola.edu' }
+  let(:account_email) { create :department_email }
   let(:account_email_id) { account_email.id.to_s }
   let(:address) { 'bobby.dole@biola.edu' }
   let(:biola_id) { 1234567 }
@@ -26,7 +26,7 @@ describe Workers::CreateAliasEmail, type: :unit do
 
   context 'when account_email is a PersonEmail' do
     let(:uuid) { '00000000-0000-0000-0000-000000000000' }
-    let(:account_email) { PersonEmail.create uuid: uuid, address: 'bob.dole@biola.edu' }
+    let(:account_email) { create :person_email, uuid: uuid }
     before { expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: biola_id) }
 
     it 'updates the legacy table' do

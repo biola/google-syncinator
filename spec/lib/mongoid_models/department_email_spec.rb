@@ -15,10 +15,10 @@ describe DepartmentEmail do
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }
 
   describe '#notification_recipients' do
-    let!(:bob) { PersonEmail.create!(uuid: uuids.first, address: 'bob.dole@biola.edu') }
-    let!(:liz) { PersonEmail.create!(uuid: uuids.last, address: 'elizabeth.dole@biola.edu') }
+    let!(:bob) { create :person_email, uuid: uuids.first }
+    let!(:liz) { create :person_email, uuid: uuids.last }
 
-    subject { DepartmentEmail.new uuids: uuids }
+    subject { build :department_email, uuids: uuids }
     it 'is not implemented' do
       expect(subject.notification_recipients).to eql [subject, bob, liz]
     end
@@ -37,11 +37,10 @@ describe DepartmentEmail do
   end
 
   describe '#to_s' do
-    subject { DepartmentEmail.new(uuids: uuids, address: address) }
+    subject { build :department_email, uuids: uuids, address: address }
 
     it 'returns a string of the uuid and the address' do
       expect(subject.to_s).to eql 'dole.for.pres@biola.edu'
     end
   end
-
 end

@@ -6,9 +6,9 @@ describe API::V1::AliasEmailsAPI, type: :unit do
 
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let(:account_email) { PersonEmail.create! uuid: uuid, address: address }
+  let(:account_email) { create :person_email, uuid: uuid, address: address }
   let(:alias_address) { 'bobby.dole@biola.edu' }
-  let!(:alias_email) { AliasEmail.create! account_email: account_email, address: alias_address }
+  let!(:alias_email) { create :alias_email, account_email: account_email, address: alias_address }
   let(:method) { :get }
   let(:url) { '/v1/alias_emails' }
   let(:params) { {} }
@@ -42,7 +42,7 @@ describe API::V1::AliasEmailsAPI, type: :unit do
     let(:ross_uuid) { '11111111-1111-1111-1111-111111111111' }
     let(:ross_address) { 'ross.perot@biola.edu' }
     let(:ross_alias) { 'rossie.perot@biola.edu' }
-    let(:ross_account_email) { PersonEmail.create! uuid: ross_uuid, address: ross_address }
+    let(:ross_account_email) { create :person_email, uuid: ross_uuid, address: ross_address }
     let(:params) { {account_email_id: ross_account_email.id.to_s, address: ross_alias} }
 
     context 'when unauthenticated' do

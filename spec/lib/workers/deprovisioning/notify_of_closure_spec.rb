@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Workers::Deprovisioning::NotifyOfClosure, type: :unit do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let!(:email) { PersonEmail.create uuid: uuid, address: address }
+  let!(:email) { create :person_email, uuid: uuid, address: address }
   let(:reason) { nil }
   let!(:schedule) { email.deprovision_schedules.create action: :notify_of_closure, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
@@ -35,9 +35,9 @@ describe Workers::Deprovisioning::NotifyOfClosure, type: :unit do
     end
 
     context 'when multiple recipients' do
-      let(:bob) { PersonEmail.create!(uuid: '00000000-0000-0000-0000-000000000001', address: 'bob.dole@biola.edu') }
-      let(:liz) { PersonEmail.create!(uuid: '00000000-0000-0000-0000-000000000002', address: 'ezilabeth.dole@biola.edu') }
-      let!(:email) { DepartmentEmail.create uuids: [bob.uuid, liz.uuid], address: 'dole.for.pres@biola.edu' }
+      let(:bob) { create :person_email }
+      let(:liz) { create :person_email }
+      let!(:email) { create :department_email, uuids: [bob.uuid, liz.uuid], address: 'dole.for.pres@biola.edu' }
 
       it 'sends multiple emails' do
         dept_email = instance_double(Emails::NotifyOfClosure)

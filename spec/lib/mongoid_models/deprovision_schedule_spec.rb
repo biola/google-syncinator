@@ -4,7 +4,7 @@ describe DeprovisionSchedule, type: :unit do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
   let(:job_id) { '1234567890' }
-  let(:person_email) { PersonEmail.create uuid: uuid, address: address }
+  let(:person_email) { create :person_email, uuid: uuid, address: address }
 
   it { is_expected.to be_embedded_in(:university_email) }
   it { is_expected.to have_fields(:action, :reason, :scheduled_for, :completed_at, :canceled, :job_id) }
@@ -16,8 +16,8 @@ describe DeprovisionSchedule, type: :unit do
   it { is_expected.to validate_inclusion_of(:action).to_allow(:notify_of_inactivity, :notify_of_closure, :suspend, :delete, :activate) }
 
   describe 'validate' do
-    let(:alias_email) { AliasEmail.create! address: 'bobby.dole@biola.edu', account_email: person_email }
-    subject { DeprovisionSchedule.new university_email: alias_email, action: action, scheduled_for: 1.day.from_now }
+    let(:alias_email) { create :alias_email, address: 'bobby.dole@biola.edu', account_email: person_email }
+    subject { build :deprovision_schedule, university_email: alias_email, action: action, scheduled_for: 1.day.from_now }
 
     context 'when action is delete' do
       let(:action) { :delete }
@@ -32,17 +32,17 @@ describe DeprovisionSchedule, type: :unit do
 
   describe '#pending?' do
     context 'when completed_at and canceled blank' do
-      subject { DeprovisionSchedule.new action: :delete, scheduled_for: 1.day.from_now }
+      subject { build :deprovision_schedule }
       it { expect(subject.pending?).to be true }
     end
 
     context 'when completed_at is set' do
-      subject { DeprovisionSchedule.new action: :delete, scheduled_for: 1.day.ago, completed_at: 1.day.ago }
+      subject { build :deprovision_schedule, completed_at: 1.day.ago }
       it { expect(subject.pending?).to be false }
     end
 
     context 'when canceled is true' do
-      subject { DeprovisionSchedule.new action: :delete, scheduled_for: 1.day.ago, canceled: true }
+      subject { build :deprovision_schedule, canceled: true }
       it { expect(subject.pending?).to be false }
     end
   end

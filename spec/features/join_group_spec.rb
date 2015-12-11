@@ -14,7 +14,7 @@ describe 'join a group', type: :feature do
     # It gets called a second time for the second "page" of results
     expect(Workers::HandleChanges).to receive(:perform_async)
 
-    PersonEmail.create uuid: uuid, address: address, state: :suspended
+    create :person_email, uuid: uuid, address: address, state: :suspended
     DB[:email].insert idnumber: biola_id, email: address, expiration_date: 1.month.ago, reusable_date: 1.week.ago
   end
 

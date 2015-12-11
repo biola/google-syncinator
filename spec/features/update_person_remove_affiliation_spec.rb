@@ -14,7 +14,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
     # It gets called a second time for the second "page" of results
     expect(Workers::HandleChanges).to receive(:perform_async)
 
-    PersonEmail.create uuid: uuid, address: address, state: :active, created_at: 31.days.ago
+    create :person_email, uuid: uuid, address: address
     DB[:email].insert(idnumber: biola_id, email: address)
   end
 

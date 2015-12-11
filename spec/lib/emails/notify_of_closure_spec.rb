@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Emails::NotifyOfClosure, type: :unit do
-  let(:account_email) { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
+  let(:account_email) { create :person_email, address: 'bob.dole@biola.edu' }
   let(:deprovision_schedule) { account_email.deprovision_schedules.create action: :notify_of_closure, scheduled_for: 1.minute.ago }
   before { account_email.deprovision_schedules.create action: :suspend, scheduled_for: 7.days.from_now }
 

@@ -6,7 +6,7 @@ describe API::V1::EmailsAPI, type: :unit do
 
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let!(:email) { PersonEmail.create! uuid: uuid, address: address }
+  let!(:email) { create :person_email, uuid: uuid, address: address }
   let(:method) { :get }
   let(:url) { '/v1/emails' }
   let(:params) { {} }
@@ -20,7 +20,7 @@ describe API::V1::EmailsAPI, type: :unit do
   subject { response }
 
   describe 'GET /v1/emails' do
-    let!(:ross) { PersonEmail.create! uuid: '11111111-1111-1111-1111-111111111111', address: 'ross.perot@biola.edu' }
+    let!(:ross) { create :person_email, address: 'ross.perot@biola.edu' }
 
     context 'when unauthenticated' do
       before { get url }

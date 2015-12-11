@@ -10,7 +10,7 @@ describe Exclusion, type: :unit do
 
   describe '#validate' do
     let(:starts_at) { Time.now }
-    subject { Exclusion.new(creator_uuid: '00000000-0000-0000-0000-000000000000', starts_at: starts_at, ends_at: ends_at) }
+    subject { build :exclusion, starts_at: starts_at, ends_at: ends_at }
     context 'when ends_at is nil' do
       let(:ends_at) { nil }
       it { expect(subject).to be_valid }

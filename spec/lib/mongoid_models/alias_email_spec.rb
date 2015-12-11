@@ -12,8 +12,8 @@ describe AliasEmail, type: :unit do
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }
 
   describe 'before_create' do
-    let(:account_email) { AccountEmail.create! address: 'bobby.dole@biola.edu', state: :suspended }
-    let(:alias_email) { AliasEmail.new account_email: account_email, address: address }
+    let(:account_email) { create :account_email, state: :suspended }
+    let(:alias_email) { build :alias_email, account_email: account_email, address: address }
 
     it "uses the account email's state" do
       expect { alias_email.save! }.to change { alias_email.state }.from(:active).to :suspended
@@ -27,10 +27,10 @@ describe AliasEmail, type: :unit do
   end
 
   describe '#sync_to_legacy_email_table?' do
-    subject { AliasEmail.new account_email: account_email }
+    subject { build :alias_email, account_email: account_email }
 
     context 'when account_email is a PersonEmail' do
-      let(:account_email) { PersonEmail.new }
+      let(:account_email) { build :person_email }
 
       it 'is true' do
         expect(subject.sync_to_legacy_email_table?).to be true
@@ -38,7 +38,7 @@ describe AliasEmail, type: :unit do
     end
 
     context 'when account_email is a DepartmentEmail' do
-      let(:account_email) { DepartmentEmail.new }
+      let(:account_email) { build :department_email }
 
       it 'is false' do
         expect(subject.sync_to_legacy_email_table?).to be false

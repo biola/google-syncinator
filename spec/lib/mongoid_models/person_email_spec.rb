@@ -16,7 +16,7 @@ describe PersonEmail, type: :unit do
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }
 
   describe '#notification_recipients' do
-    subject { PersonEmail.new address: address }
+    subject { build :person_email, address: address }
 
     it 'is the address in an array' do
       expect(subject.notification_recipients).to eql [subject]
@@ -37,7 +37,7 @@ describe PersonEmail, type: :unit do
 
 
   describe '#to_s' do
-    subject { PersonEmail.new(uuid: uuid, address: address) }
+    subject { build :person_email, uuid: uuid, address: address }
 
     it 'returns a string of the uuid and the address' do
       expect(subject.to_s).to eql '00000000-0000-0000-0000-000000000000/bob.dole@biola.edu'

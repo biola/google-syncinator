@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Workers::Deprovisioning::NotifyOfInactivity, type: :unit do
-  let!(:email) { PersonEmail.create uuid: '00000000-0000-0000-0000-000000000000', address: 'bob.dole@biola.edu' }
+  let!(:email) { create :person_email }
   let(:reason) { nil }
   let!(:schedule) { email.deprovision_schedules.create action: :notify_of_inactivity, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
@@ -68,9 +68,9 @@ describe Workers::Deprovisioning::NotifyOfInactivity, type: :unit do
       end
 
       context 'when multiple recipients' do
-        let(:bob) { PersonEmail.create!(uuid: '00000000-0000-0000-0000-000000000001', address: 'bob.dole@biola.edu') }
-        let(:liz) { PersonEmail.create!(uuid: '00000000-0000-0000-0000-000000000002', address: 'ezilabeth.dole@biola.edu') }
-        let!(:email) { DepartmentEmail.create uuids: [bob.uuid, liz.uuid], address: 'dole.for.pres@biola.edu' }
+        let(:bob) { create :person_email }
+        let(:liz) { create :person_email }
+        let!(:email) { create :department_email, uuids: [bob.uuid, liz.uuid] }
 
         it 'sends multiple emails' do
           dept_email = instance_double(Emails::NotifyOfInactivity)

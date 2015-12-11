@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Workers::Deprovisioning::Activate, type: :unit do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let(:email) { PersonEmail.create uuid: uuid, address: address, state: state }
+  let(:email) { create :person_email, uuid: uuid, address: address, state: state }
   let(:schedule) { email.deprovision_schedules.create action: :activate, scheduled_for: 1.minute.ago }
 
   describe '#perform' do
@@ -44,7 +44,7 @@ describe Workers::Deprovisioning::Activate, type: :unit do
       end
 
       context 'when a DepartmentEmail' do
-        let(:email) { DepartmentEmail.create uuids: [uuid], address: address, state: state }
+        let(:email) { create :department_email, uuids: [uuid], address: address, state: state }
 
         it 'activates the email' do
           expect { subject.perform(schedule.id) }.to change { email.reload.state }.from(:suspended).to :active

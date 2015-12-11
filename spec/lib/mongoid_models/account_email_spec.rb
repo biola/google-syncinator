@@ -49,8 +49,8 @@ describe AccountEmail, type: :unit do
   end
 
   describe 'after_save' do
-    let(:account_email) { AccountEmail.create! address: address }
-    let!(:alias_email) { AliasEmail.create! account_email: account_email, address: 'test@example.com' }
+    let(:account_email) { create :account_email, address: address }
+    let!(:alias_email) { create :alias_email, account_email: account_email }
 
     it 'updates the state of associated alias emails' do
       expect { account_email.update state: 'deleted' }.to change { alias_email.reload.state }.from(:active).to :deleted

@@ -6,7 +6,7 @@ describe API::V1::DeprovisionSchedulesAPI, type: :unit do
 
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let!(:email) { PersonEmail.create uuid: uuid, address: address }
+  let!(:email) { create :person_email, uuid: uuid, address: address }
   let!(:action) { 'delete' }
   let(:scheduled_for) { Time.now.iso8601(3) }
   let(:reason) { "Because I'm testing" }

@@ -38,7 +38,7 @@ describe ServiceObjects::AssignEmailAddress, type: :unit do
 
     context 'when creating a user with a university email' do
       let(:fixture) { 'create_employee' }
-      before { PersonEmail.create uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
+      before { create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
       it { expect(subject.ignore?).to be true }
     end
 

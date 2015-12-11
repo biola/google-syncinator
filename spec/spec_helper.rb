@@ -24,8 +24,11 @@ unless DB.table_exists?(:email)
   end
 end
 
+FactoryGirl.find_definitions
+
 RSpec.configure do |config|
   config.include Mongoid::Matchers
+  config.include FactoryGirl::Syntax::Methods
 
   config.before(:context, type: :feature) do
     Sidekiq::Testing.inline!

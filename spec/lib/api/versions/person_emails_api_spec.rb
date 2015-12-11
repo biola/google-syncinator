@@ -6,7 +6,7 @@ describe API::V1::EmailsAPI, type: :unit do
 
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let!(:email) { PersonEmail.create uuid: uuid, address: address }
+  let!(:email) { create :person_email, uuid: uuid, address: address }
   let(:method) { :get }
   let(:url) { '/v1/person_emails' }
   let(:params) { {} }

@@ -17,7 +17,7 @@ describe 'create employee', type: :feature do
 
   context 'when reprovisionable email exists' do
     before do
-      PersonEmail.create uuid: uuid, address: address, state: :suspended
+      create :person_email, uuid: uuid, address: address, state: :suspended
       DB[:email].insert idnumber: biola_id, email: address, expiration_date: 1.month.ago, reusable_date: 1.week.ago
     end
 

@@ -4,7 +4,7 @@ describe Workers::Deprovisioning::Delete, type: :unit do
   describe '#perform' do
     let(:uuid) { '00000000-0000-0000-0000-000000000000' }
     let(:address) { 'bob.dole@biola.edu' }
-    let!(:email) { PersonEmail.create uuid: uuid, address: address }
+    let!(:email) { create :person_email, uuid: uuid, address: address }
     let(:reason) { nil }
     let!(:schedule) { email.deprovision_schedules.create action: :delete, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
@@ -72,7 +72,7 @@ describe Workers::Deprovisioning::Delete, type: :unit do
       end
 
       context 'when a DepartmenEmail' do
-        let!(:email) { DepartmentEmail.create uuids: [uuid], address: address }
+        let!(:email) { create :department_email, uuids: [uuid], address: address }
 
         it 'deletes Google account' do
           account = instance_double(GoogleAccount)
@@ -107,8 +107,8 @@ describe Workers::Deprovisioning::Delete, type: :unit do
       end
 
       context 'when an AliasEmail' do
-        let(:person_email) { PersonEmail.create address: 'bobby.dole@biola.edu', uuid: uuid }
-        let!(:email) { AliasEmail.create account_email: person_email, address: address }
+        let(:person_email) { create :person_email, address: 'bobby.dole@biola.edu', uuid: uuid }
+        let!(:email) { create :alias_email, account_email: person_email, address: address }
 
         before do
           allow_any_instance_of(GoogleAccount).to receive(:delete_alias!)

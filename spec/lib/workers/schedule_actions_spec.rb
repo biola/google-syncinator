@@ -6,7 +6,7 @@ describe Workers::ScheduleActions, type: :unit do
   let(:actions_and_durations) { [1.day.to_i, :notify_of_inactivity, 2.days.to_i, :notify_of_closure, 1.week.to_i, :suspend, 2.weeks.to_i, :delete] }
 
   describe '#perform' do
-    let!(:email) { PersonEmail.create!(uuid: uuid, address: address, state: state) }
+    let!(:email) { create :person_email, uuid: uuid, address: address, state: state }
 
     context 'with active emails' do
       context 'when scheduling an activation' do

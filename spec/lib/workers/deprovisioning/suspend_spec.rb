@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Workers::Deprovisioning::Suspend, type: :unit do
   let(:uuid) { '00000000-0000-0000-0000-000000000000' }
   let(:address) { 'bob.dole@biola.edu' }
-  let!(:email) { PersonEmail.create uuid: uuid, address: address }
+  let!(:email) { create :person_email, uuid: uuid, address: address }
   let(:reason) { nil }
   let!(:schedule) { email.deprovision_schedules.create action: :suspend, scheduled_for: 1.minute.ago, canceled: canceled, reason: reason }
 
@@ -71,7 +71,7 @@ describe Workers::Deprovisioning::Suspend, type: :unit do
     end
 
     context 'when a DepartmentEmail' do
-      let!(:email) { DepartmentEmail.create uuids: [uuid], address: address }
+      let!(:email) { create :department_email, uuids: [uuid], address: address }
 
       it 'suspends Google account' do
         account = instance_double(GoogleAccount)

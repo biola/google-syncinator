@@ -31,10 +31,10 @@ class Client
 
   # @!attribute active
   #   Set to false to disable this client.
-  #   @return [String]
+  #   @return [Boolean]
   # @!method active=(active)
-  #   @param active [String]
-  #   @return [String]
+  #   @param active [Boolean]
+  #   @return [Boolean]
   field :active, type: Boolean, default: true
 
   attr_readonly :slug, :access_id, :secret_key

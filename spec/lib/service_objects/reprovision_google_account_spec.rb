@@ -7,7 +7,7 @@ describe ServiceObjects::ReprovisionGoogleAccount, type: :unit do
   subject { ServiceObjects::ReprovisionGoogleAccount.new(trogdir_change) }
 
   describe '#call' do
-    let!(:university_email) { PersonEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, state: :suspended) }
+    let!(:university_email) { create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, state: :suspended }
 
     it 'calls Workers::Deprovisioning::Activate' do
       expect(Workers::ScheduleActions).to receive(:perform_async).with(university_email.id.to_s, [10, :activate], DeprovisionSchedule::GAINED_AFFILIATION_REASON)
@@ -17,7 +17,7 @@ describe ServiceObjects::ReprovisionGoogleAccount, type: :unit do
 
   describe '#ignore?' do
     context "when universtiy email does exist" do
-      before { PersonEmail.create! uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
+      before { create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
       it { expect(subject.ignore?).to be true }
     end
 
@@ -28,7 +28,7 @@ describe ServiceObjects::ReprovisionGoogleAccount, type: :unit do
 
     context 'when an exclusion exists' do
       before do
-        e = PersonEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email)
+        e = create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email
         e.exclusions.create creator_uuid: trogdir_change.person_uuid, starts_at: 1.minute.ago, ends_at: 1.minute.from_now
       end
       it { expect(subject.ignore?).to be true }
@@ -36,13 +36,13 @@ describe ServiceObjects::ReprovisionGoogleAccount, type: :unit do
 
     context 'when remove affiliation' do
       let(:fixture) { 'update_person_remove_affiliation' }
-      before { PersonEmail.create! uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
+      before { create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email }
       it { expect(subject.ignore?).to be true }
     end
 
     context 'when adding one affiliations' do
       let(:fixture) { 'update_person_add_affiliation' }
-      before { PersonEmail.create! uuid: trogdir_change.person_uuid, address: 'test@example.com', state: :suspended }
+      before { create :person_email, uuid: trogdir_change.person_uuid, state: :suspended }
       it { expect(subject.ignore?).to be false }
     end
   end

@@ -8,7 +8,7 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
   subject { ServiceObjects::DeprovisionGoogleAccount.new(trogdir_change) }
 
   describe '#call' do
-    let!(:university_email) { PersonEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, created_at: created_at) }
+    let!(:university_email) { create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email, created_at: created_at }
 
     context 'when email is protected' do
       let(:created_at) { Time.now - Settings.deprovisioning.protect_for + 86400 }
@@ -88,7 +88,7 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
 
     context 'when an exclusion exists' do
       before do
-        e = PersonEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email)
+        e = create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email
         e.exclusions.create creator_uuid: uuid, starts_at: 1.minute.ago, ends_at: 1.minute.from_now
       end
       it { expect(subject.ignore?).to be true }
@@ -96,7 +96,7 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
 
     context 'when email is already being deprovisioned' do
       before do
-        e = PersonEmail.create!(uuid: trogdir_change.person_uuid, address: trogdir_change.university_email)
+        e = create :person_email, uuid: trogdir_change.person_uuid, address: trogdir_change.university_email
         e.deprovision_schedules.create action: :suspend, scheduled_for: 1.minute.from_now
       end
       it { expect(subject.ignore?).to be true }
