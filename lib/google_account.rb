@@ -17,7 +17,7 @@ class GoogleAccount
 
     return false unless result.success?
 
-    result.data.emails.map{|e| e['address']}.include? full_email
+    result.data.emails.map{|e| e['address'].downcase }.include? full_email.downcase
   end
 
   def available?
