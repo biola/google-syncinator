@@ -65,6 +65,8 @@ class GoogleAccount
       privacy: privacy,
       org_unit_path: org_unit_path
     }
+
+    result.data.emails.map{|e| e['address'].downcase }.include? full_email.downcase
   end
 
   # Is the email account available?
