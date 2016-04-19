@@ -1,7 +1,8 @@
 require 'spec_helper'
 
-describe TrogdirChange do
-  let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+describe TrogdirChange, type: :unit do
+  let(:fixture) { 'create_employee' }
+  let(:hash) { JSON.parse(File.read("./spec/fixtures/#{fixture}.json")) }
   subject { TrogdirChange.new(hash) }
 
   describe '#sync_log_id' do
@@ -28,20 +29,16 @@ describe TrogdirChange do
     it { expect(subject.last_name).to eql 'Dole'}
   end
 
-  describe '#title' do
-    it { expect(subject.title).to eql 'Commander in Chief'}
+  describe '#old_affiliations' do
+    it { expect(subject.old_affiliations).to eql []}
   end
 
-  describe '#department' do
-    it { expect(subject.department).to eql 'Office of the President'}
+  describe '#new_affiliations' do
+    it { expect(subject.new_affiliations).to eql ['employee']}
   end
 
   describe '#affiliations' do
     it { expect(subject.affiliations).to eql ['employee']}
-  end
-
-  describe '#privacy' do
-    it { expect(subject.privacy).to eql false}
   end
 
   describe '#university_email' do
@@ -62,9 +59,21 @@ describe TrogdirChange do
     end
 
     context 'without a university email' do
-      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user_without_university_email.json')) }
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_employee_without_university_email.json')) }
 
       it { expect(subject.university_email_exists?).to be false }
+    end
+  end
+
+  describe '#affiliations_changed?' do
+    context 'when creating a person with affiliations' do
+      it { expect(subject.affiliations_changed?).to be true }
+    end
+
+    context 'when creating an id' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_id.json')) }
+
+      it { expect(subject.affiliations_changed?).to be false }
     end
   end
 
@@ -82,6 +91,11 @@ describe TrogdirChange do
     context 'when updating a person but not changing affiliations' do
       let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person.json')) }
 
+      it { expect(subject.affiliation_added?).to be false }
+    end
+
+    context 'when removing an affiliaton' do
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/update_person_remove_affiliation.json')) }
       it { expect(subject.affiliation_added?).to be false }
     end
   end
@@ -134,7 +148,7 @@ describe TrogdirChange do
 
   describe '#joined_groups' do
     context 'when creating a person' do
-      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_employee.json')) }
 
       it { expect(subject.joined_groups).to eql [] }
     end
@@ -148,7 +162,7 @@ describe TrogdirChange do
 
   describe '#left_groups' do
     context 'when creating a person' do
-      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_user.json')) }
+      let(:hash) { JSON.parse(File.read('./spec/fixtures/create_employee.json')) }
 
       it { expect(subject.left_groups).to eql [] }
     end

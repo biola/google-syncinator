@@ -1,5 +1,8 @@
 module ServiceObjects
+  # Handles leaving the appropriate groups in google when a group change occurs
   class LeaveGoogleGroup < Base
+    # Leave Google Groups if they are in the whitelisted groups
+    # @return [:update, :skip] action taken
     def call
       changes = Whitelist.filter(change.left_groups).each do |group|
         @changed = true if google_account.leave! group
@@ -8,6 +11,8 @@ module ServiceObjects
       changes.any? && @changed ? :update : :skip
     end
 
+    # Should this change trigger a group leaving
+    # @return [Boolean]
     def ignore?
       Whitelist.filter(change.left_groups).none?
     end

@@ -6,3 +6,13 @@ HandleChanges:
   cron: "0 08-20 * * 1-5"
   class: "Workers::HandleChanges"
   queue: default
+
+CheckNeverActive:
+  cron:  "0 1 * * 0" # 1am Sundays
+  class: "Workers::CheckNeverActive"
+  queue: default
+
+CheckInactive:
+  cron:  "0 2 * * 0" # 2am Sundays
+  class: "Workers::CheckInactive"
+  queue: default

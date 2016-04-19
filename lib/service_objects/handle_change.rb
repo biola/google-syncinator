@@ -1,21 +1,19 @@
 module ServiceObjects
+  # Runs the appropriate other `ServiceObject`s
   class HandleChange < Base
-    # TODO: handle changes to email address with appropriate renaming and aliasing
-    # TODO: limit to emails with @biola.edu domain
+    # Trogdir SyncLogs only accept one action. This array is ordered by which action
+    # should take precedence over the other when multiple actions are performed.
+    PRIORITIZED_ACTIONS = [:destroy, :create, :update, :skip]
+
+    # Runs the appropriate service objects for this change
+    # @return [Array<Symbol>] a list of actions taken
     def call
       actions = []
 
       begin
         unless AssignEmailAddress.ignore?(change)
-          if assign_action = AssignEmailAddress.new(change).call
-            Log.info "Assigning email address to person #{change.person_uuid}"
-            actions << assign_action
-          end
-        end
-
-        unless UpdateEmailAddress.ignore?(change)
-          Log.info "Updating Google account email (#{change.university_email}) for person #{change.person_uuid}"
-          actions << UpdateEmailAddress.new(change).call
+          actions << AssignEmailAddress.new(change).call
+          Log.info "Assigning email address to person #{change.person_uuid}"
         end
 
         unless SyncGoogleAccount.ignore?(change)
@@ -33,25 +31,62 @@ module ServiceObjects
           actions << LeaveGoogleGroup.new(change).call
         end
 
-        action = actions.first || :skip
+        unless DeprovisionGoogleAccount.ignore?(change)
+          Log.info "Begin deprovisioning of #{change.university_email} for person #{change.person_uuid}"
+          actions << DeprovisionGoogleAccount.new(change).call
+        end
+
+        unless CancelDeprovisioningGoogleAccount.ignore?(change)
+          Log.info "Cancel deprovisioning of #{change.university_email} for person #{change.person_uuid}"
+          actions << CancelDeprovisioningGoogleAccount.new(change).call
+        end
+
+        unless ReprovisionGoogleAccount.ignore?(change)
+          Log.info "Begin deprovisioning of #{change.university_email} for person #{change.person_uuid}"
+          actions << ReprovisionGoogleAccount.new(change).call
+        end
+
+        unless UpdateBiolaID.ignore?(change)
+          Log.info "Begin change from #{change.old_id} to #{change.new_id} for person #{change.person_uuid}"
+          actions << UpdateBiolaID.new(change).call
+        end
+
+        action = most_important_action(actions) || :skip
         Log.info "No changes needed for person #{change.person_uuid}" if actions.empty?
-        Workers::ChangeFinish.perform_async change.sync_log_id, action
+        Workers::Trogdir::ChangeFinish.perform_async change.sync_log_id, action
 
       rescue StandardError => err
-        Workers::ChangeError.perform_async change.sync_log_id, err.message
+        Workers::Trogdir::ChangeError.perform_async change.sync_log_id, err.message
         Raven.capture_exception(err) if defined? Raven
         raise err
       end
+
+      actions
     end
 
+    # Should this `change` be processed by any of the other ServiceObjects
+    # @return [Boolean]
     def ignore?
-      AssignEmailAddress.ignore?(change) && SyncGoogleAccount.ignore?(change) && UpdateEmailAddress.ignore?(change) && JoinGoogleGroup.ignore?(change) && LeaveGoogleGroup.ignore?(change)
+      [AssignEmailAddress, SyncGoogleAccount, JoinGoogleGroup, LeaveGoogleGroup, DeprovisionGoogleAccount, CancelDeprovisioningGoogleAccount, ReprovisionGoogleAccount, UpdateBiolaID].all? do |klass|
+        klass.ignore? change
+      end
     end
 
     private
 
+    # Simple wrapper for the Trogdir API change syncs object
+    # @return [Trogdir::APIClient::ChangeSyncs]
     def change_syncs
       Trogdir::APIClient::ChangeSyncs.new
+    end
+
+    # Returns the single most important actions
+    # @param actions [Array<Symbol>]
+    # @return [Symbol]
+    def most_important_action(actions)
+      PRIORITIZED_ACTIONS.find do |action|
+        actions.include? action
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EmailAddressOptions do
+describe EmailAddressOptions, type: :unit do
   let(:affiliations) { ['student'] }
   let(:preferred_name) { 'Johnny' }
   let(:first_name) { 'John' }
@@ -43,5 +43,25 @@ describe EmailAddressOptions do
   context 'when an alumnus' do
     let(:affiliations) { ['alumnus'] }
     it { expect(subject.to_a).to eql [] }
+  end
+
+  describe '.required?' do
+    it { expect(EmailAddressOptions.required?([])).to be false }
+    it { expect(EmailAddressOptions.required?(['student'])).to be true }
+    it { expect(EmailAddressOptions.required?(['alumnus'])).to be false }
+    it { expect(EmailAddressOptions.required?(['alumnus', 'employee'])).to be true }
+  end
+
+  describe '.not_required?' do
+    it { expect(EmailAddressOptions.not_required?([])).to be false }
+    it { expect(EmailAddressOptions.not_required?(['student'])).to be false }
+    it { expect(EmailAddressOptions.not_required?(['alumnus'])).to be true }
+    it { expect(EmailAddressOptions.not_required?(['alumnus', 'employee'])).to be false }
+  end
+
+  describe '.allowed?' do
+    it { expect(EmailAddressOptions.allowed?(['employee'])).to be true }
+    it { expect(EmailAddressOptions.allowed?(['alumnus'])).to be true }
+    it { expect(EmailAddressOptions.allowed?([])).to be false }
   end
 end

@@ -2,5 +2,9 @@ language: ruby
 rvm:
   - 2.1.6
 services:
+  - mongodb
+  - mysql
   - redis-server
+before_script:
+  - mysql -e 'create database ws_test;'
 script: bundle exec rspec

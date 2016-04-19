@@ -1,8 +1,11 @@
 /certs/*
 *.p12
 .bundle
+.yardoc/*
+/config/mongoid.yml
 /config/settings.local.yml
 /config/blazing.rb
+/log/*
 /vendor/bundle
 /tmp
 /log/*

@@ -1,3 +1,8 @@
+# Log changes but don't actually do anything
+dry_run: false
+# Interact with third-party API's
+third_party_apis: true
+
 redis:
   url: "redis://localhost:6379/0"
 
@@ -6,6 +11,11 @@ sentry:
 
 google:
   domain: biola.edu
+  usage_report:
+    # NOTE: You'd think you could just set this to today but it seems like you get errors like
+    # "Data for dates later than ______ is not yet available" unless you back about 2-3 days
+    # See https://developers.google.com/admin-sdk/reports/v1/reference/userUsageReport/get
+    days_ago: 3
   api_client:
     application_name: google-syncinator
     application_version: '0.1.0'
@@ -15,6 +25,7 @@ google:
       - "https://www.googleapis.com/auth/admin.directory.user"
       - "https://www.googleapis.com/auth/admin.directory.group"
       - "https://www.googleapis.com/auth/admin.directory.group.member"
+      - "https://www.googleapis.com/auth/admin.reports.usage.readonly"
     issuer: # set in settings.local.yml
     person: # set in settings.local.yml
 
@@ -28,8 +39,6 @@ trogdir:
   secret_key: # set in settings.local.yml
   api_timeout: 300 # 5 min
 
-dev_mode: false
-
 ws:
   db:
     adapter: mysql2
@@ -38,6 +47,97 @@ ws:
     user: # set in settings.local.yml
     password: # set in settings.local.yml
     reconnect: true
+
+# See http://rdoc.info/github/mikel/mail/Mail#defaults-class_method
+email:
+  from: no-reply@biola.edu
+  delivery_method: test
+  options: {}
+
+# UUIDs of people who should not have accounts created
+prevent_creation: []
+
+# all times should be in seconds
+deprovisioning:
+  # period to protect new accounts from being deprovisioned
+  protect_for: 2592000 # 30 days
+  inactive_after: 31557600 # 1 year
+  reusable_after: 15552000 # 6 months
+  schedules:
+    person_emails:
+      # typically alumni only
+      allowed:
+        never_active: []
+          # - 432000 # 5 days
+          # - :suspend
+          # - 15552000 # 6 months
+          # - :delete
+        inactive:
+          - 432000 # 5 days
+          - :notify_of_inactivity
+          - 2332800 # 27 days
+          - :notify_of_inactivity
+          # - 259200 # 3.days
+          # - :suspend
+          # - 15552000 # 6 months
+          # - :delete
+      # typically those with no affiliations
+      unallowed:
+        never_active: []
+          # - 432000 # 5 days
+          # - :delete
+        active:
+          - 432000 # 5 days
+          - :notify_of_closure
+          # - 604800 # 1 week
+          # - :suspend
+          # - 15552000 # 6 months
+          # - :delete
+    department_emails:
+      never_active: []
+        # - 432000 # 5 days
+        # - :suspend
+      inactive:
+        - 432000 # 5 days
+        - :notify_of_inactivity
+        - 2332800 # 27 days
+        - :notify_of_inactivity
+        # - 259200 # 3.days
+        # - :suspend
+
+affiliations:
+  # affiliations that get a john.doe style email
+  employeeish:
+    - employee
+    - trustee
+    - faculty
+    - other
+    - faculty emeritus
+  # affiliations that get a john.h.doe style email
+  studentish:
+    - student
+  # these affiliations are required to have an email address
+  email_required:
+    - employee
+    - trustee
+    - faculty
+    - other
+    - faculty emeritus
+    - student
+  # these affiliations are allowed but not required to have an email address
+  email_allowed:
+    - alumnus
+
+# Maps affiliations to Google Orgnizational Units
+# NOTE: The key should be the orgUnitPath used by Google. Values should match Trogdir affiliationsn.
+# NOTE: Order is important. Google accounts can only be in one org unit so the top match in the list takes precedence.
+organizational_units:
+  person_emails:
+    /Employees:
+      - employee
+    /Alumni:
+      - alumnus
+  department_emails: "/Departments"
 
 groups:
   whitelist:

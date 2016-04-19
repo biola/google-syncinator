@@ -1,3 +1,6 @@
+dry_run: # set to true if you want to generate logs but not really do anything
+third_party_apis: # set to false to disable calling Google's APIs
+
 sentry:
   url:
 
@@ -17,5 +20,3 @@ ws:
     host: db.example.com
     user: google_syncinator
     password: "************"
-
-dev_mode: # set to true to skip google calls

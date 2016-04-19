@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Workers::HandleChanges do
+describe Workers::HandleChanges, type: :unit do
   subject { Workers::HandleChanges.new }
   let(:success) { true }
   let(:change_syncs) { [] }
@@ -30,7 +30,7 @@ describe Workers::HandleChanges do
   end
 
   context 'when affiliation added' do
-    let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/create_user_without_university_email.json'))] }
+    let(:change_syncs) { [JSON.parse(File.read('./spec/fixtures/create_employee_without_university_email.json'))] }
 
     it 'calls AssignEmailAddress worker' do
       expect(Workers::HandleChange).to receive(:perform_async)
