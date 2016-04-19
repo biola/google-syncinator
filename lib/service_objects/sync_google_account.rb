@@ -6,7 +6,8 @@ module ServiceObjects
     # @return [:create, :update] the action
     def call
       person = TrogdirPerson.new(change.person_uuid)
-      org_unit_path = OrganizationalUnit.path_for(person)
+      # NOTE: temporarily disabling org unit changes
+      # org_unit_path = OrganizationalUnit.path_for(person)
 
       google_account.unsuspend! if google_account.suspended?
       google_account.update!(
@@ -14,8 +15,9 @@ module ServiceObjects
         last_name: person.last_name,
         department: person.department,
         title: person.title,
-        privacy: person.privacy,
-        org_unit_path: org_unit_path
+        privacy: person.privacy#,
+        # NOTE: temporarily disabling org unit changes
+        # org_unit_path: org_unit_path
       )
 
       :update
