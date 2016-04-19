@@ -89,7 +89,7 @@ Rake Tasks
 - `rake import:legacy_email_table` imports all of the records from the legacy email table to the new MongoDB university_emails collection. Logs are stored as `log/import_legacy_email_table-[timestamp].log`
 - `rake import:department_emails` imports all of the records from Google Apps that aren't already in the `university_emails` collection as `DepartmentEmail`s. Logs are stored as `log/import_department_emails-[timestamp].log`
 
-__Warning:__ `import:legacy_email_table` should be run before `impor:department_emails`, otherwise everything from Google Apps will be imported as a `DepartmentEmail`.
+__Warning:__ `import:legacy_email_table` should be run before `import:department_emails`, otherwise everything from Google Apps will be imported as a `DepartmentEmail`.
 
 Notes
 -----

@@ -67,43 +67,43 @@ deprovisioning:
     person_emails:
       # typically alumni only
       allowed:
-        never_active:
-          - 432000 # 5 days
-          - :suspend
-          - 15552000 # 6 months
-          - :delete
+        never_active: []
+          # - 432000 # 5 days
+          # - :suspend
+          # - 15552000 # 6 months
+          # - :delete
         inactive:
           - 432000 # 5 days
           - :notify_of_inactivity
           - 2332800 # 27 days
           - :notify_of_inactivity
-          - 259200 # 3.days
-          - :suspend
-          - 15552000 # 6 months
-          - :delete
+          # - 259200 # 3.days
+          # - :suspend
+          # - 15552000 # 6 months
+          # - :delete
       # typically those with no affiliations
       unallowed:
-        never_active:
-          - 432000 # 5 days
-          - :delete
+        never_active: []
+          # - 432000 # 5 days
+          # - :delete
         active:
           - 432000 # 5 days
           - :notify_of_closure
-          - 604800 # 1 week
-          - :suspend
-          - 15552000 # 6 months
-          - :delete
+          # - 604800 # 1 week
+          # - :suspend
+          # - 15552000 # 6 months
+          # - :delete
     department_emails:
-      never_active:
-        - 432000 # 5 days
-        - :suspend
+      never_active: []
+        # - 432000 # 5 days
+        # - :suspend
       inactive:
         - 432000 # 5 days
         - :notify_of_inactivity
         - 2332800 # 27 days
         - :notify_of_inactivity
-        - 259200 # 3.days
-        - :suspend
+        # - 259200 # 3.days
+        # - :suspend
 
 affiliations:
   # affiliations that get a john.doe style email
