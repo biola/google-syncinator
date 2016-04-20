@@ -1,35 +1,37 @@
 development:
-  sessions:
+  clients:
     default:
       database: google_syncinator_development
       hosts:
         - localhost:27017
 
 test:
-  sessions:
+  clients:
     default:
       database: google_syncinator_test
       hosts:
         - localhost:27017
 
 staging:
-  sessions:
+  clients:
     default:
       database: google_syncinator
       hosts:
         - mongo1.staging.biola.edu:27017
         - mongo2.staging.biola.edu:27017
         - mongo3.staging.biola.edu:27017
-      username: google_syncinator
-      password: "*************"
+      options:
+        username: google_syncinator
+        password: "*************"
 
 production:
-  sessions:
+  clients:
     default:
       database: google_syncinator
       hosts:
         - mongo1.prod.biola.edu:27017
         - mongo2.prod.biola.edu:27017
         - mongo3.prod.biola.edu:27017
-      username: google_syncinator
-      password: "*************"
+      options:
+        username: google_syncinator
+        password: "*************"
