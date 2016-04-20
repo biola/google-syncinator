@@ -109,7 +109,7 @@ describe DeprovisionSchedule, type: :unit do
 
     it 'destroys the record' do
       expect(Sidekiq::Status).to receive(:cancel)
-      expect { subject.cancel_and_destroy! }.to change { subject.deleted? }.from(false).to true
+      expect { subject.cancel_and_destroy! }.to change { subject.destroyed? }.from(false).to true
     end
   end
 
