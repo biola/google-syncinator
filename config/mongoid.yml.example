@@ -21,7 +21,7 @@ staging:
         - mongo2.staging.biola.edu:27017
         - mongo3.staging.biola.edu:27017
       options:
-        username: google_syncinator
+        user: google_syncinator
         password: "*************"
 
 production:
@@ -33,5 +33,5 @@ production:
         - mongo2.prod.biola.edu:27017
         - mongo3.prod.biola.edu:27017
       options:
-        username: google_syncinator
+        user: google_syncinator
         password: "*************"
