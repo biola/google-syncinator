@@ -15,6 +15,7 @@ gem 'mongoid', '~> 5.1'
 gem 'mysql2'
 gem 'oj'
 gem 'pinglish'
+gem 'puma'
 # NOTE: beta1 fixes this issue https://github.com/railsconfig/rails_config/pull/86
 gem 'rails_config', '~> 0.5.0.beta1'
 gem 'rack-contrib'
