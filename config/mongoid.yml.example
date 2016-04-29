@@ -11,27 +11,3 @@ test:
       database: google_syncinator_test
       hosts:
         - localhost:27017
-
-staging:
-  clients:
-    default:
-      database: google_syncinator
-      hosts:
-        - mongo1.staging.biola.edu:27017
-        - mongo2.staging.biola.edu:27017
-        - mongo3.staging.biola.edu:27017
-      options:
-        user: google_syncinator
-        password: "*************"
-
-production:
-  clients:
-    default:
-      database: google_syncinator
-      hosts:
-        - mongo1.prod.biola.edu:27017
-        - mongo2.prod.biola.edu:27017
-        - mongo3.prod.biola.edu:27017
-      options:
-        user: google_syncinator
-        password: "*************"
