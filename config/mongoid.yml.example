@@ -11,3 +11,4 @@ test:
       database: google_syncinator_test
       hosts:
         - localhost:27017
+        
