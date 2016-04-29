@@ -8,4 +8,6 @@ use Rack::CommonLogger, file
 
 use Pinglish, &GoogleSyncinator.pinglish_block
 
-run API
+map ENV['PUMA_RELATIVE_URL_ROOT'] || '/' do
+  run API
+end
