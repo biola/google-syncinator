@@ -11,7 +11,7 @@ gem 'grape-entity'
 gem 'grape-kaminari'
 gem 'logging', '~> 1.8' # 2.0 is not compatible with blazing
 gem 'mail'
-gem 'mongoid'
+gem 'mongoid', '~> 5.1'
 gem 'mysql2'
 gem 'oj'
 gem 'pinglish'
@@ -41,7 +41,7 @@ end
 group :test do
   gem 'factory_girl'
   gem 'faker'
-  gem 'mongoid-rspec', '~> 2.1'
+  gem 'mongoid-rspec', '~> 3.0'
 end
 
 group :production do

@@ -44,7 +44,7 @@ RSpec.configure do |config|
 
   # Clean/Reset Mongoid DB and MySQL prior to running each test.
   config.before(:each) do
-    Mongoid::Sessions.default.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+    Mongoid::Clients.default.collections.select {|c| c.name !~ /system/ }.each(&:drop)
     Sidekiq::Worker.clear_all
   end
 end
