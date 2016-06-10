@@ -509,16 +509,16 @@ class GoogleAccount
     params[:privacy] = !params[:privacy] if params.has_key? :privacy
 
     google_params = map_it(params,
-      'address' => :primaryEmail,
-      'password' => :password,
-      'privacy' => :includeInGlobalAddressList,
-      'org_unit_path' => :orgUnitPath
+      address: :primaryEmail,
+      password: :password,
+      privacy: :includeInGlobalAddressList,
+      org_unit_path: :orgUnitPath
     )
 
-    name_params = map_it(params, 'first_name' => :givenName, 'last_name' => :familyName)
+    name_params = map_it(params, first_name: :givenName, last_name: :familyName)
     google_params[:name] = name_params if name_params.any?
 
-    org_params = map_it(params, 'department' => :department, 'title' => :title)
+    org_params = map_it(params, department: :department, title: :title)
     google_params[:organizations] = [org_params] if org_params.any?
 
     google_params
