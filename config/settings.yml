@@ -73,10 +73,10 @@ deprovisioning:
           # - 15552000 # 6 months
           # - :delete
         inactive:
-          - 432000 # 5 days
-          - :notify_of_inactivity
-          - 2332800 # 27 days
-          - :notify_of_inactivity
+          # - 432000 # 5 days
+          # - :notify_of_inactivity
+          # - 2332800 # 27 days
+          # - :notify_of_inactivity
           # - 259200 # 3.days
           # - :suspend
           # - 15552000 # 6 months
@@ -87,8 +87,8 @@ deprovisioning:
           # - 432000 # 5 days
           # - :delete
         active:
-          - 432000 # 5 days
-          - :notify_of_closure
+          # - 432000 # 5 days
+          # - :notify_of_closure
           # - 604800 # 1 week
           # - :suspend
           # - 15552000 # 6 months
@@ -98,10 +98,10 @@ deprovisioning:
         # - 432000 # 5 days
         # - :suspend
       inactive:
-        - 432000 # 5 days
-        - :notify_of_inactivity
-        - 2332800 # 27 days
-        - :notify_of_inactivity
+        # - 432000 # 5 days
+        # - :notify_of_inactivity
+        # - 2332800 # 27 days
+        # - :notify_of_inactivity
         # - 259200 # 3.days
         # - :suspend
 
@@ -134,9 +134,9 @@ affiliations:
 organizational_units:
   person_emails:
     /Employees:
-      - employee
+      # - employee
     /Alumni:
-      - alumnus
+      # - alumnus
   department_emails: "/Departments"
 
 groups:
