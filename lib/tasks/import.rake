@@ -23,7 +23,6 @@ namespace :import do
       expiration_date = rec[:expiration_date]
       reusable_date = rec[:reusable_date]
       response = Trogdir::APIClient::People.new.by_id(id: biola_id, type: :biola_id).perform
-
       if response.status == 404
         log.warn %{Could not find Biola ID "#{biola_id}" in Trogdir}
       elsif response.success?
@@ -32,19 +31,24 @@ namespace :import do
         if AccountEmail.where(uuid: uuid, address: address).any?
           log.info %{Account Email for UUID: "#{uuid}", address: "#{address}" already exists}
         else
-          email = PersonEmail.create! uuid: uuid, address: address
+          begin
+            email = PersonEmail.create! uuid: uuid, address: address
 
-          if expiration_date
-            email.deprovision_schedules.create action: :suspend, reason: REASON, scheduled_for: expiration_date, completed_at: expiration_date
+            if expiration_date
+              email.deprovision_schedules.create action: :suspend, reason: REASON, scheduled_for: expiration_date, completed_at: expiration_date
+            end
+
+            if reusable_date
+              email.deprovision_schedules.create action: :delete, reason: REASON, scheduled_for: reusable_date, completed_at: reusable_date
+            end
+
+            log.info %{Imported Account Email for UUID: "#{uuid}", Biola ID: "#{biola_id}", Email: "#{address}"}
+            count += 1
+          rescue Mongoid::Errors::Validations
+            log.warn %{The import encountered an error when attempting to import "#{rec.slice(:email, :idnumber, :expiration_date, :reuseable_date, :primary)}".}
           end
-
-          if reusable_date
-            email.deprovision_schedules.create action: :delete, reason: REASON, scheduled_for: reusable_date, completed_at: reusable_date
-          end
-
-          log.info %{Imported Account Email for UUID: "#{uuid}", Biola ID: "#{biola_id}", Email: "#{address}"}
-          count += 1
         end
+
       else
         fail response.parse['error']
       end
@@ -63,11 +67,15 @@ namespace :import do
         if AliasEmail.where(address: address, :status.ne => :deleted).any?
           log.info %{Alias Email with address: "#{address}" already exists}
         else
-          person_email = PersonEmail.find_by(uuid: uuid, state: :active)
-          AliasEmail.create! account_email: person_email, address: address
+          begin
+            person_email = PersonEmail.find_by(uuid: uuid, state: :active)
+            AliasEmail.create! account_email: person_email, address: address
 
-          log.info %{Imported Alias Email for UUID: "#{uuid}", Biola ID: "#{biola_id}", Email: "#{address}"}
-          count += 1
+            log.info %{Imported Alias Email for UUID: "#{uuid}", Biola ID: "#{biola_id}", Email: "#{address}"}
+            count += 1
+          rescue Mongoid::Errors::Validations
+            log.warn %{The import encountered an error when attempting to import "#{rec.slice(:email, :idnumber, :expiration_date, :reuseable_date, :primary)}".}
+          end
         end
       else
         fail response.parse['error']
