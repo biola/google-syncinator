@@ -45,7 +45,7 @@ namespace :import do
             log.info %{Imported Account Email for UUID: "#{uuid}", Biola ID: "#{biola_id}", Email: "#{address}"}
             count += 1
           rescue ImportError
-            log.warn %{The import encountered an error when attempting to import email: "#{address}", uuid: "#{uuid}" from ws.}
+            log.warn %{The import encountered an error when attempting to import "#{rec.slice(:email, :idnumber, :expiration_date, :reuseable_date, :primary)}".}
           end
         end
 
@@ -67,11 +67,15 @@ namespace :import do
         if AliasEmail.where(address: address, :status.ne => :deleted).any?
           log.info %{Alias Email with address: "#{address}" already exists}
         else
-          person_email = PersonEmail.find_by(uuid: uuid, state: :active)
-          AliasEmail.create! account_email: person_email, address: address
+          begin
+            person_email = PersonEmail.find_by(uuid: uuid, state: :active)
+            AliasEmail.create! account_email: person_email, address: address
 
-          log.info %{Imported Alias Email for UUID: "#{uuid}", Biola ID: "#{biola_id}", Email: "#{address}"}
-          count += 1
+            log.info %{Imported Alias Email for UUID: "#{uuid}", Biola ID: "#{biola_id}", Email: "#{address}"}
+            count += 1
+          rescue ImportError
+            log.warn %{The import encountered an error when attempting to import "#{rec.slice(:email, :idnumber, :expiration_date, :reuseable_date, :primary)}".}
+          end
         end
       else
         fail response.parse['error']
