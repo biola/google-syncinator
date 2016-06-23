@@ -133,9 +133,9 @@ affiliations:
 # NOTE: Order is important. Google accounts can only be in one org unit so the top match in the list takes precedence.
 organizational_units:
   person_emails:
-    /Employees:
+    /Employees: []
       # - employee
-    /Alumni:
+    /Alumni: []
       # - alumnus
   department_emails: "/Departments"
 
