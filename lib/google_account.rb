@@ -65,8 +65,6 @@ class GoogleAccount
       privacy: privacy,
       org_unit_path: org_unit_path
     }
-
-    result.data.emails.map{|e| e['address'].downcase }.include? full_email.downcase
   end
 
   # Is the email account available?
@@ -369,7 +367,7 @@ class GoogleAccount
   def exists?
     return false if data.nil?
 
-    data.emails.map{|e| e['address']}.include? full_email
+    data.emails.map{|e| e['address'].downcase}.include? full_email.downcase
   end
 
   def exists_in_group?(group)
