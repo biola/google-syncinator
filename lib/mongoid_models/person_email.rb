@@ -6,6 +6,10 @@ class PersonEmail < AccountEmail
   #   @param uuid [String] the Trogdir UUID of the person who owns the email
   #   @return [String]
   field :uuid, type: String
+
+  # Email addresses that have been vaulted in Google apps will no longer be
+  #  associated with the person that they belonged to.
+  #  If in the future they return, they will be given a new address.
   validates :uuid, presence: true, unless: :vfe?
   validates :address, uniqueness: {scope: :uuid}
 
