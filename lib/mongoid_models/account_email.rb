@@ -12,6 +12,9 @@ class AccountEmail < UniversityEmail
   # @!method alias_emails=(alias_emails)
   #   @param alias_emails [Array<AliasEmail>]
   #   @return [Array<AliasEmail>]
+
+  field :vfe, type: Boolean, default: false
+
   has_many :alias_emails, dependent: :destroy
 
 
@@ -20,7 +23,7 @@ class AccountEmail < UniversityEmail
   # Email addresses who should recieve notifications about this account
   # @return [Array<String>] email addresses
   def notification_recipients
-    raise NotImplementedError, 'This method should be overridden in child clasess'
+    raise NotImplementedError, 'This method should be overridden in child classes'
   end
 
   # Does an currently active exclusion record exist?

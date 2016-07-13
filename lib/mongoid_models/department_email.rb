@@ -7,7 +7,7 @@ class DepartmentEmail < AccountEmail
   #   @return [Array<String>]
   field :uuids, type: Array
 
-  validates :uuids, presence: true
+  validates :uuids, presence: true, unless: :vfe?
 
   # Email addresses who should recieve notifications about this account
   # @return [Array<AccountEmail>] email addresses

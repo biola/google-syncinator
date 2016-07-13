@@ -6,8 +6,6 @@ class PersonEmail < AccountEmail
   #   @param uuid [String] the Trogdir UUID of the person who owns the email
   #   @return [String]
   field :uuid, type: String
-  field :vfe, type: Boolean, default: false
-
   validates :uuid, presence: true, unless: :vfe?
   validates :address, uniqueness: {scope: :uuid}
 
