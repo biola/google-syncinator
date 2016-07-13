@@ -16,9 +16,9 @@ class AccountEmail < UniversityEmail
 
   # @!attribute vfe
   #   @return [Boolean] whether or not the email has been vaulted in Google apps
-  # @!method vfes=(vfes)
-  #   @param vfes [Array<Boolean>] email accounts that have been vaulted in Google apps
-  #   @return [Array<Boolean>]
+  # @!method vfe=(vfe)
+  #   @param vfe [Boolean]
+  #   @return [Boolean]
   field :vfe, type: Boolean, default: false
 
 
