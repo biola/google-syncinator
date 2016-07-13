@@ -14,13 +14,20 @@ class AccountEmail < UniversityEmail
   #   @return [Array<AliasEmail>]
   has_many :alias_emails, dependent: :destroy
 
+  # @!attribute vfe
+  #   @return [Boolean] whether or not the email has been vaulted in Google apps
+  # @!method vfe=(vfe)
+  #   @param vfe [Boolean]
+  #   @return [Boolean]
+  field :vfe, type: Boolean, default: false
+
 
   after_save :update_alias_state
 
   # Email addresses who should recieve notifications about this account
   # @return [Array<String>] email addresses
   def notification_recipients
-    raise NotImplementedError, 'This method should be overridden in child clasess'
+    raise NotImplementedError, 'This method should be overridden in child classes'
   end
 
   # Does an currently active exclusion record exist?

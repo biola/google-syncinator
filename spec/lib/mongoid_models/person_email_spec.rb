@@ -6,7 +6,7 @@ describe PersonEmail, type: :unit do
 
   it { is_expected.to embed_many(:deprovision_schedules) }
   it { is_expected.to embed_many(:exclusions) }
-  it { is_expected.to have_fields(:uuid, :address, :state) }
+  it { is_expected.to have_fields(:uuid, :address, :state, :vfe) }
   it { is_expected.to be_timestamped_document }
 
   it { is_expected.to validate_presence_of(:uuid) }
