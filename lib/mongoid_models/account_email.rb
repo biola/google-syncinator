@@ -12,10 +12,14 @@ class AccountEmail < UniversityEmail
   # @!method alias_emails=(alias_emails)
   #   @param alias_emails [Array<AliasEmail>]
   #   @return [Array<AliasEmail>]
-
-  field :vfe, type: Boolean, default: false
-
   has_many :alias_emails, dependent: :destroy
+
+  # @!attribute vfe
+  #   @return [Boolean] whether or not the email has been vaulted in Google apps
+  # @!method vfes=(vfes)
+  #   @param vfes [Array<Boolean>] email accounts that have been vaulted in Google apps
+  #   @return [Array<Boolean>]
+  field :vfe, type: Boolean, default: false
 
 
   after_save :update_alias_state
