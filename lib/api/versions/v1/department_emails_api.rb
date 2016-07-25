@@ -23,7 +23,7 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       optional :privacy, type: Boolean
     end
     post do
-      args = params.slice(:first_name, :last_name, :password, :department, :title, :privacy)
+      args = params.slice(:first_name, :last_name, :password, :department, :title, :privacy).to_hash(symbolize_keys: true)
       params[:org_unit_path] = Settings.organizational_units.department_emails
 
       GoogleAccount.new(params[:address]).create! args
@@ -47,10 +47,10 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       email = DepartmentEmail.find(params[:department_email_id])
       old_address = email.address.dup
 
-      api_args = params.slice(:address, :password, :first_name, :last_name, :department, :title, :privacy)
+      api_args = params.slice(:address, :password, :first_name, :last_name, :department, :title, :privacy).to_hash(symbolize_keys: true)
       GoogleAccount.new(email.address).update! api_args if api_args.any?
 
-      model_args = params.slice(:address, :uuids).to_hash
+      model_args = params.slice(:address, :uuids).to_hash(symbolize_keys: true)
       email.update! model_args if model_args.any?
 
       # Google will automatically create an alias of the old email when renaming the email address
