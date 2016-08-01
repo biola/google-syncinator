@@ -8,6 +8,7 @@ class API::V1::EmailsAPI < Grape::API
       optional :q, type: String
       optional :state, type: String
       optional :pending, type: String
+      optional :_type, type: String
     end
     paginate
     get do
@@ -27,6 +28,9 @@ class API::V1::EmailsAPI < Grape::API
         ands << {:'deprovision_schedules.scheduled_for'.ne => nil, 'deprovision_schedules.completed_at' => nil, 'deprovision_schedules.canceled' => nil}
       end
 
+      if params[:_type].present?
+        ands << {_type: params[:_type]}
+      end
 
       emails = if ors.any? || ands.any?
         UniversityEmail.or(*ors).and(*ands)
