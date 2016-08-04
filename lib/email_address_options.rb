@@ -23,6 +23,7 @@ class EmailAddressOptions
   # The person's last name
   # @return [String]
   attr_reader :last_name
+  
 
   # @param affiliations [Array<String>] the person's affiliations
   # @param preferred_name [String] the person's preferred name or nickname, if any

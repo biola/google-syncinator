@@ -10,6 +10,7 @@ class API::V1::DepartmentEmailEntity < Grape::Entity
   expose :privacy
   expose :org_unit_path
   expose :state
+  expose :vfe
   expose :deprovision_schedules, using: API::V1::DeprovisionScheduleEntity
   expose :exclusions, using: API::V1::ExclusionEntity
   expose :alias_emails, using: API::V1::AliasEmailEntity
