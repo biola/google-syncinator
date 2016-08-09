@@ -25,13 +25,20 @@ class API::V1::PersonEmailsAPI < Grape::API
       present email, with: API::V1::PersonEmailEntity
     end
 
-    desc 'Rename a person email'
+    # NOTE: uuid will always be set to whatever is passed through.   
+    desc 'Update a person email'
     params do
-      requires :address, type: String
+      optional :first_name, type: String
+      optional :last_name, type: String
+      optional :address, type: String
+      optional :uuid, type: String
+      optional :password, type: String
+      optional :vfe, type: Boolean
+      optional :privacy, type: Boolean
     end
     put ':id' do
-      # NOTE: We need the email object back so don't preform asynchronously here
-      email = Workers::RenamePersonEmail.new.perform params['id'], params['address']
+      account_params = params.to_hash(symbolize_keys: true)
+      email = Workers::UpdatePersonAccount.new.perform account_params
 
       present email, with: API::V1::PersonEmailEntity
     end
