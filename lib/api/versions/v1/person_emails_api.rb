@@ -25,20 +25,19 @@ class API::V1::PersonEmailsAPI < Grape::API
       present email, with: API::V1::PersonEmailEntity
     end
 
-    # NOTE: uuid will always be set to whatever is passed through.   
+    # NOTE: uuid will always be set to whatever is passed through and should be an empty string if the owner is being removed.
     desc 'Update a person email'
     params do
+      requires :uuid, type: String
+      requires :address, type: String
       optional :first_name, type: String
       optional :last_name, type: String
-      optional :address, type: String
-      optional :uuid, type: String
       optional :password, type: String
       optional :vfe, type: Boolean
       optional :privacy, type: Boolean
     end
     put ':id' do
-      account_params = params.to_hash(symbolize_keys: true)
-      email = Workers::UpdatePersonAccount.new.perform account_params
+      email = Workers::UpdatePersonEmail.new(id, uuid, address, first_name, last_name, password, vfe, privacy).perform 
 
       present email, with: API::V1::PersonEmailEntity
     end

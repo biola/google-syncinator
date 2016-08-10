@@ -80,7 +80,7 @@ describe API::V1::EmailsAPI, type: :unit do
     context 'when authenticated' do
       before do
         expect(TrogdirPerson).to receive(:new).with(uuid).and_return double(biola_id: 1234567)
-        expect_any_instance_of(GoogleAccount).to receive(:rename!).with(new_address)
+        expect_any_instance_of(GoogleAccount).to receive(:update!).with(new_address)
       end
 
       it { expect(subject.status).to eql 200 }

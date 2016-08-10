@@ -5,6 +5,6 @@ module Workers
     require './lib/workers/trogdir/change_finish.rb'
     require './lib/workers/trogdir/create_email.rb'
     require './lib/workers/trogdir/delete_email.rb'
-    require './lib/workers/trogdir/update_email.rb'
+    require './lib/workers/trogdir/rename_email.rb'
   end
 end
