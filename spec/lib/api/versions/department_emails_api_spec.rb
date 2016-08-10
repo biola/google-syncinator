@@ -51,6 +51,7 @@ describe API::V1::EmailsAPI, type: :unit do
         privacy: false,
         org_unit_path: '/BabyKissers',
         state: email.state.to_s,
+        vfe: false,
         deprovision_schedules: [],
         exclusions: [],
         alias_emails: []

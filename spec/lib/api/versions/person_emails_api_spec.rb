@@ -69,7 +69,7 @@ describe API::V1::EmailsAPI, type: :unit do
     let(:method) { :put }
     let(:url) { "/v1/person_emails/#{email.id}" }
     let(:new_address) { 'bobby.dole@biola.edu' }
-    let(:params) { {uuid: uuid, address: new_address} }
+    let(:params) { {id: email.id, uuid: uuid, address: new_address, first_name: 'Bob', last_name: 'Dole', password: '1234', vfe: false, privacy: false} }
 
     context 'when unauthenticated' do
       before { post url, params }
