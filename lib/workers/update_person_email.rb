@@ -43,7 +43,7 @@ module Workers
     # @param password [String] The users new password
     # @param vfe [Boolean] Whether or not the account has been vaulted
     # @param privacy [Boolean] The users privacy status
-    def initialize(id, uuid, address, first_name, last_name, password, vfe, privacy)
+    def initialize(id: nil, uuid: nil, address: nil, first_name: nil, last_name: nil, password: nil, vfe: nil, privacy: nil)
       @id = id
       @new_uuid = uuid.presence
       @new_address = address

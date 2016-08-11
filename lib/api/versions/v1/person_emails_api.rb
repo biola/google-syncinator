@@ -46,7 +46,16 @@ class API::V1::PersonEmailsAPI < Grape::API
     end
     put ':id' do
       # We need the email object back so don't perform asynchronously here
-      email = Workers::UpdatePersonEmail.new(params['id'], params['uuid'], params['address'], params['first_name'], params['last_name'], params['password'], params['vfe'], params['privacy']).perform
+      email = Workers::UpdatePersonEmail.new(
+                                              id: params['id'],
+                                              uuid: params['uuid'],
+                                              address: params['address'],
+                                              first_name: params['first_name'],
+                                              last_name: params['last_name'],
+                                              password: params['password'],
+                                              vfe: params['vfe'],
+                                              privacy: params['privacy']
+                                             ).perform
 
       email = prep_email(email)
 
