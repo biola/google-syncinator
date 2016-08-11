@@ -6,6 +6,8 @@ class API::V1::PersonEmailEntity < Grape::Entity
   expose :state
   expose :vfe
   expose :first_name
+  expose :last_name
+  expose :privacy
   expose :deprovision_schedules, using: API::V1::DeprovisionScheduleEntity
   expose :exclusions, using: API::V1::ExclusionEntity
   expose :alias_emails, using: API::V1::AliasEmailEntity

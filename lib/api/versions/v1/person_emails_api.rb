@@ -1,6 +1,10 @@
+require './lib/api/versions/v1/helpers/email_helpers'
+
 # Version 1 of the person emails Grape API
 class API::V1::PersonEmailsAPI < Grape::API
   include Grape::Kaminari
+
+  helpers  EmailHelpers
 
   resource :person_emails do
     desc 'Gets an individual person email'
@@ -9,6 +13,8 @@ class API::V1::PersonEmailsAPI < Grape::API
     end
     get ':id' do
       email = PersonEmail.find(params[:id])
+
+      email = prep_email(email)
 
       present email, with: API::V1::PersonEmailEntity
     end
@@ -21,6 +27,8 @@ class API::V1::PersonEmailsAPI < Grape::API
     post do
       # NOTE: We need the email object back so don't preform asynchronously here
       email = Workers::CreatePersonEmail.new.perform(params[:uuid], params[:address])
+
+      email = prep_email(email)
 
       present email, with: API::V1::PersonEmailEntity
     end
@@ -37,7 +45,10 @@ class API::V1::PersonEmailsAPI < Grape::API
       optional :privacy, type: Boolean
     end
     put ':id' do
-      email = Workers::UpdatePersonEmail.new(id, uuid, address, first_name, last_name, password, vfe, privacy).perform 
+      # We need the email object back so don't perform asynchronously here
+      email = Workers::UpdatePersonEmail.new(params['id'], params['uuid'], params['address'], params['first_name'], params['last_name'], params['password'], params['vfe'], params['privacy']).perform
+
+      email = prep_email(email)
 
       present email, with: API::V1::PersonEmailEntity
     end

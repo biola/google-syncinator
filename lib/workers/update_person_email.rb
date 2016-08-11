@@ -61,18 +61,18 @@ module Workers
     def perform
       email = PersonEmail.find(id)
       old_address = email.address.dup
+      google_address = (new_address == old_address ? nil : new_address)
       old_uuid = email.uuid.try(:dup).presence
       old_biola_id = biola_id(old_uuid) if old_uuid.present?
       new_biola_id = biola_id(new_uuid) if new_uuid.present?
 
-      google_params = Hash( first_name: first_name, last_name: last_name, password: password, address: new_address, privacy: privacy ).reject{|k, v| v.nil? || v.try(:empty?) }
+      google_params = Hash( first_name: first_name, last_name: last_name, password: password, address: google_address, privacy: privacy ).reject{|k, v| v.nil? || v.try(:empty?) }
 
       Log.info %{Update PersonEmail address from "#{email}" to "#{google_params.merge(uuid: new_uuid, vfe: vfe).except(:password)}"}
 
       if Enabled.write?
-        GoogleAccount.new(old_address).update! google_params
+        GoogleAccount.new(old_address).update!(google_params) unless google_params.empty?
         email.update! address: new_address, vfe: vfe, uuid: new_uuid
-
         if old_address != new_address
           AliasEmail.create! account_email: email, address: old_address
           if old_uuid.present?
