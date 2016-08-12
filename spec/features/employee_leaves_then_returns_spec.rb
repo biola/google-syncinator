@@ -25,7 +25,7 @@ describe 'employee leaves then returns', type: :feature  do
       # We stub these to keep them from running immediately.
       before { expect_any_instance_of(Workers::Deprovisioning::Delete).to receive(:perform) }
 
-      it 'cancels the deletion and reactivates the account' do
+      xit 'cancels the deletion and reactivates the account' do
         allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: ['employee'])
         expect_any_instance_of(Trogdir::APIClient::Emails).to receive(:index).and_return double(perform: double(success?: true, parse: [{'address' => address}]))
         expect_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false

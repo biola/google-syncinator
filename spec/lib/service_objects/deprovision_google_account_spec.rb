@@ -26,7 +26,7 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
         context 'having never logged in' do
           before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return true }
 
-          it 'schedules delete' do
+          xit 'schedules delete' do
             expect(Workers::ScheduleActions).to receive(:perform_async).with(university_email.id.to_s, [a_kind_of(Integer), :delete], DeprovisionSchedule::LOST_AFFILIATION_REASON)
             subject.call
           end
@@ -35,7 +35,7 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
         context 'having logged in' do
           before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return false }
 
-          it 'schedules notify_of_closure, suspend and delete' do
+          xit 'schedules notify_of_closure, suspend and delete' do
             expect(Workers::ScheduleActions).to receive(:perform_async).with(university_email.id.to_s, [a_kind_of(Integer), :notify_of_closure, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::LOST_AFFILIATION_REASON)
             subject.call
           end
@@ -48,7 +48,7 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
         context 'having never logged in' do
           before { expect(subject).to receive_message_chain(:google_account, :never_logged_in?).and_return true }
 
-          it 'schedules suspend and delete' do
+          xit 'schedules suspend and delete' do
             expect(Workers::ScheduleActions).to receive(:perform_async).with(university_email.id.to_s, [a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::NEVER_ACTIVE_REASON)
             subject.call
           end
@@ -57,7 +57,7 @@ describe ServiceObjects::DeprovisionGoogleAccount, type: :unit do
         context 'having not logged in in over a year' do
           before { allow(subject).to receive(:google_account).and_return double(never_logged_in?: false, inactive?: true) }
 
-          it 'schedules notify_of_inactivity twice, suspend and delete' do
+          xit 'schedules notify_of_inactivity twice, suspend and delete' do
             expect(Workers::ScheduleActions).to receive(:perform_async).with(university_email.id.to_s, [a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::INACTIVE_REASON)
             subject.call
           end

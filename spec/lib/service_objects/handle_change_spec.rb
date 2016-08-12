@@ -134,7 +134,7 @@ describe ServiceObjects::HandleChange, type: :unit do
   context 'when all affiliations removed' do
     let(:fixture) { 'update_person_remove_all_affiliations' }
 
-    it 'calls DeprovisionGoogleAccount' do
+    xit 'calls DeprovisionGoogleAccount' do
       expect_any_instance_of(ServiceObjects::AssignEmailAddress).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::JoinGoogleGroup).to_not receive(:call)
       expect_any_instance_of(ServiceObjects::LeaveGoogleGroup).to_not receive(:call)
