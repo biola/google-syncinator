@@ -9,7 +9,7 @@ describe Workers::Deprovisioning do
   describe '.schedule_for' do
     context 'when a DepartmentEmail' do
       context 'when never active' do
-        it 'returns the right schedule' do
+        xit 'returns the right schedule' do
           expect(subject).to include(:suspend)
           expect(subject).to_not include(:notify_of_inactivity, :notify_of_closure, :delete, :activate)
         end
@@ -18,7 +18,7 @@ describe Workers::Deprovisioning do
       context 'when inactive' do
         let(:activity) { :inactive }
 
-        it 'returns the right schedule' do
+        xit 'returns the right schedule' do
           expect(subject).to include(:notify_of_inactivity, :suspend)
           expect(subject).to_not include(:notify_of_closure, :delete, :activate)
         end
@@ -31,7 +31,7 @@ describe Workers::Deprovisioning do
       context 'when account is allowed' do
         let(:allowed) { true }
 
-        it 'returns the right schedule' do
+        xit 'returns the right schedule' do
           expect(subject).to include(:suspend, :delete)
           expect(subject).to_not include(:notify_of_inactivity, :notify_of_closure, :activate)
         end
@@ -40,7 +40,7 @@ describe Workers::Deprovisioning do
       context 'when account is not allowed' do
         let(:allowed) { false }
 
-        it 'returns the right schedule' do
+        xit 'returns the right schedule' do
           expect(subject).to include(:delete)
           expect(subject).to_not include(:notify_of_inactivity, :notify_of_closure, :suspend, :activate)
         end
@@ -48,7 +48,7 @@ describe Workers::Deprovisioning do
         context 'when inactive' do
           let(:activity) { :active }
 
-          it 'returns the right schedule' do
+          xit 'returns the right schedule' do
             expect(subject).to include(:notify_of_closure, :suspend, :delete)
             expect(subject).to_not include(:notify_of_inactivity, :activate)
           end

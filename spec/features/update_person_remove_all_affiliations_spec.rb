@@ -19,7 +19,7 @@ describe 'remove all affiliations', type: :feature  do
   end
 
   context 'when never active' do
-    it 'schedules a deletion' do
+    xit 'schedules a deletion' do
       allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return nil
       allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
@@ -51,7 +51,7 @@ describe 'remove all affiliations', type: :feature  do
   end
 
   context 'when has been active' do
-    it 'schedules a notice of closure, suspension and deletion' do
+    xit 'schedules a notice of closure, suspension and deletion' do
       allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 366.days.ago
       allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false

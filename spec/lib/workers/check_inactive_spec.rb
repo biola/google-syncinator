@@ -40,7 +40,7 @@ describe Workers::CheckInactive, type: :unit do
         context 'when the person is just an alumnus' do
           let(:affiliations) { ['alumnus'] }
 
-          it 'scheduled deprovisioning' do
+          xit 'scheduled deprovisioning' do
             expect(Workers::ScheduleActions).to receive(:perform_async).with(email.id.to_s, [a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :notify_of_inactivity, a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::INACTIVE_REASON)
             Workers::CheckInactive.new.perform
           end

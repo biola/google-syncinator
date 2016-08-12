@@ -41,7 +41,7 @@ describe Workers::CheckNeverActive, type: :unit do
           let(:affiliations) { ['alumnus'] }
           # before { expect_any_instance_of(GoogleAccount).to receive(:never_active?).and_return true }
 
-          it 'scheduled deprovisioning' do
+          xit 'scheduled deprovisioning' do
             expect(Workers::ScheduleActions).to receive(:perform_async).with(email.id.to_s, [a_kind_of(Integer), :suspend, a_kind_of(Integer), :delete], DeprovisionSchedule::NEVER_ACTIVE_REASON)
             Workers::CheckNeverActive.new.perform
           end

@@ -18,7 +18,7 @@ describe 'update person name', type: :feature  do
     DB[:email].insert(idnumber: biola_id, email: address)
   end
 
-  it 'syncs the google account data' do
+xit 'syncs the google account data' do
     expect(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, first_or_preferred_name: 'B-dizzle', last_name: 'Dole', department: 'Office of the President', title: 'Commander in Chief', privacy: false, affiliations: ['employee'])
     expect_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
 

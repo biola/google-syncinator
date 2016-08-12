@@ -19,7 +19,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
   end
 
   context 'when never active' do
-    it 'schedules a suspension and deletion' do
+    xit 'schedules a suspension and deletion' do
       allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return nil
       allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
@@ -54,7 +54,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
   end
 
   context 'when a long time since active' do
-    it 'schedules two notices of inactivity, a suspension and a deletion' do
+    xit 'schedules two notices of inactivity, a suspension and a deletion' do
       allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 366.days.ago
       allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
@@ -89,7 +89,7 @@ describe 'remove affilation leaving alumnus only', type: :feature  do
   end
 
   context 'when recently active' do
-    it 'does nothing' do
+    xit 'does nothing' do
       allow(TrogdirPerson).to receive(:new).and_return instance_double(TrogdirPerson, biola_id: biola_id, first_or_preferred_name: 'Bob', last_name: 'Dole', department: nil, title: nil, privacy: false, affiliations: [])
       allow_any_instance_of(GoogleAccount).to receive(:last_login).and_return 364.days.ago
       allow_any_instance_of(GoogleAccount).to receive(:suspended?).and_return false
