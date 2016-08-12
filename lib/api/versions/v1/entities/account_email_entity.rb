@@ -4,6 +4,7 @@ class API::V1::AccountEmailEntity < Grape::Entity
   expose :_type
   expose :address
   expose :state
+  expose :vfe
   expose :deprovision_schedules, using: API::V1::DeprovisionScheduleEntity
   expose :exclusions, using: API::V1::ExclusionEntity
 

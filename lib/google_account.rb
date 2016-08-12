@@ -147,25 +147,12 @@ class GoogleAccount
   # @option params [String, nil] :title The users title
   # @option params [Boolean] :privacy The users privacy setting
   # @option params [String] :org_unit_path The users organization unit path
+  # @option params [String] :address The users email address
   # @return [true]
   def update!(params)
     google_params = self.class.to_google_params(params)
 
     user_updates = directory.users.update.request_schema.new(google_params)
-
-    safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
-
-    true
-  end
-
-  # Renames a Google Apps account's primary email
-  # @param new_address [String] the new email address the account will use
-  # @return [true]
-  # @note this will automatically create an alias of the old address
-  def rename!(new_address)
-    params = {primaryEmail: new_address}
-
-    user_updates = directory.users.update.request_schema.new(params)
 
     safe_execute api_method: directory.users.update, parameters: {userKey: full_email}, body_object: user_updates
 

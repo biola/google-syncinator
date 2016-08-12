@@ -1,6 +1,10 @@
+require './lib/api/versions/v1/helpers/email_helpers'
+
 # Version 1 of the department emails Grape API
 class API::V1::DepartmentEmailsAPI < Grape::API
   include Grape::Kaminari
+
+  helpers  EmailHelpers
 
   resource :department_emails do
     desc 'Gets an individual department email'
@@ -8,7 +12,8 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       requires :id, type: String
     end
     get ':id' do
-      present_email DepartmentEmail.find(params[:id])
+      email = prep_email(DepartmentEmail.find(params[:id]))
+      present email, with: API::V1::DepartmentEmailEntity
     end
 
     desc 'Create a department email'
@@ -29,7 +34,8 @@ class API::V1::DepartmentEmailsAPI < Grape::API
       GoogleAccount.new(params[:address]).create! args
       email = DepartmentEmail.create! address: params[:address], uuids: params[:uuids]
 
-      present_email email
+      email = prep_email(email)
+      present email, with: API::V1::DepartmentEmailEntity
     end
 
     desc 'Update a department email'
@@ -59,22 +65,7 @@ class API::V1::DepartmentEmailsAPI < Grape::API
         AliasEmail.create! address: old_address, account_email: email
       end
 
-      present_email email
-    end
-  end
-
-  helpers do
-    def present_email(department_email)
-      google_email = GoogleAccount.new(department_email.address)
-
-      attribs = google_email.to_hash
-      attribs.merge! department_email.attributes
-      attribs.merge! id: department_email.id # attributes uses _id
-      attribs.merge! deprovision_schedules: department_email.deprovision_schedules
-      attribs.merge! exclusions: department_email.exclusions
-      attribs.merge! alias_emails: department_email.alias_emails
-      email = OpenStruct.new(attribs)
-
+      email = prep_email(email)
       present email, with: API::V1::DepartmentEmailEntity
     end
   end

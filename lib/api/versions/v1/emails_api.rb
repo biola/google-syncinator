@@ -9,6 +9,7 @@ class API::V1::EmailsAPI < Grape::API
       optional :state, type: String
       optional :pending, type: String
       optional :_type, type: String
+      optional :vfe, type: Boolean
     end
     paginate
     get do
@@ -30,6 +31,10 @@ class API::V1::EmailsAPI < Grape::API
 
       if params[:_type].present?
         ands << {_type: params[:_type]}
+      end
+
+      if params[:vfe].present?
+        ands << {vfe: true}
       end
 
       emails = if ors.any? || ands.any?

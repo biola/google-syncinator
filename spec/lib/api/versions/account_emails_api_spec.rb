@@ -52,7 +52,7 @@ describe API::V1::AccountEmailsAPI, type: :unit do
 
     context 'when a PersonEmail' do
       it 'returns PersonEmail attributes' do
-        expect(json).to eql id: email.id.to_s, _type: 'PersonEmail', uuid: email.uuid, address: email.address, state: email.state.to_s, deprovision_schedules: [], exclusions: []
+        expect(json).to eql id: email.id.to_s, _type: 'PersonEmail', address: email.address, state: email.state.to_s, vfe: email.vfe, deprovision_schedules: [], exclusions: [], uuid: email.uuid
       end
     end
 
@@ -60,7 +60,7 @@ describe API::V1::AccountEmailsAPI, type: :unit do
       let(:email) { department_email }
 
       it 'returns DepartmentEmail attributes' do
-        expect(json).to eql id: email.id.to_s, _type: 'DepartmentEmail', uuids: email.uuids, address: email.address, state: email.state.to_s, deprovision_schedules: [], exclusions: []
+        expect(json).to eql id: email.id.to_s, _type: 'DepartmentEmail', address: email.address, state: email.state.to_s, vfe: email.vfe, deprovision_schedules: [], exclusions: [], uuids: email.uuids
       end
     end
   end
