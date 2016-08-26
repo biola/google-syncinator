@@ -171,6 +171,21 @@ class GoogleAccount
     update_suspension! false
   end
 
+  # Vault the Google Apps account
+  # @return [true]
+  def vault!
+    # TODO: finish this
+    # safe_execute api_method: directory.users.update, parameters: {productId: 'Google-Vault', skuId: 'Google-Vault-Former-Employee'}, body_object: { userId: email }
+
+    suspend!
+    update!(
+      first_name: "VFE #{first_name}",
+      address: "vfe.#{email}"
+    )
+
+    true
+  end
+
   # Delete an alias of this Google Apps account
   # @return [true]
   def delete_alias!(alias_address)
@@ -404,6 +419,7 @@ class GoogleAccount
       signing_key: key)
     api.authorization.person = Settings.google.api_client.person
     api.authorization.fetch_access_token!
+
     api
   end
 
