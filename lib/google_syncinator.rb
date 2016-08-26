@@ -64,7 +64,7 @@ module GoogleSyncinator
 
     require 'active_support'
     require 'active_support/core_ext'
-    require 'google/api_client'
+    require 'google/apis/admin_directory_v1'
     require 'grape-kaminari'
     require 'rack/contrib'
 

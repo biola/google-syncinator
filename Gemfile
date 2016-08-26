@@ -5,11 +5,11 @@ gem 'activesupport'
 #   problems with some Rails hooks in other gems. We'll not require it here, but
 #   require it in google_syncinator.rb instead to work around it.
 gem 'api-auth', require: false
-gem 'google-api-client'
+gem 'google-api-client', '~> 0.9'
 gem 'grape'
 gem 'grape-entity'
 gem 'grape-kaminari'
-gem 'logging', '~> 1.8' # 2.0 is not compatible with blazing
+gem 'logging', '~> 2.0' 
 gem 'mail'
 gem 'mongoid', '~> 5.1'
 gem 'mysql2'

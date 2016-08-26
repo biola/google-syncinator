@@ -342,6 +342,56 @@ class GoogleAccount
 
   private
 
+  ##
+  # Loads a key from PKCS12 file, assuming a single private key
+  # is present.
+  #
+  # @param [String] keyfile
+  #    Path of the PKCS12 file to load. If not a path to an actual file,
+  #    assumes the string is the content of the file itself.
+  # @param [String] passphrase
+  #   Passphrase for unlocking the private key
+  #
+  # @return [OpenSSL::PKey] The private key for signing assertions.
+  def self.load_from_pkcs12(keyfile, passphrase)
+    load_key(keyfile, passphrase) do |content, pass_phrase|
+    OpenSSL::PKCS12.new(content, pass_phrase).key
+    end
+  end
+
+  ##
+  # Helper for loading keys from file or memory. Accepts a block
+  # to handle the specific file format.
+  #
+  # @param [String] keyfile
+  #    Path of thefile to load. If not a path to an actual file,
+  #    assumes the string is the content of the file itself.
+  # @param [String] passphrase
+  #   Passphrase for unlocking the private key
+  #
+  # @yield [String, String]
+  #   Key file & passphrase to extract key from
+  # @yieldparam [String] keyfile
+  #   Contents of the file
+  # @yieldparam [String] passphrase
+  #   Passphrase to unlock key
+  # @yieldreturn [OpenSSL::PKey]
+  #   Private key
+  #
+  # @return [OpenSSL::PKey] The private key for signing assertions.
+  def self.load_key(keyfile, passphrase, &block)
+    begin
+      begin
+        content = File.open(keyfile, 'rb') { |io| io.read }
+      rescue
+        content = keyfile
+      end
+      block.call(content, passphrase)
+    rescue OpenSSL::OpenSSLError
+      raise ArgumentError.new("Invalid keyfile or passphrase")
+    end
+  end
+
   # The full email address of the Google account
   # @return [String] a full email address including the domain part
   def full_email
@@ -388,13 +438,13 @@ class GoogleAccount
 
   # An wrapper of sorts for making API calls to Google.
   #   OAuth authentication is handled here.
-  # @return [Google::APIClient]
+  # @return [Google::Apis::AdminDirectoryV1::DirectoryService]
   def self.api
-    api = Google::APIClient.new(
-      application_name: Settings.google.api_client.application_name,
-      application_version: Settings.google.api_client.application_version)
+    api = Google::Apis::AdminDirectoryV1::DirectoryService.new
+    api.client_options.application_name = Settings.google.api_client.application_name
+    api.client_options.application_version = Settings.google.api_client.application_version
 
-    key = Google::APIClient::KeyUtils.load_from_pkcs12(Settings.google.api_client.key_path, Settings.google.api_client.secret)
+    key = load_from_pkcs12(Settings.google.api_client.key_path, Settings.google.api_client.secret)
 
     api.authorization = Signet::OAuth2::Client.new(
       token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
