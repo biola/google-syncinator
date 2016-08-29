@@ -21,7 +21,7 @@ module Workers
 
         unless schedule.canceled?
           GoogleAccount.new(email.address).vault!
-          email.update_attributes(address: "vfe.#{emails.address}")
+          email.update_attributes(address: "vfe.#{emails.address}", state: :suspended)
 
           if email.sync_to_trogdir? && email.uuid.present?
             Trogdir::DeleteEmail.perform_async(email.uuid, email.address)
