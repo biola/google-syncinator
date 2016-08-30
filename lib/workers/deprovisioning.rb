@@ -7,6 +7,7 @@ module Workers
     require './lib/workers/deprovisioning/notify_of_closure'
     require './lib/workers/deprovisioning/notify_of_inactivity'
     require './lib/workers/deprovisioning/suspend'
+    require './lib/workers/deprovisioning/vault'
 
     # Find the right deprovision schedule
     # @note Assumes the account_email should be deprovisioned

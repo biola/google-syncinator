@@ -10,7 +10,7 @@ class DeprovisionSchedule
   include Mongoid::Timestamps
 
   # Valid values for the action field
-  ACTIONS = [:notify_of_inactivity, :notify_of_closure, :suspend, :delete, :activate]
+  ACTIONS = [:notify_of_inactivity, :notify_of_closure, :suspend, :vault, :delete, :activate]
   # Maps action names to university email states
   # @see UniversityEmail#state
   STATE_MAP = {

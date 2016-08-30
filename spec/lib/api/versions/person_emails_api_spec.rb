@@ -145,5 +145,14 @@ describe API::V1::EmailsAPI, type: :unit do
         end
       end
     end
+
+    context 'when removing the owner and setting vfe' do
+      let(:params) { { id: email.id, address: new_address, uuid: '' , vfe: true } }
+
+      it 'updates the email object' do
+        expect_any_instance_of(GoogleAccount).to receive(:update!).with address: 'bobby.dole@biola.edu'
+        expect { subject }.to change { email.reload.uuid }.from(uuid).to nil
+      end
+    end
   end
 end

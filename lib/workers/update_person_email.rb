@@ -44,6 +44,7 @@ module Workers
     # @param vfe [Boolean] Whether or not the account has been vaulted
     # @param privacy [Boolean] The users privacy status
     def initialize(id: nil, uuid: nil, address: nil, first_name: nil, last_name: nil, password: nil, vfe: nil, privacy: nil)
+      Log.info %{UUID Update: "#{uuid}"}
       @id = id
       @new_uuid = uuid.presence
       @new_address = address
@@ -72,7 +73,9 @@ module Workers
 
       if Enabled.write?
         GoogleAccount.new(old_address).update!(google_params) unless google_params.empty?
+
         email.update! address: new_address, vfe: vfe, uuid: new_uuid
+
         if old_address != new_address
           AliasEmail.create! account_email: email, address: old_address
           if old_uuid.present?
