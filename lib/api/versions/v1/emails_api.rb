@@ -34,7 +34,7 @@ class API::V1::EmailsAPI < Grape::API
       end
 
       if params[:vfe].present?
-        ands << {vfe: true}
+        ands << {vfe: params[:vfe]}
       end
 
       emails = if ors.any? || ands.any?
