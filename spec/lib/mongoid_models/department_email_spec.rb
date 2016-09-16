@@ -9,7 +9,7 @@ describe DepartmentEmail do
   it { is_expected.to embed_many :exclusions }
   it { is_expected.to be_timestamped_document }
 
-  it { is_expected.to validate_presence_of(:uuids) }
+  it { is_expected.to validate_presence_of(:uuids).on(:create) }
   it { is_expected.to validate_presence_of(:address) }
   it { is_expected.to validate_presence_of(:state) }
   it { is_expected.to validate_inclusion_of(:state).to_allow(:active, :suspended, :deleted) }

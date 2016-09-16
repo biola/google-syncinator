@@ -7,10 +7,8 @@ class DepartmentEmail < AccountEmail
   #   @return [Array<String>]
   field :uuids, type: Array
 
-  # Email addresses that have been vaulted in Google apps will no longer be
-  #  associated with the person that they belonged to.
-  #  If in the future they return, they will be given a new address. 
-  validates :uuids, presence: true, unless: :vfe?
+  # Many of the imported Department Emails don't have owners assigned.
+  validates :uuids, presence: true, on: :create
 
   # Email addresses who should recieve notifications about this account
   # @return [Array<AccountEmail>] email addresses
