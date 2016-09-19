@@ -94,7 +94,7 @@ module Workers
             Workers::LegacyEmailTable::Expire.perform_async(old_biola_id, old_address)
           end
         elsif old_address != new_address
-          Workers::Trogdir::RenameEmail.perform_async old_uuid, new_uuid, old_address, new_address
+          Workers::Trogdir::RenameEmail.perform_async old_uuid, old_address, new_address
         end
       end
 
