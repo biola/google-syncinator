@@ -31,10 +31,11 @@ module ServiceObjects
           actions << LeaveGoogleGroup.new(change).call
         end
 
-        unless DeprovisionGoogleAccount.ignore?(change)
-          Log.info "Begin deprovisioning of #{change.university_email} for person #{change.person_uuid}"
-          actions << DeprovisionGoogleAccount.new(change).call
-        end
+        # At the moment we are skipping automatic deprovisioning
+        # unless DeprovisionGoogleAccount.ignore?(change)
+        #   Log.info "Begin deprovisioning of #{change.university_email} for person #{change.person_uuid}"
+        #   actions << DeprovisionGoogleAccount.new(change).call
+        # end
 
         unless CancelDeprovisioningGoogleAccount.ignore?(change)
           Log.info "Cancel deprovisioning of #{change.university_email} for person #{change.person_uuid}"
