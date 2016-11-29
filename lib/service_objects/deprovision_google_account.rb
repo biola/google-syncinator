@@ -77,7 +77,9 @@ module ServiceObjects
     # Simple wrapper for the Workers::ScheduleActions worker
     # @return [String] Sidekiq worked job ID
     def schedule_actions!(actions_and_durations, reason)
-      Workers::ScheduleActions.perform_async(account_email.id.to_s, actions_and_durations, reason)
+      # TODO: Uncomment this (among other things) when we want to reactivate automatic email deprovisioning
+      # Workers::ScheduleActions.perform_async(account_email.id.to_s, actions_and_durations, reason)
+      return 'skipping this for now..'
     end
   end
 end
