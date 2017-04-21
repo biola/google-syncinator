@@ -23,10 +23,11 @@ class API::V1::PersonEmailsAPI < Grape::API
     params do
       requires :uuid, type: String
       requires :address, type: String
+      optional :primary, type: Boolean
     end
     post do
       # NOTE: We need the email object back so don't preform asynchronously here
-      email = Workers::CreatePersonEmail.new.perform(params[:uuid], params[:address])
+      email = Workers::CreatePersonEmail.new.perform(params[:uuid], params[:address], params[:primary])
 
       email = prep_email(email)
 

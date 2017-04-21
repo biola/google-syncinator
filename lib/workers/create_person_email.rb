@@ -9,13 +9,13 @@ module Workers
     # @param uuid [String] the UUID of the Trogdir person
     # @param address [String] the email address to create
     # @return [nil]
-    def perform(uuid, address)
+    def perform(uuid, address, primary = nil)
       person = TrogdirPerson.new(uuid)
       org_unit_path = OrganizationalUnit.path_for(person)
 
       email = PersonEmail.create! uuid: uuid, address: address if Enabled.write?
       Log.info %{Create PersonEmail for uuid: "#{uuid}" with address: "#{address}" }
-      Workers::Trogdir::CreateEmail.perform_async uuid, address
+      Workers::Trogdir::CreateEmail.perform_async uuid, address, primary
       Workers::LegacyEmailTable::Insert.perform_async(person.biola_id, address)
       GoogleAccount.new(address).create!(
         first_name: person.first_or_preferred_name,
