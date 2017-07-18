@@ -12,13 +12,23 @@ module Workers
     # Workers::HandleChange to process asynchronously
     # @return [nil]
     def perform
-      Log.info "[#{jid}] Starting job"
+      Log.info "[#{jid}] Starting Google Syncinator Handle Changes job"
 
       # TODO: if Trogdir ever gets a dry run feature for starting change syncs, it should be used here
-      response = change_syncs.start.perform
-      raise TrogdirAPIError, response.parse['error'] unless response.success?
+      hashes = []
+      response = []
 
-      hashes = Array(response.parse)
+      begin
+        loop do
+          response = change_syncs.start(limit: 10).perform
+          break if response.parse.blank?
+          raise TrogdirAPIError, response.parse['error'] unless response.success?
+
+          hashes += Array(response.parse)
+        end
+      rescue StandardError
+        Log.error "Error in HandleChanges: #{response.inspect}"
+      end
 
       # Keep processing batches until we run out
       changes_processed = if hashes.any?
@@ -48,3 +58,4 @@ module Workers
     end
   end
 end
+
