@@ -20,7 +20,7 @@ module Workers
 
       begin
         loop do
-          response = change_syncs.start(limit: 10).perform
+          response = change_syncs.start(limit: 100).perform
           break if response.parse.blank?
           raise TrogdirAPIError, response.parse['error'] unless response.success?
 
