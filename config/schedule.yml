@@ -1,11 +1,13 @@
+---
+{}
 ##############################
 ########## Changes ###########
 ##############################
 
-HandleChanges:
-  cron: "0 08-20 * * 1-5"
-  class: "Workers::HandleChanges"
-  queue: default
+# HandleChanges:
+#   cron: "0 08-20 * * 1-5"
+#   class: "Workers::HandleChanges"
+#   queue: default
 
 # CheckNeverActive:
 #   cron:  "0 1 * * 0" # 1am Sundays
